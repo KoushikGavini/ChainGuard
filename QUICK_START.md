@@ -10,22 +10,7 @@ git clone https://github.com/KoushikGavini/ChainGuard.git
 cd ChainGuard
 cargo install --path .
 
-# Option B: Download pre-built binary (Linux/macOS)
-# For Linux (amd64):
-curl -L https://github.com/KoushikGavini/ChainGuard/releases/latest/download/chainguard-linux-amd64 -o chainguard
-
-# For macOS (Intel):
-curl -L https://github.com/KoushikGavini/ChainGuard/releases/latest/download/chainguard-darwin-amd64 -o chainguard
-
-# For macOS (Apple Silicon):
-curl -L https://github.com/KoushikGavini/ChainGuard/releases/latest/download/chainguard-darwin-arm64 -o chainguard
-
-# For Windows:
-# Download chainguard-windows-amd64.exe from releases page
-
-# Make executable and install (Linux/macOS)
-chmod +x chainguard
-sudo mv chainguard /usr/local/bin/
+# Building from source is the only installation method
 
 # Verify it works
 chainguard --version

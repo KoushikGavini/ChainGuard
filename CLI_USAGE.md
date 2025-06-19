@@ -8,10 +8,7 @@ ChainGuard is a **command-line tool** for blockchain security analysis, designed
 # Install directly as a global CLI tool
 cargo install --path .
 
-# Or download pre-built binary and add to PATH
-wget https://github.com/KoushikGavini/ChainGuard/releases/latest/download/chainguard-linux-amd64
-chmod +x chainguard-linux-amd64
-sudo mv chainguard-linux-amd64 /usr/local/bin/chainguard
+# Building from source is required - no pre-built binaries available
 
 # Verify installation
 chainguard --version
