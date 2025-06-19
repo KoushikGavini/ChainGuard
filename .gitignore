@@ -1,0 +1,119 @@
+# Rust
+target/
+Cargo.lock
+**/*.rs.bk
+*.pdb
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+*.log
+
+# Project specific
+.chainguard-cache/
+chainguard.toml
+!chainguard.example.toml
+analysis-results/
+reports/
+*.json
+*.html
+*.pdf
+*.csv
+
+# API Keys and Secrets
+.env
+.env.local
+.env.*.local
+secrets/
+*.key
+*.pem
+
+# Test coverage
+tarpaulin-report.html
+cobertura.xml
+coverage/
+
+# Benchmarks
+bench_results/
+
+# Build artifacts
+dist/
+build/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Documentation
+docs/_build/
+docs/_static/
+docs/_templates/
+
+# Python (for any Python scripts)
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+env/
+
+# Node (for any JS tooling)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Profiling
+*.prof
+flamegraph.svg
+perf.data
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Archives
+*.tar
+*.tar.gz
+*.zip
+*.7z
+*.rar
+
+# Custom rules
+custom-rules/
+plugins/ 

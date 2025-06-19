@@ -1,0 +1,175 @@
+[package]
+name = "chainguard"
+version = "0.1.0"
+edition = "2021"
+authors = ["ChainGuard Team"]
+description = "Advanced command-line security analysis tool for blockchain platforms with Hyperledger Fabric specialization"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/KoushikGavini/ChainGuard"
+keywords = ["blockchain", "security", "hyperledger", "fabric", "cli"]
+categories = ["command-line-utilities", "development-tools"]
+readme = "README.md"
+homepage = "https://github.com/KoushikGavini/ChainGuard"
+
+# This is a binary crate (CLI tool), not a library
+[[bin]]
+name = "chainguard"
+path = "src/main.rs"
+
+# Disable library compilation - this is purely a CLI tool
+[lib]
+name = "chainguard"
+path = "src/lib.rs"
+
+[dependencies]
+# CLI and argument parsing
+clap = { version = "4.4", features = ["derive", "color", "suggestions", "env"] }
+indicatif = "0.17"
+console = "0.15"
+dialoguer = "0.11"
+colored = "2.1"
+
+# Async runtime
+tokio = { version = "1.35", features = ["full"] }
+futures = "0.3"
+rayon = "1.8"
+num_cpus = "1.16"
+async-trait = "0.1"
+
+# Go code parsing and analysis
+tree-sitter = "0.20"
+tree-sitter-go = "0.20"
+tree-sitter-javascript = "0.20"
+tree-sitter-typescript = "0.20"
+syn = "2.0"
+quote = "1.0"
+pest = "2.7"
+pest_derive = "2.7"
+
+# Configuration and serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+serde_yaml = "0.9"
+toml = "0.8"
+config = "0.13"
+quick-xml = { version = "0.31", features = ["serialize"] }
+
+# Date and time
+chrono = { version = "0.4", features = ["serde"] }
+
+# Security and crypto
+sha2 = "0.10"
+blake3 = "1.5"
+regex = "1.10"
+hex = "0.4"
+base64 = "0.21"
+
+# HTTP client for LLM APIs and package verification
+reqwest = { version = "0.11", features = ["json", "rustls-tls", "stream"] }
+hyper = "0.14"
+
+# LLM Integration
+openai-api-rs = "4.0"
+anthropic-sdk = "0.1"
+google-generativeai = "0.2"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Logging and telemetry
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+tracing-appender = "0.2"
+opentelemetry = "0.21"
+opentelemetry-jaeger = "0.20"
+
+# File handling
+walkdir = "2.4"
+ignore = "0.4"
+notify = "6.1"
+glob = "0.3"
+dirs = "5.0"
+
+# Report generation
+handlebars = "5.0"
+tera = "1.19"
+pdf = "0.8"
+pulldown-cmark = "0.9"
+printpdf = "0.6"
+lopdf = "0.31"
+
+# Database for tracking and caching
+rusqlite = { version = "0.30", features = ["bundled", "backup"] }
+diesel = { version = "2.1", features = ["sqlite", "r2d2"] }
+redis = "0.24"
+rocksdb = "0.21"
+
+# Formal verification and symbolic execution
+z3 = "0.12"
+smt2parser = "0.1"
+
+# Machine learning for anomaly detection
+candle-core = "0.3"
+candle-nn = "0.3"
+ort = "1.16"
+
+# WebAssembly support for sandboxed execution
+wasmtime = "16.0"
+wasmer = "4.2"
+
+# Git integration
+git2 = "0.18"
+gix = "0.56"
+
+# IDE integration
+lsp-types = "0.94"
+lsp-server = "0.7"
+
+# Testing and benchmarking
+pretty_assertions = "1.4"
+proptest = "1.4"
+quickcheck = "1.0"
+
+# Terminal UI enhancements
+ratatui = "0.25"
+crossterm = "0.27"
+
+# Parallel processing
+crossbeam = "0.8"
+dashmap = "5.5"
+
+# Metrics and monitoring
+prometheus = "0.13"
+metrics = "0.22"
+
+# Compression
+flate2 = "1.0"
+zstd = "0.13"
+
+# Cache
+cached = "0.47"
+moka = "0.12"
+
+# Plugin system
+libloading = "0.8"
+abi_stable = "0.11"
+
+[dev-dependencies]
+tempfile = "3.8"
+criterion = "0.5"
+mockito = "1.2"
+wiremock = "0.5"
+serial_test = "3.0"
+
+[profile.release]
+lto = true
+opt-level = 3
+codegen-units = 1
+strip = true
+
+[profile.dev]
+opt-level = 0
+
+[profile.test]
+opt-level = 0 
