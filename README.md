@@ -201,7 +201,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🤝 Integration
 
-### IDE Integration
+### IDE Integration [Coming Soon]
 - **VSCode**: Install the ChainGuard extension
 - **IntelliJ**: Available in JetBrains marketplace
 - **Vim**: Use the chainGuard.vim plugin
