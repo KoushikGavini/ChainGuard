@@ -7,12 +7,14 @@ pub mod erc20;
 pub mod erc721;
 pub mod erc1155;
 pub mod erc777;
+pub mod stablecoin;
 
 pub struct TokenStandardsValidator {
     erc20_validator: erc20::ERC20Validator,
     erc721_validator: erc721::ERC721Validator,
     erc1155_validator: erc1155::ERC1155Validator,
     erc777_validator: erc777::ERC777Validator,
+    stablecoin_validator: stablecoin::StablecoinValidator,
     loaded_standards: HashMap<String, Box<dyn TokenStandard>>,
 }
 
@@ -59,6 +61,7 @@ impl TokenStandardsValidator {
             erc721_validator: erc721::ERC721Validator::new(),
             erc1155_validator: erc1155::ERC1155Validator::new(),
             erc777_validator: erc777::ERC777Validator::new(),
+            stablecoin_validator: stablecoin::StablecoinValidator::new(),
             loaded_standards: HashMap::new(),
         }
     }
@@ -69,6 +72,7 @@ impl TokenStandardsValidator {
             "erc721" | "erc-721" => Box::new(self.erc721_validator.clone()),
             "erc1155" | "erc-1155" => Box::new(self.erc1155_validator.clone()),
             "erc777" | "erc-777" => Box::new(self.erc777_validator.clone()),
+            "stablecoin" | "stable" => Box::new(self.stablecoin_validator.clone()),
             _ => return Err(ChainGuardError::TokenStandard(
                 format!("Unknown token standard: {}", standard)
             )),

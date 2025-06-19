@@ -10,6 +10,7 @@ An advanced analysis and review platform for smart contracts and blockchain appl
 - **Review and Harden AI-Generated Code**: The core of ChainGuard. It's designed to help developers review, validate, and harden smart contracts produced by AI, catching subtle flaws, hallucinations, and vulnerabilities that models can introduce.
 - **Multi-LLM Consensus Analysis**: Plug in API keys for multiple LLM providers (ChatGPT, Claude, Gemini) to get a robust, consensus-based analysis. This is critical for validating the logic and security of AI-generated code.
 - **Comprehensive Smart Contract Auditing**: Goes beyond security to analyze for correctness, performance bottlenecks, and compliance with best practices.
+- **Stablecoin Security Analysis**: Specialized checks for stablecoin contracts including collateralization, oracle security, minting controls, flash loan protection, and peg stability mechanisms.
 - **Hyperledger Fabric Support**: Analysis of Fabric chaincode for common issues including nondeterministic operations (timestamps, randomness, global state), potential private data exposure, basic MVCC conflict detection, and platform-specific vulnerabilities.
 - **Performance & Optimization Insights**: Analyzes transaction throughput and storage efficiency, providing actionable, AI-powered suggestions for optimization.
 - **Flexible Reporting**: Generates detailed reports in JSON, Markdown, HTML, and SARIF to integrate seamlessly into your development and CI/CD workflows.
@@ -98,6 +99,7 @@ ChainGuard offers a rich set of commands for different analysis needs.
 | `analyze` | Comprehensive security, performance, and quality analysis. | `chainguard analyze --fabric ./my-chaincode/` |
 | `scan` | Quick scan for high-severity vulnerabilities. | `chainguard scan ./contracts/` |
 | `audit` | Check for compliance with standards like ERC-20. | `chainguard audit --standards erc20 ./token.sol` |
+| `audit` | Check stablecoin-specific security issues. | `chainguard audit --standards stablecoin ./stablecoin.sol` |
 | `validate` | Use multiple LLMs to review and validate code for correctness. | `chainguard validate --consensus ./contract.go` |
 | `benchmark` | Analyze performance metrics like throughput and storage. | `chainguard benchmark --throughput ./chaincode/` |
 | `report` | Generate a detailed report from a previous analysis. | `chainguard report results.json -o report.html` |
@@ -180,6 +182,32 @@ We welcome contributions! Please read our `CONTRIBUTING.md` for details on how t
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🏦 Stablecoin Security
+
+ChainGuard includes comprehensive security checks specifically designed for stablecoin contracts:
+
+### Key Stablecoin Checks:
+- **Collateralization**: Verifies proper collateral ratio tracking and minimum thresholds
+- **Oracle Security**: Detects vulnerable price feeds, single oracle dependencies, and manipulation risks
+- **Minting Controls**: Ensures proper access control and supply limits on token creation
+- **Emergency Mechanisms**: Checks for pause functionality and timelock governance
+- **Peg Stability**: Validates rebalancing mechanisms and redemption functionality
+- **Flash Loan Protection**: Identifies reentrancy vulnerabilities and price manipulation risks
+- **Reserve Management**: Ensures multi-signature controls and transparent tracking
+- **Liquidation Logic**: Verifies proper liquidation mechanisms and incentives
+
+### Example Usage:
+```bash
+# Analyze a stablecoin contract
+chainguard analyze --standards stablecoin ./my-stablecoin.sol
+
+# The analysis will identify issues like:
+# - STABLE-COLLAT-001: Missing collateralization mechanism
+# - STABLE-ORACLE-001: Unprotected oracle price feed
+# - STABLE-MINT-001: Unrestricted minting capability
+# - STABLE-FLASH-001: Missing reentrancy protection
+```
 
 ## 🔍 Analysis Categories
 
