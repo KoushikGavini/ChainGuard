@@ -23,6 +23,7 @@ Thumbs.db
 .chainguard-cache/
 chainguard.toml
 !chainguard.example.toml
+auth.toml
 analysis-results/
 reports/
 *.json
