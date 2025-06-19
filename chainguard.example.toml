@@ -1,0 +1,174 @@
+# ChainGuard Configuration Example
+# Copy this file to chainguard.toml and customize for your needs
+
+[analysis]
+# Enable parallel analysis for faster processing
+parallel_analysis = true
+
+# Number of threads to use (defaults to CPU count)
+max_threads = 8
+
+# Enable AI-powered validation
+enable_ai_validation = true
+
+# Enable performance analysis
+enable_performance_analysis = true
+
+# Minimum severity level to report
+severity_threshold = "low"
+
+# Default output format
+output_format = "table"
+
+# Path to custom rules (optional)
+custom_rules_path = "./custom-rules"
+
+# Enable caching for faster subsequent runs
+cache_enabled = true
+
+# Cache directory (defaults to system temp)
+cache_dir = ".chainguard-cache"
+
+# Enable incremental analysis
+incremental_analysis = true
+
+[fabric]
+# Enable Hyperledger Fabric specific analysis
+enabled = true
+
+# Check for determinism violations
+check_determinism = true
+
+# Validate endorsement policies
+check_endorsement = true
+
+# Check for private data leaks
+check_private_data = true
+
+# Validate MVCC compliance
+check_mvcc = true
+
+# Channel isolation checks
+check_channel_isolation = true
+
+[ai]
+# AI models to use for analysis
+models = ["chatgpt", "claude", "gemini"]
+
+# Consensus threshold (0.0 - 1.0)
+# Higher values require more AI models to agree
+consensus_threshold = 0.7
+
+# Cache AI responses to reduce API calls
+cache_responses = true
+
+# Enable prompt injection protection
+prompt_injection_protection = true
+
+# Timeout for AI requests (seconds)
+timeout_seconds = 30
+
+# Maximum retries for failed AI requests
+max_retries = 3
+
+[token_standards]
+# Token standards to validate against
+validate = ["erc20", "erc721", "erc1155", "erc777"]
+
+# Strict mode - fail on any deviation from standard
+strict_mode = false
+
+# Check for security best practices
+security_checks = true
+
+[performance]
+# Transaction throughput threshold (TPS)
+min_throughput = 100
+
+# Maximum acceptable latency (ms)
+max_latency = 1000
+
+# Storage efficiency threshold (%)
+min_storage_efficiency = 80
+
+# Consensus overhead threshold (ms)
+max_consensus_overhead = 100
+
+[security]
+# Enable all security checks
+enable_all = true
+
+# Specific security checks
+check_hardcoded_secrets = true
+check_weak_crypto = true
+check_access_control = true
+check_input_validation = true
+check_injection = true
+check_dos_vulnerabilities = true
+
+[compliance]
+# Compliance frameworks to check against
+frameworks = ["owasp", "nist", "iso27001", "cis"]
+
+# Generate compliance reports
+generate_reports = true
+
+# Fail on compliance violations
+strict_compliance = false
+
+[reporting]
+# Report templates directory
+templates_dir = "./templates"
+
+# Include code snippets in reports
+include_code_snippets = true
+
+# Include remediation guidance
+include_remediation = true
+
+# Include references and links
+include_references = true
+
+# Maximum findings per category
+max_findings_per_category = 50
+
+[integration]
+# Git integration
+git_enabled = true
+
+# IDE integration
+ide_support = true
+
+# CI/CD integration
+ci_mode = false
+
+# Webhook URL for notifications
+webhook_url = ""
+
+[rules]
+# Rule categories to enable
+enabled_categories = ["security", "performance", "compliance", "quality"]
+
+# Specific rules to disable (by ID)
+disabled_rules = []
+
+# Custom rule definitions
+[[rules.custom]]
+id = "CUSTOM-001"
+category = "security"
+severity = "high"
+title = "Custom security check"
+pattern = "customPattern\\("
+description = "Detects usage of deprecated custom pattern"
+remediation = "Use the new secure pattern instead"
+
+[plugins]
+# Plugin directory
+plugin_dir = "./plugins"
+
+# Enabled plugins
+enabled = []
+
+# Plugin configuration
+[plugins.config]
+# Plugin-specific configuration goes here 
