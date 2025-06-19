@@ -69,9 +69,9 @@ reqwest = { version = "0.11", features = ["json", "rustls-tls", "stream"] }
 hyper = "0.14"
 
 # LLM Integration
-openai-api-rs = "4.0"
-anthropic-sdk = "0.1"
-google-generativeai = "0.2"
+# openai-api-rs = "4.0" # Commented out for now
+# anthropic-sdk = "0.1" # Commented out for now
+# google-generativeai = "0.2" # Not available yet, commented out for now
 
 # Error handling
 anyhow = "1.0"
@@ -119,8 +119,8 @@ wasmtime = "16.0"
 wasmer = "4.2"
 
 # Git integration
-git2 = "0.18"
-gix = "0.56"
+# git2 = "0.18" # Temporarily disabled for compatibility
+# gix = "0.56" # Temporarily disabled for compatibility
 
 # IDE integration
 lsp-types = "0.94"
