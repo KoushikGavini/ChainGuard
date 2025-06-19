@@ -77,6 +77,18 @@ pub enum Severity {
     Info,
 }
 
+impl std::fmt::Display for Severity {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Severity::Critical => write!(f, "Critical"),
+            Severity::High => write!(f, "High"),
+            Severity::Medium => write!(f, "Medium"),
+            Severity::Low => write!(f, "Low"),
+            Severity::Info => write!(f, "Info"),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Finding {
     pub id: String,
@@ -90,7 +102,6 @@ pub struct Finding {
     pub code_snippet: Option<String>,
     pub remediation: Option<String>,
     pub references: Vec<String>,
-    pub confidence: f32,
     pub ai_consensus: Option<AIConsensus>,
 }
 
@@ -199,4 +210,16 @@ pub mod types {
     }
 }
 
-pub use types::*; 
+pub use types::*;
+
+impl From<toml::ser::Error> for ChainGuardError {
+    fn from(e: toml::ser::Error) -> Self {
+        ChainGuardError::Config(e.to_string())
+    }
+}
+
+impl From<dialoguer::Error> for ChainGuardError {
+    fn from(e: dialoguer::Error) -> Self {
+        ChainGuardError::Io(std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))
+    }
+} 

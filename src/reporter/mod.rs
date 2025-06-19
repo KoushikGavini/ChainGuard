@@ -111,7 +111,7 @@ impl Reporter {
             medium_findings: findings.iter().filter(|f| f.severity == Severity::Medium).count(),
             low_findings: findings.iter().filter(|f| f.severity == Severity::Low).count(),
             info_findings: findings.iter().filter(|f| f.severity == Severity::Info).count(),
-            security_score: results.compliance_score,
+            security_score: results.compliance_score as f64,
             ai_validation_score: 100.0,
             complexity_score: 100.0,
         };
@@ -151,8 +151,7 @@ impl Reporter {
                     code_snippet: None,
                     remediation: None,
                     references: vec![],
-                    confidence: 0.8,
-                    ai_consensus: None,
+                    ai_consensus: None
                 });
             }
             
@@ -213,7 +212,6 @@ impl Reporter {
                     suggestion.code_before, suggestion.code_after)),
                 remediation: Some(suggestion.explanation.clone()),
                 references: vec![],
-                confidence: 0.9,
                 ai_consensus: None,
             });
             

@@ -248,8 +248,7 @@ impl Auditor {
                     code_snippet: None,
                     remediation: Some("Implement GetCreator() validation".to_string()),
                     references: vec![],
-                    confidence: 0.8,
-                    ai_consensus: None,
+                    ai_consensus: None
                 });
             }
             
@@ -266,8 +265,7 @@ impl Auditor {
                     code_snippet: None,
                     remediation: Some("Use GetTxTimestamp() instead".to_string()),
                     references: vec![],
-                    confidence: 1.0,
-                    ai_consensus: None,
+                    ai_consensus: None
                 });
             }
         }
@@ -293,7 +291,6 @@ impl Auditor {
             code_snippet: None,
             remediation: None,
             references: vec![],
-            confidence: 0.9,
             ai_consensus: None,
         }
     }

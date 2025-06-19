@@ -84,6 +84,7 @@ impl DependencyAnalyzer {
                     references: vec![
                         "https://hyperledger-fabric.readthedocs.io/en/latest/chaincode4ade.html#external-dependencies".to_string()
                     ],
+                    ai_consensus: None,
                 });
             }
         }
@@ -139,6 +140,7 @@ impl DependencyAnalyzer {
                     code_snippet: None,
                     remediation: Some(format!("Remove import of '{}' package", pkg)),
                     references: vec![],
+                    ai_consensus: None,
                 });
             }
         }
@@ -160,6 +162,7 @@ impl DependencyAnalyzer {
                     code_snippet: None,
                     remediation: Some("Ensure third-party dependencies are deterministic and secure".to_string()),
                     references: vec![],
+                    ai_consensus: None,
                 });
             }
         }
@@ -190,6 +193,7 @@ impl DependencyAnalyzer {
                     code_snippet: Some(extract_snippet(content, line_number)),
                     remediation: Some("Remove unsafe operations from chaincode".to_string()),
                     references: vec![],
+                    ai_consensus: None
                 });
             }
         }

@@ -4,10 +4,11 @@ use chainguard::{
     analyzer::Analyzer,
     validator::Validator,
     reporter::Reporter,
-    llm::LLMManager,
-    fabric::FabricAnalyzer,
+    rules::RuleManager,
     token_standards::TokenStandardsValidator,
-    AnalysisConfig, OutputFormat, Result, Severity,
+    fabric::FabricAnalyzer,
+    llm::LLMManager,
+    Severity, AnalysisConfig, OutputFormat, Result, ChainGuardError,
 };
 use indicatif::{ProgressBar, ProgressStyle, MultiProgress};
 use std::path::PathBuf;
@@ -687,7 +688,7 @@ async fn analyze_command(
     );
     
     progress.set_message("Initializing analyzer...");
-    let analyzer = Analyzer::new();
+    let mut analyzer = Analyzer::new();
     
     progress.set_message("Initializing validator...");
     let validator = Validator::new().await?;
@@ -805,7 +806,7 @@ async fn init_command(config_path: PathBuf, platform: Option<String>, examples: 
     
     let config = AnalysisConfig::default();
     let content = toml::to_string_pretty(&config)
-        .map_err(|e| fabricguard::FabricGuardError::Config(e.to_string()))?;
+        .map_err(|e| ChainGuardError::Config(e.to_string()))?;
     
     tokio::fs::write(&config_path, content).await?;
     
@@ -914,14 +915,14 @@ async fn audit_command(
     
     if !standards.is_empty() {
         progress.set_message("Loading token standards...");
-        let token_validator = TokenStandardsValidator::new();
+        let mut token_validator = TokenStandardsValidator::new();
         for standard in &standards {
             token_validator.load_standard(standard)?;
         }
     }
     
     if let Some(ref fw) = framework {
-        progress.set_message(&format!("Loading {} framework...", fw));
+        progress.set_message("Loading framework...");
         auditor.load_framework(fw)?;
     }
     
@@ -1127,7 +1128,7 @@ async fn auth_command(command: AuthCommands) -> Result<()> {
             if let Some(svc) = service {
                 println!("Testing connection to {}...", svc);
                 match auth_manager.test_connection(&svc).await {
-                    Ok(_) => println!("✅ {} connection successful"),
+                    Ok(_) => println!("✅ {} connection successful", svc),
                     Err(e) => println!("❌ {} connection failed: {}", svc, e),
                 }
             } else {
@@ -1228,13 +1229,13 @@ async fn load_config(path: &PathBuf) -> Result<AnalysisConfig> {
     
     let config = if path.extension().map_or(false, |ext| ext == "yaml" || ext == "yml") {
         serde_yaml::from_str(&content)
-            .map_err(|e| chainguard::ChainGuardError::Config(e.to_string()))?
+            .map_err(|e| ChainGuardError::Config(e.to_string()))?
     } else if path.extension().map_or(false, |ext| ext == "json") {
         serde_json::from_str(&content)
-            .map_err(|e| chainguard::ChainGuardError::Config(e.to_string()))?
+            .map_err(|e| ChainGuardError::Config(e.to_string()))?
     } else {
         toml::from_str(&content)
-            .map_err(|e| chainguard::ChainGuardError::Config(e.to_string()))?
+            .map_err(|e| ChainGuardError::Config(e.to_string()))?
     };
     
     Ok(config)

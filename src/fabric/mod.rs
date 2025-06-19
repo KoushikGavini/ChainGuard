@@ -10,7 +10,6 @@ pub mod state_db;
 pub mod private_data;
 pub mod performance;
 
-#[derive(Debug, Clone)]
 pub struct FabricAnalyzer {
     parser: Parser,
     determinism_analyzer: determinism::DeterminismAnalyzer,
@@ -36,7 +35,7 @@ impl FabricAnalyzer {
         })
     }
     
-    pub async fn analyze_chaincode(&self, path: &Path) -> Result<FabricAnalysisResult> {
+    pub async fn analyze_chaincode(&mut self, path: &Path) -> Result<FabricAnalysisResult> {
         let content = tokio::fs::read_to_string(path).await?;
         let mut findings = Vec::new();
         
@@ -75,11 +74,12 @@ impl FabricAnalyzer {
         findings.extend(performance_issues);
         
         Ok(FabricAnalysisResult {
-            findings,
+            findings: findings.clone(),
             determinism_score: self.calculate_determinism_score(&findings),
             security_score: self.calculate_security_score(&findings),
             performance_score: self.calculate_performance_score(&findings),
             fabric_best_practices_score: self.calculate_best_practices_score(&findings),
+            optimization_suggestions: Vec::new(),
         })
     }
     
@@ -120,7 +120,6 @@ impl FabricAnalyzer {
                     references: vec![
                         "https://hyperledger-fabric.readthedocs.io/en/latest/chaincode4ade.html#chaincode-determinism".to_string()
                     ],
-                    confidence: 1.0,
                     ai_consensus: None,
                 });
             }
@@ -175,7 +174,6 @@ impl FabricAnalyzer {
                             "Store state in the ledger using stub.PutState() instead of global variables".to_string()
                         ),
                         references: vec![],
-                        confidence: 0.95,
                         ai_consensus: None,
                     });
                 }
@@ -219,8 +217,7 @@ impl FabricAnalyzer {
                     references: vec![
                         "https://hyperledger-fabric.readthedocs.io/en/latest/couchdb_as_state_database.html".to_string()
                     ],
-                    confidence: 0.9,
-                    ai_consensus: None,
+                    ai_consensus: None
                 });
             }
         }
@@ -252,9 +249,8 @@ impl FabricAnalyzer {
                     "Implement proper access control using stub.GetCreator() and validate MSP IDs".to_string()
                 ),
                 references: vec![],
-                confidence: 0.85,
-                ai_consensus: None,
-            });
+                ai_consensus: None
+                });
         }
         
         Ok(findings)
@@ -298,9 +294,8 @@ impl FabricAnalyzer {
                                 "Use PutPrivateData() to store private data, not PutState()".to_string()
                             ),
                             references: vec![],
-                            confidence: 0.8,
-                            ai_consensus: None,
-                        });
+                            ai_consensus: None
+                });
                         break;
                     }
                 }
@@ -341,8 +336,7 @@ impl FabricAnalyzer {
                         "Minimize the number of GetState calls and consider transaction ordering".to_string()
                     ),
                     references: vec![],
-                    confidence: 0.7,
-                    ai_consensus: None,
+                    ai_consensus: None
                 });
             }
         }
@@ -385,9 +379,8 @@ impl FabricAnalyzer {
                             "Add explicit bounds checking and limits to all loops".to_string()
                         ),
                         references: vec![],
-                        confidence: 0.75,
-                        ai_consensus: None,
-                    });
+                        ai_consensus: None
+                });
                 }
             }
         }
@@ -419,8 +412,7 @@ impl FabricAnalyzer {
                         "Use pagination with GetStateByRangeWithPagination() to limit result size".to_string()
                     ),
                     references: vec![],
-                    confidence: 0.85,
-                    ai_consensus: None,
+                    ai_consensus: None
                 });
             }
         }
@@ -462,9 +454,8 @@ impl FabricAnalyzer {
                     "Verify that channel-specific data is properly isolated".to_string()
                 ),
                 references: vec![],
-                confidence: 0.6,
-                ai_consensus: None,
-            });
+                ai_consensus: None
+                });
         }
         
         Ok(findings)
@@ -555,4 +546,5 @@ pub struct FabricAnalysisResult {
     pub security_score: f32,
     pub performance_score: f32,
     pub fabric_best_practices_score: f32,
+    pub optimization_suggestions: Vec<String>,
 } 

@@ -1,4 +1,4 @@
-use crate::{Finding, Result, Severity, FabricGuardError};
+use crate::{Finding, Result, Severity, ChainGuardError};
 use regex::Regex;
 use std::path::Path;
 use tree_sitter::{Parser, Query, QueryCursor};
@@ -133,7 +133,7 @@ impl SecurityAnalyzer {
         let patterns = vec![
             SecurityPattern {
                 id: "SEC-VULN-001".to_string(),
-                pattern: Regex::new(r"(?i)(password|secret|key)\s*=\s*[\"'][^\"']+[\"']").unwrap(),
+                pattern: Regex::new(r#"(?i)(password|secret|key)\s*=\s*["'][^"']+["']"#).unwrap(),
                 severity: Severity::Critical,
                 title: "Hardcoded credentials detected".to_string(),
                 description: "Hardcoded passwords or secrets found in code".to_string(),
@@ -182,7 +182,7 @@ impl SecurityAnalyzer {
         }
     }
 
-    pub fn analyze(&self, content: &str, path: &Path) -> Result<Vec<Finding>> {
+    pub fn analyze(&mut self, content: &str, path: &Path) -> Result<Vec<Finding>> {
         let mut findings = Vec::new();
         
         // Check for nondeterminism patterns
@@ -203,17 +203,18 @@ impl SecurityAnalyzer {
                     references: vec![
                         "https://hyperledger-fabric.readthedocs.io/en/latest/chaincode4ade.html".to_string()
                     ],
+                    ai_consensus: None,
                 });
             }
         }
         
         // Check for concurrency issues using tree-sitter
         let tree = self.parser.parse(content, None)
-            .ok_or_else(|| FabricGuardError::Parse("Failed to parse Go code".to_string()))?;
+            .ok_or_else(|| ChainGuardError::Parse("Failed to parse Go code".to_string()))?;
         
         for pattern in &self.concurrency_patterns {
             let query = Query::new(tree_sitter_go::language(), &pattern.query)
-                .map_err(|e| FabricGuardError::Parse(format!("Invalid query: {}", e)))?;
+                .map_err(|e| ChainGuardError::Parse(format!("Invalid query: {}", e)))?;
             
             let mut cursor = QueryCursor::new();
             let matches = cursor.matches(&query, tree.root_node(), content.as_bytes());
@@ -233,6 +234,7 @@ impl SecurityAnalyzer {
                         code_snippet: Some(extract_code_snippet(content, start.row + 1, 3)),
                         remediation: Some("Ensure chaincode execution is deterministic".to_string()),
                         references: vec![],
+                        ai_consensus: None,
                     });
                 }
             }
@@ -254,6 +256,7 @@ impl SecurityAnalyzer {
                     code_snippet: Some(extract_code_snippet(content, line_number, 3)),
                     remediation: Some("Review ledger interaction patterns".to_string()),
                     references: vec![],
+                    ai_consensus: None,
                 });
             }
         }
@@ -290,8 +293,7 @@ impl SecurityAnalyzer {
                     code_snippet: Some(self.get_code_snippet(content, line)),
                     remediation: Some(pattern.remediation.clone()),
                     references: vec![],
-                    confidence: 0.9,
-                    ai_consensus: None,
+                    ai_consensus: None
                 });
             }
         }
@@ -324,7 +326,6 @@ impl SecurityAnalyzer {
                     code_snippet: None,
                     remediation: Some("Use strong cryptographic algorithms like SHA-256 or AES".to_string()),
                     references: vec!["https://owasp.org/www-project-cryptographic-storage-cheat-sheet/".to_string()],
-                    confidence: 0.95,
                     ai_consensus: None,
                 });
             }
@@ -355,9 +356,8 @@ impl SecurityAnalyzer {
                 code_snippet: None,
                 remediation: Some("Implement proper authentication and authorization checks".to_string()),
                 references: vec![],
-                confidence: 0.7,
-                ai_consensus: None,
-            });
+                ai_consensus: None
+                });
         }
         
         Ok(findings)
@@ -390,9 +390,8 @@ impl SecurityAnalyzer {
                 code_snippet: None,
                 remediation: Some("Validate and sanitize all user inputs".to_string()),
                 references: vec!["https://owasp.org/www-project-input-validation-cheat-sheet/".to_string()],
-                confidence: 0.75,
-                ai_consensus: None,
-            });
+                ai_consensus: None
+                });
         }
         
         Ok(findings)

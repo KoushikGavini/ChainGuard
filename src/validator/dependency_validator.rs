@@ -63,6 +63,7 @@ impl DependencyValidator {
                     code_snippet: None,
                     remediation: Some("Use valid package names from official repositories".to_string()),
                     references: vec![],
+                    ai_consensus: None,
                 });
             }
             
@@ -81,6 +82,7 @@ impl DependencyValidator {
                         code_snippet: None,
                         remediation: Some(format!("Update {} to a patched version", vuln.package)),
                         references: vec![vuln.cve.clone()],
+                        ai_consensus: None,
                     });
                 }
             }
@@ -99,6 +101,7 @@ impl DependencyValidator {
                     code_snippet: None,
                     remediation: Some("Ensure package paths follow Go module conventions".to_string()),
                     references: vec![],
+                    ai_consensus: None,
                 });
             }
         }

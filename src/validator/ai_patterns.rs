@@ -113,6 +113,7 @@ impl AIPatternValidator {
                     references: vec![
                         "https://hyperledger-fabric.readthedocs.io/en/latest/".to_string()
                     ],
+                    ai_consensus: None,
                 });
             }
         }
@@ -133,6 +134,7 @@ impl AIPatternValidator {
                     code_snippet: Some(extract_snippet(content, line_number)),
                     remediation: Some("Review and complete the implementation".to_string()),
                     references: vec![],
+                    ai_consensus: None,
                 });
             }
         }
@@ -169,6 +171,7 @@ impl AIPatternValidator {
                     code_snippet: Some(pattern.to_string()),
                     remediation: Some("Review repeated patterns for necessary refactoring".to_string()),
                     references: vec![],
+                    ai_consensus: None,
                 });
             }
         }
@@ -194,7 +197,8 @@ impl AIPatternValidator {
                 code_snippet: None,
                 remediation: Some("Ensure code has been properly reviewed by humans".to_string()),
                 references: vec![],
-            });
+                    ai_consensus: None
+                });
         }
     }
 }

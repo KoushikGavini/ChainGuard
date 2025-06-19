@@ -119,7 +119,7 @@ impl Benchmarker {
     pub async fn analyze_storage(&self, path: &Path) -> Result<StorageResult> {
         let content = tokio::fs::read_to_string(path).await?;
         
-        let mut efficiency = 100.0;
+        let mut efficiency: f32 = 100.0;
         let mut index_usage = Vec::new();
         
         // Analyze data structures
@@ -150,7 +150,7 @@ impl Benchmarker {
         let estimated_state_size = put_state_count as u64 * 1024; // Assume 1KB per state entry
         
         Ok(StorageResult {
-            efficiency: efficiency.max(0.0),
+            efficiency: efficiency.max(0.0_f32),
             state_size_bytes: estimated_state_size,
             query_performance_ms: if efficiency > 80.0 { 10.0 } else { 50.0 },
             index_usage,
@@ -232,7 +232,7 @@ impl Benchmarker {
         }
         
         if let Some(ref consensus) = results.consensus {
-            let consensus_score = (100.0 - consensus.overhead_ms).max(0.0);
+            let consensus_score = (100.0 - consensus.overhead_ms).max(0.0_f32);
             score = (score + consensus_score) / 2.0;
             factors += 1;
         }

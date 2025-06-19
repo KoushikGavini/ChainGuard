@@ -8,7 +8,6 @@ pub mod erc721;
 pub mod erc1155;
 pub mod erc777;
 
-#[derive(Debug, Clone)]
 pub struct TokenStandardsValidator {
     erc20_validator: erc20::ERC20Validator,
     erc721_validator: erc721::ERC721Validator,
@@ -97,7 +96,7 @@ impl TokenStandardsValidator {
         
         Ok(TokenValidationResult {
             findings: all_findings,
-            compliance_results,
+            compliance_results: compliance_results.clone(),
             overall_score: self.calculate_overall_score(&compliance_results),
         })
     }
@@ -147,7 +146,6 @@ impl TokenStandardsValidator {
                         func_name
                     )),
                     references: vec![],
-                    confidence: 0.95,
                     ai_consensus: None,
                 });
             }
@@ -187,7 +185,6 @@ impl TokenStandardsValidator {
                         event_name
                     )),
                     references: vec![],
-                    confidence: 0.9,
                     ai_consensus: None,
                 });
             }
@@ -217,9 +214,8 @@ impl TokenStandardsValidator {
                     "Implement safe arithmetic operations with overflow checks".to_string()
                 ),
                 references: vec![],
-                confidence: 0.85,
-                ai_consensus: None,
-            });
+                ai_consensus: None
+                });
         }
         
         // Check for access control
@@ -240,9 +236,8 @@ impl TokenStandardsValidator {
                     "Implement role-based access control for administrative functions".to_string()
                 ),
                 references: vec![],
-                confidence: 0.8,
-                ai_consensus: None,
-            });
+                ai_consensus: None
+                });
         }
         
         Ok(findings)

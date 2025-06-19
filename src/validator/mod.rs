@@ -81,6 +81,7 @@ impl Validator {
                     code_snippet: None,
                     remediation: Some("Verify the import path is correct and from a trusted source".to_string()),
                     references: vec![],
+                    ai_consensus: None,
                 });
             }
         }
