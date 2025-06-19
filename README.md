@@ -259,11 +259,6 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
-
-- Hyperledger Fabric community
-- OpenAI, Anthropic, and Google for AI capabilities
-- Rust community for excellent tooling
 
 ## 📞 Support
 
@@ -273,4 +268,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**ChainGuard** - Securing the future of blockchain, one smart contract at a time. 🚀 
+**ChainGuard** - Securing the future of blockchain, one smart contract at a time. 
