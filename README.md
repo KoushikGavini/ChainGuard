@@ -1,228 +1,185 @@
 # ChainGuard 🛡️
 
-Advanced security analysis for blockchain platforms with specialized Hyperledger Fabric support.
+An advanced analysis and review platform for smart contracts and blockchain applications. ChainGuard is designed for the modern development workflow, providing the tools to ensure that any code—whether human-written or AI-generated—is secure, efficient, and correct. It includes specialized support for Hyperledger Fabric chaincode alongside broad capabilities for other platforms.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=flat&logo=rust&logoColor=white)](https://www.rust-lang.org/)
 
-## 🚀 Features
+## Key Features
 
-### Hyperledger Fabric Specialization
-- **Comprehensive chaincode analysis** for Go, JavaScript, and TypeScript
-- **Nondeterminism detection** to ensure consensus compatibility
-- **Rich query vulnerability analysis** for CouchDB implementations
-- **Global variable misuse detection** preventing state corruption
-- **Endorsement policy compliance** validation
-- **Private data security** assessment with leakage detection
-- **MVCC compliance** checking for concurrent transactions
-- **DoS vulnerability** detection in chaincode implementations
-- **Channel isolation** security analysis
+- **Review and Harden AI-Generated Code**: The core of ChainGuard. It's designed to help developers review, validate, and harden smart contracts produced by AI, catching subtle flaws, hallucinations, and vulnerabilities that models can introduce.
+- **Multi-LLM Consensus Analysis**: Plug in API keys for multiple LLM providers (ChatGPT, Claude, Gemini) to get a robust, consensus-based analysis. This is critical for validating the logic and security of AI-generated code.
+- **Comprehensive Smart Contract Auditing**: Goes beyond security to analyze for correctness, performance bottlenecks, and compliance with best practices.
+- **Hyperledger Fabric Support**: Analysis of Fabric chaincode for common issues including nondeterministic operations (timestamps, randomness, global state), potential private data exposure, basic MVCC conflict detection, and platform-specific vulnerabilities.
+- **Performance & Optimization Insights**: Analyzes transaction throughput and storage efficiency, providing actionable, AI-powered suggestions for optimization.
+- **Flexible Reporting**: Generates detailed reports in JSON, Markdown, HTML, and SARIF to integrate seamlessly into your development and CI/CD workflows.
 
-### AI-Powered Code Validation 🤖
-- **Multi-LLM integration** with ChatGPT, Claude, and Gemini
-- **AI-generated code validation** with determinism checking
-- **Hallucination detection** for non-existent dependencies
-- **Real-time validation feedback** during development
-- **Multi-model consensus** for critical findings
-- **Confidence scoring** based on AI agreement levels
-- **Interactive AI assistant** for code explanations
-- **Automated fix generation** with AI explanations
-
-💡 **See [AI Features Guide](AI_FEATURES_GUIDE.md) for setup and usage**
-
-### Token Standards Compliance
-- **ERC-20** token standard validation
-- **ERC-721** NFT implementation checking
-- **ERC-1155** multi-token standard compliance
-- **ERC-777** advanced token features validation
-- **Fabric-adapted** token standards support
-
-### Security Analysis
-- **Traditional vulnerabilities**: reentrancy, overflow, underflow
-- **Access control** vulnerability detection
-- **Business logic** flaw identification
-- **Cryptographic** implementation assessment
-- **Transaction ordering** dependency analysis
-- **Input validation** checking
-
-### Performance & Optimization
-- **Transaction throughput** analysis
-- **State storage** efficiency evaluation
-- **Consensus mechanism** impact assessment
-- **Memory usage** pattern analysis
-- **AI-powered** optimization suggestions
-
-## 📦 Installation
+## Installation
 
 ### Prerequisites
-- Rust 1.70+ (install from [rustup.rs](https://rustup.rs/))
-- Git
-- Optional: Docker for containerized execution
+- **Rust (1.70+):** Install via [rustup.rs](https://rustup.rs/).
+- **Git:** For cloning the repository.
+- **Z3 Solver (for formal verification):**
+  ```bash
+  # macOS
+  brew install z3
+  # Ubuntu/Debian
+  sudo apt-get install z3
+  ```
 
 ### Build from Source
+Building from source is the recommended way to install ChainGuard.
+
 ```bash
-# Clone the repository
+# 1. Clone the repository
 git clone https://github.com/KoushikGavini/ChainGuard.git
 cd ChainGuard
 
-# Build the project
+# 2. Build the release binary
 cargo build --release
 
-# Install globally
+# The executable will be at ./target/release/chainguard
+./target/release/chainguard --version
+```
+
+For convenience, you can add the target directory to your path or install it globally:
+```bash
+# Install globally using cargo
 cargo install --path .
+
+# Now you can run it from anywhere
+chainguard --version
 ```
 
-### Building from Source is Required
-Since this is a source distribution, you'll need to build ChainGuard using Cargo.
+## Getting Started: A Quick Example
 
-## 🔧 Configuration
+Once installed, you can immediately run a scan on the provided test file to see ChainGuard in action.
 
-### Initialize Configuration
-```bash
-chainguard init
-```
+### Run Your First Scan
 
-### Configure AI Services (Required for AI Features)
-
-API keys are stored securely in `~/.chainguard/auth.toml` with restricted permissions.
+From the root of the project directory, run the following command after building the tool:
 
 ```bash
-# Set API keys for AI services
-chainguard auth set openai --key YOUR_OPENAI_API_KEY
-chainguard auth set claude --key YOUR_ANTHROPIC_API_KEY
-chainguard auth set gemini --key YOUR_GOOGLE_API_KEY
-
-# Test connections
-chainguard auth test --all
-
-# List configured services
-chainguard auth list
+./target/release/chainguard analyze test_chaincode.go --fabric
 ```
 
-📖 See [AI Features Guide](AI_FEATURES_GUIDE.md) for complete setup instructions
+This command analyzes the sample Go chaincode file (`test_chaincode.go`) using ChainGuard's Hyperledger Fabric-specific rules.
 
-### Example Configuration (chainguard.toml)
-```toml
-[analysis]
-parallel_analysis = true
-max_threads = 8
-enable_ai_validation = true
-severity_threshold = "medium"
+### Expected Output
 
-[fabric]
-enabled = true
-check_determinism = true
-check_endorsement = true
+You will see a summary of the findings directly in your terminal, similar to this:
 
-[ai]
-models = ["chatgpt", "claude", "gemini"]
-consensus_threshold = 0.7
-cache_responses = true
+```text
+🔍 Chainguard Analysis
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+...
+ChainGuard Analysis Report
+==========================
+Total Findings: 2
+Critical: 0 | High: 2 | Medium: 0 | Low: 0 | Info: 0
 
-[token_standards]
-validate = ["erc20", "erc721"]
+[High] SEC-ND-TIMESTAMP_USAGE - Nondeterministic pattern: timestamp_usage
+  File: test_chaincode.go:1
+  System timestamps are non-deterministic across peers
+
+[High] SEC-ACCESS-001 - Missing access control implementation
+  File: test_chaincode.go:1
+  No authentication or authorization checks found
 ```
 
-## 🎯 Usage
+This gives you immediate feedback that the tool is working correctly. You can now point ChainGuard at your own projects.
 
-### Basic Commands
+## Common Commands
 
-#### Comprehensive Analysis
+ChainGuard offers a rich set of commands for different analysis needs.
+
+| Command | Description | Example |
+|---|---|---|
+| `analyze` | Comprehensive security, performance, and quality analysis. | `chainguard analyze --fabric ./my-chaincode/` |
+| `scan` | Quick scan for high-severity vulnerabilities. | `chainguard scan ./contracts/` |
+| `audit` | Check for compliance with standards like ERC-20. | `chainguard audit --standards erc20 ./token.sol` |
+| `validate` | Use multiple LLMs to review and validate code for correctness. | `chainguard validate --consensus ./contract.go` |
+| `benchmark` | Analyze performance metrics like throughput and storage. | `chainguard benchmark --throughput ./chaincode/` |
+| `report` | Generate a detailed report from a previous analysis. | `chainguard report results.json -o report.html` |
+| `init` | Create a default `chainguard.toml` configuration file. | `chainguard init` |
+
+Run `chainguard --help` or `chainguard <COMMAND> --help` for a full list of options.
+
+## AI-Powered Review and Analysis
+
+ChainGuard's AI capabilities are designed to augment the developer's review process, not replace it. To enable these features, you need to configure API keys for one or more supported LLM providers.
+
+### 1. Configure API Keys
+You can connect multiple LLM providers to ChainGuard. API keys are stored securely in `~/.chainguard/auth.toml`.
+
 ```bash
-# Analyze a single file
-chainguard analyze path/to/chaincode.go
+# Set API keys for your preferred AI services
+chainguard auth set openai --key sk-...
+chainguard auth set claude --key ...
+chainguard auth set gemini --key ...
 
-# Analyze with Fabric-specific checks
-chainguard analyze --fabric path/to/chaincode.go
+# Test the connection to all configured services
+chainguard auth test
+```
 
-# Analyze directory recursively
-chainguard analyze ./contracts/
+### 2. Run AI-Assisted Review
+Use the `validate` command to specifically review AI-generated code, or use the `--ai-validate` flag during a full analysis to incorporate AI-driven checks.
 
-# With AI validation
+```bash
+# Review AI-generated code for correctness, hallucinations, and vulnerabilities
+chainguard validate ./ai-generated-contract.go
+
+# Run a full analysis, including an AI-powered review with multiple LLMs
 chainguard analyze --ai-validate --ai-plugins chatgpt,claude ./contracts/
 ```
 
-#### Quick Security Scan
-```bash
-# Quick vulnerability scan
-chainguard scan ./contracts/ --severity high
+## CI/CD Integration
 
-# Fabric-specific scan
-chainguard scan --fabric ./chaincode/
-```
+ChainGuard can be easily integrated into your CI/CD pipeline to automate security checks. Use the `--exit-code` flag to have the process fail if high-severity findings are detected.
 
-#### Token Standards Audit
-```bash
-# Validate ERC-20 compliance
-chainguard audit --standards erc20 ./token.sol
-
-# Multiple standards
-chainguard audit --standards erc20,erc721,erc1155 ./contracts/
-```
-
-#### AI Code Validation
-```bash
-# Validate AI-generated code
-chainguard validate ./ai-generated-contract.go
-
-# With consensus validation
-chainguard validate --consensus --consensus-level high ./contract.go
-```
-
-#### Performance Benchmarking
-```bash
-# Full benchmark suite
-chainguard benchmark --fabric --throughput --storage --consensus ./chaincode/
-
-# Specific analysis
-chainguard benchmark --throughput ./contracts/
-```
-
-#### Generate Reports
-```bash
-# Generate HTML report
-chainguard report analysis-results.json -o report.html --format html
-
-# PDF report with remediation guidance
-chainguard report results/ -o audit-report.pdf --format pdf --remediation
-```
-
-### Advanced Usage
-
-#### Custom Rules
-```bash
-# Import custom rules
-chainguard rules import ./custom-rules.yaml
-
-# List all rules
-chainguard rules list --category security
-
-# Enable/disable specific rules
-chainguard rules enable FABRIC-SEC-*
-chainguard rules disable FABRIC-PERF-001
-```
-
-#### CI/CD Integration
+### GitHub Actions Example
 ```yaml
-# GitHub Actions example
 - name: Run ChainGuard Analysis
   run: |
     chainguard analyze ./contracts/ \
       --fabric \
-      --ai-validate \
       --severity high \
       --exit-code \
-      --output-file results.json
+      --output-file results.sarif \
+      --format sarif
+
+- name: Upload SARIF to GitHub Security
+  uses: github/codeql-action/upload-sarif@v2
+  with:
+    sarif_file: results.sarif
 ```
 
-#### Interactive Mode
+## Configuration
+
+Generate a default `chainguard.toml` file to customize analysis settings.
 ```bash
-# Start interactive session
-chainguard interactive
-
-# With AI assistance
-chainguard interactive --ai-assist
+chainguard init
 ```
+This file allows you to configure rules, AI models, severity thresholds, and more.
+
+## Docker Usage
+You can also run ChainGuard within a Docker container.
+
+```bash
+# Build the Docker image
+docker build -t chainguard .
+
+# Run analysis on a local directory
+docker run -v $(pwd):/workspace chainguard analyze /workspace/my-project
+```
+
+## Contributing
+
+We welcome contributions! Please read our `CONTRIBUTING.md` for details on how to submit pull requests, our code of conduct, and development setup.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🔍 Analysis Categories
 
