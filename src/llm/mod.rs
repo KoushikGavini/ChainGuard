@@ -6,9 +6,9 @@ use std::collections::HashMap;
 use tokio::sync::RwLock;
 use std::sync::Arc;
 
-pub mod chatgpt;
-pub mod claude;
-pub mod gemini;
+// pub mod chatgpt;
+// pub mod claude;
+// pub mod gemini; // Commented out - implementations not included in this version
 
 #[async_trait]
 pub trait LLMProvider: Send + Sync {
