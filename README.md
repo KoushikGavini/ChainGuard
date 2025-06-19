@@ -4,7 +4,6 @@ Advanced security analysis for blockchain platforms with specialized Hyperledger
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=flat&logo=rust&logoColor=white)](https://www.rust-lang.org/)
-[![CI/CD](https://img.shields.io/badge/CI%2FCD-passing-brightgreen)](https://github.com/KoushikGavini/ChainGuard/actions)
 
 ## 🚀 Features
 
@@ -69,8 +68,8 @@ cargo build --release
 cargo install --path .
 ```
 
-### Using Pre-built Binaries
-Download the latest release for your platform from the [releases page](https://github.com/KoushikGavini/ChainGuard/releases).
+### Building from Source is Required
+Since this is a source distribution, you'll need to build ChainGuard using Cargo.
 
 ## 🔧 Configuration
 
