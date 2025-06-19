@@ -81,7 +81,7 @@ pub struct CodeLocation {
 }
 
 pub struct LLMManager {
-    providers: Arc<RwLock<HashMap<String, Box<dyn LLMProvider>>>>,
+    providers: Arc<RwLock<HashMap<String, Arc<dyn LLMProvider>>>>,
     client: Client,
     config: LLMConfig,
 }
@@ -138,8 +138,9 @@ impl LLMManager {
         // Test connection first
         provider.test_connection().await?;
         
+        let provider_arc = Arc::from(provider);
         let mut providers = self.providers.write().await;
-        providers.insert(name, provider);
+        providers.insert(name, provider_arc);
         Ok(())
     }
     
@@ -148,29 +149,38 @@ impl LLMManager {
         code: &str,
         context: &AnalysisContext,
     ) -> Result<ConsensusAnalysisResult> {
-        let providers = self.providers.read().await;
-        
-        if providers.is_empty() {
-            return Err(ChainGuardError::LLM("No LLM providers configured".to_string()));
-        }
-        
         let mut results = Vec::new();
         let mut tasks = Vec::new();
         
-        // Collect all providers
-        let provider_list: Vec<_> = providers.iter().collect();
-        
-        // Create analysis tasks for each provider
-        for (name, provider) in provider_list {
-            let code = code.to_string();
-            let context = context.clone();
-            let provider = provider.clone();
+        // Create tasks inside a scope to limit provider lock lifetime
+        {
+            let providers = self.providers.read().await;
             
-            let task = tokio::spawn(async move {
-                (name.clone(), provider.analyze_code(&code, &context).await)
-            });
+            if providers.is_empty() {
+                return Err(ChainGuardError::LLM("No LLM providers configured".to_string()));
+            }
             
-            tasks.push(task);
+            // Clone provider references into a Vec to use after lock is dropped
+            let provider_list: Vec<(String, Arc<dyn LLMProvider>)> = providers.iter()
+                .map(|(name, provider)| {
+                    (name.clone(), provider.clone())
+                })
+                .collect();
+                
+            // Drop the lock explicitly
+            drop(providers);
+            
+            // Create analysis tasks for each provider
+            for (name, provider) in provider_list {
+                let code = code.to_string();
+                let context = context.clone();
+                
+                let task = tokio::spawn(async move {
+                    (name, provider.analyze_code(&code, &context).await)
+                });
+                
+                tasks.push(task);
+            }
         }
         
         // Wait for all analyses to complete
@@ -244,8 +254,8 @@ impl LLMManager {
         
         // Aggregate suggestions
         let mut all_suggestions = Vec::new();
-        for (_, result) in results {
-            all_suggestions.extend(result.suggestions);
+        for (_, result) in &results {
+            all_suggestions.extend(result.suggestions.clone());
         }
         
         Ok(ConsensusAnalysisResult {
@@ -260,24 +270,36 @@ impl LLMManager {
         &self,
         code: &str,
     ) -> Result<AIGeneratedValidation> {
-        let providers = self.providers.read().await;
-        
-        if providers.is_empty() {
-            return Err(ChainGuardError::LLM("No LLM providers configured".to_string()));
-        }
-        
         let mut validations = Vec::new();
         let mut tasks = Vec::new();
         
-        for (name, provider) in providers.iter() {
-            let code = code.to_string();
-            let provider = provider.clone();
+        // Create tasks inside a scope to limit provider lock lifetime
+        {
+            let providers = self.providers.read().await;
             
-            let task = tokio::spawn(async move {
-                provider.validate_ai_generated(&code).await
-            });
+            if providers.is_empty() {
+                return Err(ChainGuardError::LLM("No LLM providers configured".to_string()));
+            }
             
-            tasks.push(task);
+            // Clone provider references into a Vec to use after lock is dropped
+            let provider_list: Vec<Arc<dyn LLMProvider>> = providers.iter()
+                .map(|(_, provider)| {
+                    provider.clone()
+                })
+                .collect();
+                
+            // Drop the lock explicitly
+            drop(providers);
+            
+            for provider in provider_list {
+                let code = code.to_string();
+                
+                let task = tokio::spawn(async move {
+                    provider.validate_ai_generated(&code).await
+                });
+                
+                tasks.push(task);
+            }
         }
         
         // Collect validation results
@@ -310,6 +332,11 @@ impl LLMManager {
         let mut all_hallucination_risks = Vec::new();
         let mut all_determinism_issues = Vec::new();
         
+        // Calculate avg_quality first
+        let avg_quality = validations.iter()
+            .map(|v| v.quality_score)
+            .sum::<f32>() / count;
+        
         for validation in validations {
             all_patterns.extend(validation.patterns_detected);
             all_hallucination_risks.extend(validation.hallucination_risks);
@@ -319,10 +346,6 @@ impl LLMManager {
         // Deduplicate patterns
         all_patterns.sort();
         all_patterns.dedup();
-        
-        let avg_quality = validations.iter()
-            .map(|v| v.quality_score)
-            .sum::<f32>() / count;
         
         Ok(AIGeneratedValidation {
             is_ai_generated,

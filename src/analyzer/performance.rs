@@ -1,6 +1,7 @@
 use crate::{Finding, Result, Severity};
 use regex::Regex;
 use std::path::Path;
+use lazy_static::lazy_static;
 
 pub struct PerformanceAnalyzer {
     query_patterns: Vec<QueryPattern>,
@@ -24,23 +25,24 @@ struct InefficiencyPattern {
     description: String,
 }
 
+lazy_static! {
+    static ref UNBOUNDED_QUERY: Regex = Regex::new(r"GetQueryResult[^}]+").unwrap();
+    static ref NESTED_LOOP: Regex = Regex::new(r"for\s+.*\s+in\s+.*\s*\{\s*for\s+.*\s+in\s+").unwrap();
+    static ref LARGE_ARRAY: Regex = Regex::new(r"make\s*\(\s*\[\s*\]\s*\w+\s*,\s*(\d{4,})\s*\)").unwrap();
+    static ref STRING_CONCAT: Regex = Regex::new(r#"(\w+)\s*=\s*\1\s*\+\s*"#).unwrap();
+}
+
 impl PerformanceAnalyzer {
     pub fn new() -> Self {
         let query_patterns = vec![
             QueryPattern {
                 name: "unbounded_range_query".to_string(),
-                regex: Regex::new(r"GetStateByRange\s*\(\s*\"\"\s*,\s*\"\"\s*\)").unwrap(),
+                regex: Regex::new(r#"GetStateByRange\s*\(\s*""\s*,\s*""\s*\)"#).unwrap(),
                 severity: Severity::High,
                 description: "Unbounded range query can cause performance issues".to_string(),
                 optimization: "Use pagination with limited range queries".to_string(),
             },
-            QueryPattern {
-                name: "missing_pagination".to_string(),
-                regex: Regex::new(r"GetQueryResult[^}]+(?!pageSize|bookmark)").unwrap(),
-                severity: Severity::Medium,
-                description: "Query without pagination can timeout on large datasets".to_string(),
-                optimization: "Implement pagination using pageSize and bookmark".to_string(),
-            },
+
             QueryPattern {
                 name: "inefficient_composite_key".to_string(),
                 regex: Regex::new(r"CreateCompositeKey\s*\([^,]+,\s*\[\s*\]\s*\)").unwrap(),
@@ -71,7 +73,7 @@ impl PerformanceAnalyzer {
             },
             InefficiencyPattern {
                 name: "synchronous_external_call".to_string(),
-                regex: Regex::new(r"(http\.|net\.Dial|rpc\.).*(?!go\s+)").unwrap(),
+                regex: Regex::new(r"(http\.|net\.Dial|rpc\.)").unwrap(),
                 severity: Severity::Critical,
                 description: "Synchronous external calls block transaction processing".to_string(),
             },
@@ -104,6 +106,7 @@ impl PerformanceAnalyzer {
                     references: vec![
                         "https://hyperledger-fabric.readthedocs.io/en/latest/couchdb_as_state_database.html".to_string()
                     ],
+                    ai_consensus: None,
                 });
             }
         }
@@ -124,12 +127,31 @@ impl PerformanceAnalyzer {
                     code_snippet: Some(extract_snippet(content, line_number)),
                     remediation: Some("Optimize code for better performance".to_string()),
                     references: vec![],
+                    ai_consensus: None,
                 });
             }
         }
         
         // Check for endorsement policy inefficiencies
         self.check_endorsement_patterns(content, path, &mut findings);
+        
+        // Check for unbounded queries (missing pagination)
+        if UNBOUNDED_QUERY.is_match(content) && !content.contains("pageSize") && !content.contains("bookmark") {
+            findings.push(Finding {
+                id: "PERF-QUERY-UNBOUNDED".to_string(),
+                severity: Severity::High,
+                category: "performance/query".to_string(),
+                title: "Unbounded query detected".to_string(),
+                description: "Query lacks pagination parameters which can cause performance issues with large datasets".to_string(),
+                file: path.display().to_string(),
+                line: 0,
+                column: 0,
+                code_snippet: None,
+                remediation: Some("Add pageSize and bookmark parameters for pagination".to_string()),
+                references: vec![],
+                ai_consensus: None,
+            });
+        }
         
         Ok(findings)
     }
@@ -151,7 +173,8 @@ impl PerformanceAnalyzer {
                 code_snippet: Some(extract_snippet(content, line_number)),
                 remediation: Some("Consider using chaincode-level endorsement policies".to_string()),
                 references: vec![],
-            });
+                    ai_consensus: None
+                });
         }
     }
 }

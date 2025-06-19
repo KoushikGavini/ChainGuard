@@ -42,7 +42,7 @@ impl Analyzer {
         }
     }
 
-    pub async fn analyze_file(&self, path: &Path) -> Result<AnalysisResult> {
+    pub async fn analyze_file(&mut self, path: &Path) -> Result<AnalysisResult> {
         info!("Analyzing file: {}", path.display());
         
         let content = fs::read_to_string(path).await?;
@@ -125,7 +125,7 @@ impl Analyzer {
         Ok(results)
     }
 
-    pub async fn analyze_directory(&self, path: &Path) -> Result<Vec<AnalysisResult>> {
+    pub async fn analyze_directory(&mut self, path: &Path) -> Result<Vec<AnalysisResult>> {
         info!("Analyzing directory: {}", path.display());
         
         let mut results = Vec::new();

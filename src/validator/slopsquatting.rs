@@ -16,29 +16,29 @@ impl SlopsquattingDetector {
             (
                 "github.com/hyperledger/fabric-chaincode-go".to_string(),
                 vec![
-                    "github.com/hyperledger/fabric-chaincоde-go", // Cyrillic 'o'
-                    "github.com/hyperledger/fabric-chaincode-g0", // Zero instead of 'o'
-                    "github.com/hyperledger/fabric-chainc0de-go", // Zero in 'code'
-                    "github.com/hyperledger/fabrik-chaincode-go", // 'k' instead of 'c'
-                    "github.com/hyperleger/fabric-chaincode-go",  // Missing 'd'
-                    "github.com/hyperledge/fabric-chaincode-go",  // Missing 'r'
+                    "github.com/hyperledger/fabric-chaincоde-go".to_string(), // Cyrillic 'o'
+                    "github.com/hyperledger/fabric-chaincode-g0".to_string(), // Zero instead of 'o'
+                    "github.com/hyperledger/fabric-chainc0de-go".to_string(), // Zero in 'code'
+                    "github.com/hyperledger/fabrik-chaincode-go".to_string(), // 'k' instead of 'c'
+                    "github.com/hyperleger/fabric-chaincode-go".to_string(),  // Missing 'd'
+                    "github.com/hyperledge/fabric-chaincode-go".to_string(),  // Missing 'r'
                 ]
             ),
             (
                 "github.com/hyperledger/fabric-protos-go".to_string(),
                 vec![
-                    "github.com/hyperledger/fabric-protоs-go",    // Cyrillic 'o'
-                    "github.com/hyperledger/fabric-protos-g0",    // Zero instead of 'o'
-                    "github.com/hyperledger/fabric-pr0tos-go",    // Zero in 'protos'
+                    "github.com/hyperledger/fabric-protоs-go".to_string(),    // Cyrillic 'o'
+                    "github.com/hyperledger/fabric-protos-g0".to_string(),    // Zero instead of 'o'
+                    "github.com/hyperledger/fabric-pr0tos-go".to_string(),    // Zero in 'protos'
                 ]
             ),
             (
                 "github.com/golang/protobuf".to_string(),
                 vec![
-                    "github.com/golang/protоbuf",                 // Cyrillic 'o'
-                    "github.com/golang/pr0tobuf",                 // Zero instead of 'o'
-                    "github.com/golang/protobuff",                // Extra 'f'
-                    "github.com/goland/protobuf",                 // Missing 'g'
+                    "github.com/golang/protоbuf".to_string(),                 // Cyrillic 'o'
+                    "github.com/golang/pr0tobuf".to_string(),                 // Zero instead of 'o'
+                    "github.com/golang/protobuff".to_string(),                // Extra 'f'
+                    "github.com/goland/protobuf".to_string(),                 // Missing 'g'
                 ]
             ),
         ];
@@ -77,6 +77,7 @@ impl SlopsquattingDetector {
                         references: vec![
                             "https://snyk.io/blog/typosquatting-attacks/".to_string()
                         ],
+                        ai_consensus: None,
                     });
                 }
             }
@@ -100,6 +101,7 @@ impl SlopsquattingDetector {
                     references: vec![
                         "https://en.wikipedia.org/wiki/IDN_homograph_attack".to_string()
                     ],
+                    ai_consensus: None,
                 });
             }
             
@@ -120,6 +122,7 @@ impl SlopsquattingDetector {
                     code_snippet: None,
                     remediation: Some("Verify this is the intended package".to_string()),
                     references: vec![],
+                    ai_consensus: None,
                 });
             }
         }

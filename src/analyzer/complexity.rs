@@ -22,7 +22,7 @@ impl ComplexityAnalyzer {
         Self { parser }
     }
 
-    pub fn analyze(&self, content: &str, path: &Path) -> Result<(Vec<Finding>, ComplexityMetrics)> {
+    pub fn analyze(&mut self, content: &str, path: &Path) -> Result<(Vec<Finding>, ComplexityMetrics)> {
         let mut findings = Vec::new();
         let mut metrics = ComplexityMetrics {
             cyclomatic_complexity: 0.0,
@@ -33,7 +33,7 @@ impl ComplexityAnalyzer {
         
         // Parse the code
         let tree = self.parser.parse(content, None)
-            .ok_or_else(|| crate::FabricGuardError::Parse("Failed to parse Go code".to_string()))?;
+            .ok_or_else(|| crate::ChainGuardError::Parse("Failed to parse Go code".to_string()))?;
         
         // Analyze functions
         self.analyze_functions(&tree.root_node(), content, path, &mut findings, &mut metrics);
@@ -90,6 +90,7 @@ impl ComplexityAnalyzer {
                     references: vec![
                         "https://en.wikipedia.org/wiki/Cyclomatic_complexity".to_string()
                     ],
+                    ai_consensus: None,
                 });
             } else if complexity > 10 {
                 let start = node.start_position();
@@ -105,6 +106,7 @@ impl ComplexityAnalyzer {
                     code_snippet: None,
                     remediation: Some("Consider simplifying the function logic".to_string()),
                     references: vec![],
+                    ai_consensus: None,
                 });
             }
             
@@ -119,37 +121,42 @@ impl ComplexityAnalyzer {
         }
     }
 
-    fn calculate_cyclomatic_complexity(&self, node: &Node, content: &str) -> usize {
+    fn calculate_cyclomatic_complexity(&self, node: &Node, _content: &str) -> usize {
         let mut complexity = 1; // Base complexity
-        let mut cursor = node.walk();
         
-        fn count_complexity(node: &Node, complexity: &mut usize, cursor: &mut tree_sitter::TreeCursor) {
+        fn count_node_complexity(node: &Node) -> usize {
+            let mut local_complexity = 0;
+            
             match node.kind() {
                 "if_statement" | "for_statement" | "range_statement" | 
                 "switch_statement" | "type_switch_statement" => {
-                    *complexity += 1;
+                    local_complexity += 1;
                 }
                 "case_clause" => {
-                    *complexity += 1;
+                    local_complexity += 1;
                 }
                 "binary_expression" => {
-                    if let Ok(operator) = node.child(1).unwrap().utf8_text(&[]) {
-                        if operator == "&&" || operator == "||" {
-                            *complexity += 1;
+                    if let Some(child) = node.child(1) {
+                        if let Ok(operator) = child.utf8_text(&[]) {
+                            if operator == "&&" || operator == "||" {
+                                local_complexity += 1;
+                            }
                         }
                     }
                 }
                 _ => {}
             }
             
-            // Recurse through children
-            for child in node.children(cursor) {
-                count_complexity(&child, complexity, cursor);
+            // Count complexity of all children
+            let mut cursor = node.walk();
+            for child in node.children(&mut cursor) {
+                local_complexity += count_node_complexity(&child);
             }
+            
+            local_complexity
         }
         
-        count_complexity(node, &mut complexity, &mut cursor);
-        complexity
+        complexity + count_node_complexity(node)
     }
 
     fn check_dead_code(&self, node: &Node, content: &str, path: &Path, findings: &mut Vec<Finding>) {
@@ -172,6 +179,7 @@ impl ComplexityAnalyzer {
                     code_snippet: Some(child.utf8_text(content.as_bytes()).unwrap_or("").to_string()),
                     remediation: Some("Remove unreachable code".to_string()),
                     references: vec![],
+                    ai_consensus: None
                 });
             }
             
@@ -230,6 +238,7 @@ impl ComplexityAnalyzer {
                     code_snippet: Some(block),
                     remediation: Some("Extract duplicate code into a reusable function".to_string()),
                     references: vec![],
+                    ai_consensus: None,
                 });
             }
         }

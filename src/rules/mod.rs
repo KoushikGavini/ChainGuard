@@ -268,7 +268,6 @@ impl RuleManager {
                             code_snippet: None,
                             remediation: None,
                             references: vec![],
-                            confidence: 0.9,
                             ai_consensus: None,
                         });
                     }
