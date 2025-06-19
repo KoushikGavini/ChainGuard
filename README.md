@@ -18,13 +18,17 @@ Advanced security analysis for blockchain platforms with specialized Hyperledger
 - **DoS vulnerability** detection in chaincode implementations
 - **Channel isolation** security analysis
 
-### AI-Powered Code Validation
+### AI-Powered Code Validation 🤖
 - **Multi-LLM integration** with ChatGPT, Claude, and Gemini
 - **AI-generated code validation** with determinism checking
 - **Hallucination detection** for non-existent dependencies
 - **Real-time validation feedback** during development
 - **Multi-model consensus** for critical findings
 - **Confidence scoring** based on AI agreement levels
+- **Interactive AI assistant** for code explanations
+- **Automated fix generation** with AI explanations
+
+💡 **See [AI Features Guide](AI_FEATURES_GUIDE.md) for setup and usage**
 
 ### Token Standards Compliance
 - **ERC-20** token standard validation
@@ -78,16 +82,24 @@ Since this is a source distribution, you'll need to build ChainGuard using Cargo
 chainguard init
 ```
 
-### Configure AI Services
+### Configure AI Services (Required for AI Features)
+
+API keys are stored securely in `~/.chainguard/auth.toml` with restricted permissions.
+
 ```bash
 # Set API keys for AI services
-chainguard auth set chatgpt --key YOUR_OPENAI_API_KEY
+chainguard auth set openai --key YOUR_OPENAI_API_KEY
 chainguard auth set claude --key YOUR_ANTHROPIC_API_KEY
 chainguard auth set gemini --key YOUR_GOOGLE_API_KEY
 
 # Test connections
 chainguard auth test --all
+
+# List configured services
+chainguard auth list
 ```
+
+📖 See [AI Features Guide](AI_FEATURES_GUIDE.md) for complete setup instructions
 
 ### Example Configuration (chainguard.toml)
 ```toml
