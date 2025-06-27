@@ -36,12 +36,12 @@ rayon = "1.8"
 num_cpus = "1.16"
 async-trait = "0.1"
 
-# Code parsing and analysis
-tree-sitter = "0.20"
-tree-sitter-go = "0.20"
-tree-sitter-rust = "0.20"
-tree-sitter-javascript = "0.20"
-tree-sitter-typescript = "0.20"
+# Code parsing and analysis  
+tree-sitter = "=0.20.10"
+tree-sitter-go = "=0.20.0"
+tree-sitter-rust = "=0.20.2"  # Pin to version that uses tree-sitter 0.20.x
+tree-sitter-javascript = "=0.20.0"
+tree-sitter-typescript = "=0.20.3"
 syn = "2.0"
 quote = "1.0"
 pest = "2.7"
@@ -52,7 +52,7 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 serde_yaml = "0.9"
 toml = "0.8"
-config = "0.13"
+config = "0.14"
 quick-xml = { version = "0.31", features = ["serialize"] }
 
 # Date and time
@@ -64,10 +64,11 @@ blake3 = "1.5"
 regex = "1.10"
 hex = "0.4"
 base64 = "0.21"
+ring = "0.17.12"  # Force newer version to fix RUSTSEC-2025-0009
 
 # HTTP client for LLM APIs and package verification
-reqwest = { version = "0.11", features = ["json", "rustls-tls"] }
-hyper = "0.14"
+reqwest = { version = "0.12", features = ["json", "rustls-tls"] }
+hyper = "1.0"
 
 # LLM Integration
 # openai-api-rs = "4.0" # Commented out for now
@@ -116,7 +117,7 @@ smt2parser = "0.1"
 ort = "1.16"
 
 # WebAssembly support for sandboxed execution
-wasmtime = "16.0"
+wasmtime = "26.0"
 wasmer = "4.2"
 
 # Git integration
@@ -141,7 +142,7 @@ crossbeam = "0.8"
 dashmap = "5.5"
 
 # Metrics and monitoring
-prometheus = "0.13"
+prometheus = "0.14"
 metrics = "0.22"
 
 # Compression
@@ -149,7 +150,7 @@ flate2 = "1.0"
 zstd = "0.13"
 
 # Cache
-cached = "0.47"
+cached = "0.51"
 moka = { version = "0.12", features = ["future", "sync"] }
 
 # Plugin system
