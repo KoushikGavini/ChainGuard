@@ -4,15 +4,15 @@ use chainguard::{
     analyzer::Analyzer,
     validator::Validator,
     reporter::Reporter,
-    rules::RuleManager,
     token_standards::TokenStandardsValidator,
     fabric::FabricAnalyzer,
+    solana::SolanaAnalyzer,
     llm::LLMManager,
     Severity, AnalysisConfig, OutputFormat, Result, ChainGuardError,
 };
-use indicatif::{ProgressBar, ProgressStyle, MultiProgress};
+use indicatif::{ProgressBar, ProgressStyle};
 use std::path::PathBuf;
-use tracing::{info, Level};
+use tracing::Level;
 use tracing_subscriber::{FmtSubscriber, EnvFilter};
 
 #[derive(Parser)]
@@ -59,6 +59,10 @@ enum Commands {
         /// Enable Hyperledger Fabric-specific analysis
         #[arg(long)]
         fabric: bool,
+        
+        /// Enable Solana-specific analysis
+        #[arg(long)]
+        solana: bool,
         
         /// Enable AI-generated code validation
         #[arg(long)]
@@ -118,6 +122,10 @@ enum Commands {
         #[arg(long)]
         fabric: bool,
         
+        /// Enable Solana-specific scanning
+        #[arg(long)]
+        solana: bool,
+        
         /// Minimum severity level to report
         #[arg(short, long, value_enum, default_value = "medium")]
         severity: Severity,
@@ -139,6 +147,10 @@ enum Commands {
         /// Enable Hyperledger Fabric compliance checking
         #[arg(long)]
         fabric: bool,
+        
+        /// Enable Solana compliance checking
+        #[arg(long)]
+        solana: bool,
         
         /// Specify ERC standards to audit (comma-separated)
         #[arg(long, value_delimiter = ',')]
@@ -192,6 +204,10 @@ enum Commands {
         #[arg(long)]
         fabric: bool,
         
+        /// Enable Solana-specific performance analysis
+        #[arg(long)]
+        solana: bool,
+        
         /// Analyze transaction throughput
         #[arg(long)]
         throughput: bool,
@@ -240,7 +256,7 @@ enum Commands {
         /// Path to chaincode file or directory
         path: PathBuf,
         
-        /// Target platform (fabric, ethereum, etc.)
+        /// Target platform (fabric, solana, ethereum, etc.)
         #[arg(long, default_value = "fabric")]
         platform: String,
         
@@ -457,6 +473,7 @@ async fn main() -> Result<()> {
         Commands::Analyze {
             path,
             fabric,
+            solana,
             ai_validate,
             standards,
             ai_plugins,
@@ -473,6 +490,7 @@ async fn main() -> Result<()> {
             let exit_code_val = analyze_command(
                 path,
                 fabric,
+                solana,
                 ai_validate,
                 standards,
                 ai_plugins,
@@ -499,6 +517,7 @@ async fn main() -> Result<()> {
         Commands::Scan {
             path,
             fabric,
+            solana,
             severity,
             exit_code,
             output_file,
@@ -506,6 +525,7 @@ async fn main() -> Result<()> {
             let exit_code_val = scan_command(
                 path,
                 fabric,
+                solana,
                 severity,
                 output_file,
                 cli.output,
@@ -520,6 +540,7 @@ async fn main() -> Result<()> {
         Commands::Audit {
             path,
             fabric,
+            solana,
             standards,
             framework,
             output_file,
@@ -527,6 +548,7 @@ async fn main() -> Result<()> {
             audit_command(
                 path,
                 fabric,
+                solana,
                 standards,
                 framework,
                 output_file,
@@ -560,6 +582,7 @@ async fn main() -> Result<()> {
         Commands::Benchmark {
             path,
             fabric,
+            solana,
             throughput,
             storage,
             consensus,
@@ -568,6 +591,7 @@ async fn main() -> Result<()> {
             benchmark_command(
                 path,
                 fabric,
+                solana,
                 throughput,
                 storage,
                 consensus,
@@ -643,6 +667,7 @@ async fn main() -> Result<()> {
 async fn analyze_command(
     path: PathBuf,
     fabric: bool,
+    solana: bool,
     ai_validate: bool,
     standards: Vec<String>,
     ai_plugins: Vec<String>,
@@ -675,6 +700,8 @@ async fn analyze_command(
     config.enable_performance_analysis = true;
     config.output_format = format;
     config.parallel_analysis = parallel;
+    config.fabric_specific = fabric;
+    config.solana_specific = solana;
     if let Some(t) = threads {
         config.max_threads = t;
     }
@@ -693,14 +720,38 @@ async fn analyze_command(
     progress.set_message("Initializing validator...");
     let validator = Validator::new().await?;
     
+    // Run platform-specific analysis if requested
+    let mut platform_findings = Vec::new();
+    
+    if fabric {
+        progress.set_message("Running Fabric-specific analysis...");
+        let mut fabric_analyzer = FabricAnalyzer::new()?;
+        let fabric_result = fabric_analyzer.analyze_chaincode(&path).await?;
+        platform_findings.extend(fabric_result.findings);
+    }
+    
+    if solana {
+        progress.set_message("Running Solana-specific analysis...");
+        let mut solana_analyzer = SolanaAnalyzer::new()?;
+        let solana_result = solana_analyzer.analyze_program(&path).await?;
+        platform_findings.extend(solana_result.findings);
+    }
+    
     progress.set_message("Starting analysis...");
     
     // Perform analysis
-    let results = if path.is_file() {
+    let mut results = if path.is_file() {
         vec![analyzer.analyze_file(&path).await?]
     } else {
         analyzer.analyze_directory(&path).await?
     };
+    
+    // Add platform-specific findings to the results
+    if !platform_findings.is_empty() {
+        for result in &mut results {
+            result.findings.extend(platform_findings.clone());
+        }
+    }
     
     // Run AI validation if enabled
     if ai_validate {
@@ -827,6 +878,7 @@ async fn history_command(limit: usize, filter: Option<String>, detailed: bool, e
 async fn scan_command(
     path: PathBuf,
     fabric: bool,
+    solana: bool,
     severity: Severity,
     output_file: Option<PathBuf>,
     format: OutputFormat,
@@ -850,6 +902,11 @@ async fn scan_command(
     if fabric {
         progress.set_message("Loading Fabric-specific rules...");
         // Initialize Fabric analyzer
+    }
+    
+    if solana {
+        progress.set_message("Loading Solana-specific rules...");
+        // Initialize Solana analyzer
     }
     
     progress.set_message("Scanning for vulnerabilities...");
@@ -887,6 +944,7 @@ async fn scan_command(
 async fn audit_command(
     path: PathBuf,
     fabric: bool,
+    solana: bool,
     standards: Vec<String>,
     framework: Option<String>,
     output_file: Option<PathBuf>,
@@ -911,6 +969,11 @@ async fn audit_command(
     if fabric {
         progress.set_message("Loading Fabric compliance rules...");
         auditor.enable_fabric_compliance();
+    }
+    
+    if solana {
+        progress.set_message("Loading Solana compliance rules...");
+        auditor.enable_solana_compliance();
     }
     
     if !standards.is_empty() {
@@ -955,6 +1018,7 @@ async fn audit_command(
 async fn benchmark_command(
     path: PathBuf,
     fabric: bool,
+    solana: bool,
     throughput: bool,
     storage: bool,
     consensus: bool,
@@ -979,6 +1043,10 @@ async fn benchmark_command(
     
     if fabric {
         benchmarker.enable_fabric_benchmarks();
+    }
+    
+    if solana {
+        benchmarker.enable_solana_benchmarks();
     }
     
     let mut results = chainguard::benchmark::BenchmarkResults::default();

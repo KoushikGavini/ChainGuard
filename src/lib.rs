@@ -5,6 +5,7 @@ pub mod rules;
 pub mod utils;
 pub mod llm;
 pub mod fabric;
+pub mod solana;
 pub mod token_standards;
 pub mod auditor;
 pub mod benchmark;
@@ -52,6 +53,9 @@ pub enum ChainGuardError {
     
     #[error("Fabric-specific error: {0}")]
     Fabric(String),
+    
+    #[error("Solana-specific error: {0}")]
+    Solana(String),
     
     #[error("Token standard error: {0}")]
     TokenStandard(String),
@@ -130,6 +134,7 @@ pub struct AnalysisConfig {
     pub output_format: OutputFormat,
     pub custom_rules_path: Option<String>,
     pub fabric_specific: bool,
+    pub solana_specific: bool,
     pub token_standards: Vec<String>,
     pub ai_models: Vec<String>,
     pub consensus_threshold: f32,
@@ -163,6 +168,7 @@ impl Default for AnalysisConfig {
             output_format: OutputFormat::Table,
             custom_rules_path: None,
             fabric_specific: false,
+            solana_specific: false,
             token_standards: vec![],
             ai_models: vec!["chatgpt".to_string()],
             consensus_threshold: 0.7,

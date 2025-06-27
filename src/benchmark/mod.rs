@@ -5,6 +5,7 @@ use std::time::Duration;
 
 pub struct Benchmarker {
     fabric_enabled: bool,
+    solana_enabled: bool,
     platform: String,
 }
 
@@ -52,6 +53,7 @@ impl Benchmarker {
     pub fn new() -> Self {
         Self {
             fabric_enabled: false,
+            solana_enabled: false,
             platform: "generic".to_string(),
         }
     }
@@ -59,6 +61,7 @@ impl Benchmarker {
     pub fn with_platform(platform: &str) -> Self {
         Self {
             fabric_enabled: platform.to_lowercase() == "fabric",
+            solana_enabled: platform.to_lowercase() == "solana",
             platform: platform.to_string(),
         }
     }
@@ -66,6 +69,11 @@ impl Benchmarker {
     pub fn enable_fabric_benchmarks(&mut self) {
         self.fabric_enabled = true;
         self.platform = "fabric".to_string();
+    }
+    
+    pub fn enable_solana_benchmarks(&mut self) {
+        self.solana_enabled = true;
+        self.platform = "solana".to_string();
     }
     
     pub async fn analyze_throughput(&self, path: &Path) -> Result<ThroughputResult> {
