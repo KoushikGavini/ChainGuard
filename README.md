@@ -358,6 +358,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Issues**: [GitHub Issues](https://github.com/KoushikGavini/ChainGuard/issues)
 - **Pull Requests**: [Contribute](https://github.com/KoushikGavini/ChainGuard/pulls)
 
----
 
-**ChainGuard** - Securing the future of blockchain, one smart contract at a time. 
