@@ -229,7 +229,7 @@ chainguard analyze --standards stablecoin ./my-stablecoin.sol
 
 ## 🤝 Integration
 
-### IDE Integration
+### IDE Integration [Coming Soon]
 - **VSCode**: Install the ChainGuard extension
 - **IntelliJ**: Available in JetBrains marketplace
 - **Vim**: Use the chainGuard.vim plugin
@@ -280,18 +280,10 @@ cargo test
 RUST_LOG=debug cargo run -- analyze ./test-contracts/
 ```
 
-### Contributing
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
-
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
-
-- Hyperledger Fabric community
-- OpenAI, Anthropic, and Google for AI capabilities
-- Rust community for excellent tooling
 
 ## 📞 Support
 
@@ -301,4 +293,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**ChainGuard** - Securing the future of blockchain, one smart contract at a time. 🚀 
+**ChainGuard** - Securing the future of blockchain, one smart contract at a time. 
