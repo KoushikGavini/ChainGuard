@@ -24,8 +24,9 @@ pub struct SolanaAnalyzer {
 impl SolanaAnalyzer {
     pub fn new() -> Result<Self> {
         let mut parser = Parser::new();
-        parser.set_language(tree_sitter_rust::language())
-            .map_err(|e| ChainGuardError::Parse(format!("Failed to set Rust language: {}", e)))?;
+        // TODO: Fix tree-sitter version conflicts - temporarily disabled
+        // parser.set_language(tree_sitter_rust::language())
+        //     .map_err(|e| ChainGuardError::Parse(format!("Failed to set Rust language: {}", e)))?;
         
         Ok(Self {
             parser,
