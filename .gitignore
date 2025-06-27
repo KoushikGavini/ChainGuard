@@ -117,4 +117,16 @@ perf.data
 
 # Custom rules
 custom-rules/
-plugins/ 
+plugins/
+
+# ChainGuard output files
+report.md
+report.json
+report.csv
+scan_report.json
+*_test_report.md
+*_test_results.json
+*_test_summary.txt
+solana_test_*
+SOLANA_TEST_REPORT.md
+SOLANA_IMPLEMENTATION_SUMMARY.md 
