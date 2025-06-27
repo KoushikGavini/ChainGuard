@@ -1,9 +1,15 @@
 # ChainGuard 
 
-An advanced analysis and review platform for smart contracts and blockchain applications. ChainGuard is designed for the modern development workflow, providing the tools to ensure that any code—whether human-written or AI-generated—is secure, efficient, and correct. It includes specialized support for Hyperledger Fabric chaincode and Solana programs alongside broad capabilities for other platforms.
+> Advanced security analysis and AI code review platform for blockchain smart contracts
 
+ChainGuard is a comprehensive security analysis tool designed specifically for blockchain developers. It provides deep vulnerability detection, AI-powered code review, and performance optimization for smart contracts across multiple blockchain platforms including Hyperledger Fabric, Solana, and Ethereum.
+
+[![CI](https://github.com/KoushikGavini/ChainGuard/workflows/CI/badge.svg)](https://github.com/KoushikGavini/ChainGuard/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=flat&logo=rust&logoColor=white)](https://www.rust-lang.org/)
+[![crates.io](https://img.shields.io/crates/v/chainguard.svg)](https://crates.io/crates/chainguard)
+[![codecov](https://codecov.io/gh/KoushikGavini/ChainGuard/branch/main/graph/badge.svg)](https://codecov.io/gh/KoushikGavini/ChainGuard)
+[![Security Audit](https://github.com/KoushikGavini/ChainGuard/workflows/Security%20Audit/badge.svg)](https://github.com/KoushikGavini/ChainGuard/actions)
 
 ## Key Features
 
@@ -19,38 +25,48 @@ An advanced analysis and review platform for smart contracts and blockchain appl
 ## Installation
 
 ### Prerequisites
-- **Rust (1.70+):** Install via [rustup.rs](https://rustup.rs/).
-- **Git:** For cloning the repository.
-- **Z3 Solver (for formal verification):**
+- **Z3 Solver (required for formal verification):**
   ```bash
   # macOS
   brew install z3
+  
   # Ubuntu/Debian
-  sudo apt-get install z3
+  sudo apt-get install z3 libz3-dev
+  
+  # Windows
+  choco install z3
   ```
 
-### Build from Source
-Building from source is the recommended way to install ChainGuard.
+### Install from Pre-built Binaries (Recommended)
+Download the latest release for your platform from the [releases page](https://github.com/KoushikGavini/ChainGuard/releases).
 
 ```bash
-# 1. Clone the repository
+# Example for Linux/macOS
+wget https://github.com/KoushikGavini/ChainGuard/releases/latest/download/chainguard-x86_64-unknown-linux-gnu.tar.gz
+tar xzf chainguard-x86_64-unknown-linux-gnu.tar.gz
+sudo mv chainguard /usr/local/bin/
+chainguard --version
+```
+
+### Install from Crates.io
+```bash
+cargo install chainguard
+```
+
+### Build from Source
+Requires Rust 1.70+ (install via [rustup.rs](https://rustup.rs/))
+
+```bash
+# Clone the repository
 git clone https://github.com/KoushikGavini/ChainGuard.git
 cd ChainGuard
 
-# 2. Build the release binary
-cargo build --release
-
-# The executable will be at ./target/release/chainguard
-./target/release/chainguard --version
-```
-
-For convenience, you can add the target directory to your path or install it globally:
-```bash
-# Install globally using cargo
+# Build and install
 cargo install --path .
 
-# Now you can run it from anywhere
-chainguard --version
+# Or build without installing
+cargo build --release
+./target/release/chainguard --version
 ```
 
 ## Getting Started: A Quick Example
