@@ -1,4 +1,4 @@
-# ChainGuard 🛡️
+# ChainGuard 
 
 An advanced analysis and review platform for smart contracts and blockchain applications. ChainGuard is designed for the modern development workflow, providing the tools to ensure that any code—whether human-written or AI-generated—is secure, efficient, and correct. It includes specialized support for Hyperledger Fabric chaincode and Solana programs alongside broad capabilities for other platforms.
 
@@ -214,7 +214,7 @@ We welcome contributions! Please read our `CONTRIBUTING.md` for details on how t
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🌊 Solana Program Security
+## Solana Program Security
 
 ChainGuard provides comprehensive security analysis for Solana programs, detecting common vulnerabilities and performance issues:
 
@@ -242,7 +242,7 @@ chainguard analyze --solana ./my-program/src/lib.rs
 # - SOL-PERF-001: Multiple CPIs in close proximity
 ```
 
-## 🏦 Stablecoin Security
+## Stablecoin Security
 
 ChainGuard includes comprehensive security checks specifically designed for stablecoin contracts:
 
@@ -294,7 +294,7 @@ chainguard analyze --standards stablecoin ./my-stablecoin.sol
 - **FABRIC-COMP-xxx**: Fabric best practices violations
 - **SOL-COMP-xxx**: Solana best practices violations
 
-## 🤝 Integration
+## Integration
 
 ### IDE Integration [Coming Soon]
 - **VSCode**: Install the ChainGuard extension
@@ -321,7 +321,7 @@ docker run -e OPENAI_API_KEY=$OPENAI_API_KEY \
   chainguard/chainguard:latest analyze --ai-validate /workspace
 ```
 
-## 📊 Output Formats
+## Output Formats
 
 ChainGuard supports multiple output formats:
 - **Table** (default): Human-readable terminal output
@@ -333,7 +333,7 @@ ChainGuard supports multiple output formats:
 - **XML**: Legacy tool integration
 - **Markdown**: Documentation-friendly format
 
-## 🛠️ Development
+## Development
 
 ### Building from Source
 ```bash
@@ -347,12 +347,12 @@ cargo test
 RUST_LOG=debug cargo run -- analyze ./test-contracts/
 ```
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 
-## 📞 Support
+## Support
 
 - **Repository**: [https://github.com/KoushikGavini/ChainGuard](https://github.com/KoushikGavini/ChainGuard)
 - **Issues**: [GitHub Issues](https://github.com/KoushikGavini/ChainGuard/issues)
