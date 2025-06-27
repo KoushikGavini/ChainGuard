@@ -6,6 +6,7 @@ use std::collections::HashMap;
 pub struct Auditor {
     compliance_rules: HashMap<String, ComplianceFramework>,
     fabric_compliance_enabled: bool,
+    solana_compliance_enabled: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -46,12 +47,18 @@ impl Auditor {
         Self {
             compliance_rules: HashMap::new(),
             fabric_compliance_enabled: false,
+            solana_compliance_enabled: false,
         }
     }
     
     pub fn enable_fabric_compliance(&mut self) {
         self.fabric_compliance_enabled = true;
         self.load_fabric_compliance_rules();
+    }
+    
+    pub fn enable_solana_compliance(&mut self) {
+        self.solana_compliance_enabled = true;
+        self.load_solana_compliance_rules();
     }
     
     pub fn load_framework(&mut self, framework_name: &str) -> Result<()> {
@@ -332,6 +339,38 @@ impl Auditor {
         };
         
         self.compliance_rules.insert("fabric".to_string(), framework);
+    }
+    
+    fn load_solana_compliance_rules(&mut self) {
+        let framework = ComplianceFramework {
+            name: "Solana Best Practices".to_string(),
+            version: "1.0".to_string(),
+            rules: vec![
+                ComplianceRule {
+                    id: "SOL-BP-001".to_string(),
+                    category: "Security".to_string(),
+                    description: "Validate account ownership".to_string(),
+                    severity: Severity::Critical,
+                    check_type: CheckType::CodePattern(r"owner\s*==".to_string()),
+                },
+                ComplianceRule {
+                    id: "SOL-BP-002".to_string(),
+                    category: "Security".to_string(),
+                    description: "Check signer status".to_string(),
+                    severity: Severity::Critical,
+                    check_type: CheckType::CodePattern(r"is_signer".to_string()),
+                },
+                ComplianceRule {
+                    id: "SOL-BP-003".to_string(),
+                    category: "Arithmetic".to_string(),
+                    description: "Use checked arithmetic".to_string(),
+                    severity: Severity::High,
+                    check_type: CheckType::CodePattern(r"checked_add|checked_sub|checked_mul".to_string()),
+                },
+            ],
+        };
+        
+        self.compliance_rules.insert("solana".to_string(), framework);
     }
     
     fn load_iso27001_framework(&self) -> ComplianceFramework {

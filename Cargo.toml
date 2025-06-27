@@ -36,9 +36,10 @@ rayon = "1.8"
 num_cpus = "1.16"
 async-trait = "0.1"
 
-# Go code parsing and analysis
+# Code parsing and analysis
 tree-sitter = "0.20"
 tree-sitter-go = "0.20"
+tree-sitter-rust = "0.20"
 tree-sitter-javascript = "0.20"
 tree-sitter-typescript = "0.20"
 syn = "2.0"

@@ -1,6 +1,6 @@
 # ChainGuard 🛡️
 
-An advanced analysis and review platform for smart contracts and blockchain applications. ChainGuard is designed for the modern development workflow, providing the tools to ensure that any code—whether human-written or AI-generated—is secure, efficient, and correct. It includes specialized support for Hyperledger Fabric chaincode alongside broad capabilities for other platforms.
+An advanced analysis and review platform for smart contracts and blockchain applications. ChainGuard is designed for the modern development workflow, providing the tools to ensure that any code—whether human-written or AI-generated—is secure, efficient, and correct. It includes specialized support for Hyperledger Fabric chaincode and Solana programs alongside broad capabilities for other platforms.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=flat&logo=rust&logoColor=white)](https://www.rust-lang.org/)
@@ -12,6 +12,7 @@ An advanced analysis and review platform for smart contracts and blockchain appl
 - **Comprehensive Smart Contract Auditing**: Goes beyond security to analyze for correctness, performance bottlenecks, and compliance with best practices.
 - **Stablecoin Security Analysis**: Specialized checks for stablecoin contracts including collateralization, oracle security, minting controls, flash loan protection, and peg stability mechanisms.
 - **Hyperledger Fabric Support**: Analysis of Fabric chaincode for common issues including nondeterministic operations (timestamps, randomness, global state), potential private data exposure, basic MVCC conflict detection, and platform-specific vulnerabilities.
+- **Solana Program Support**: Comprehensive analysis of Solana programs including account validation, signer checks, arithmetic overflow/underflow detection, CPI security, PDA vulnerabilities, and compute unit optimization.
 - **Performance & Optimization Insights**: Analyzes transaction throughput and storage efficiency, providing actionable, AI-powered suggestions for optimization.
 - **Flexible Reporting**: Generates detailed reports in JSON, Markdown, HTML, and SARIF to integrate seamlessly into your development and CI/CD workflows.
 
@@ -61,15 +62,20 @@ Once installed, you can immediately run a scan on the provided test file to see 
 From the root of the project directory, run the following command after building the tool:
 
 ```bash
+# Analyze Fabric chaincode
 ./target/release/chainguard analyze test_chaincode.go --fabric
+
+# Analyze Solana program
+./target/release/chainguard analyze examples/vulnerable_solana_program.rs --solana
 ```
 
-This command analyzes the sample Go chaincode file (`test_chaincode.go`) using ChainGuard's Hyperledger Fabric-specific rules.
+These commands analyze the sample files using ChainGuard's platform-specific rules.
 
 ### Expected Output
 
 You will see a summary of the findings directly in your terminal, similar to this:
 
+For Fabric chaincode:
 ```text
 🔍 Chainguard Analysis
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -88,6 +94,29 @@ Critical: 0 | High: 2 | Medium: 0 | Low: 0 | Info: 0
   No authentication or authorization checks found
 ```
 
+For Solana programs:
+```text
+🔍 Chainguard Analysis
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+...
+ChainGuard Analysis Report
+==========================
+Total Findings: 15
+Critical: 4 | High: 7 | Medium: 3 | Low: 1 | Info: 0
+
+[Critical] SOL-ACC-001 - Missing account validation
+  File: vulnerable_solana_program.rs:22
+  Account used without proper validation
+
+[Critical] SOL-SIGN-001 - Missing signer verification  
+  File: vulnerable_solana_program.rs:26
+  Sensitive operation 'transfer' performed without verifying signer
+
+[High] SOL-ARITH-001 - Unsafe arithmetic operation
+  File: vulnerable_solana_program.rs:29
+  Unchecked multiplication operation detected
+```
+
 This gives you immediate feedback that the tool is working correctly. You can now point ChainGuard at your own projects.
 
 ## Common Commands
@@ -97,11 +126,13 @@ ChainGuard offers a rich set of commands for different analysis needs.
 | Command | Description | Example |
 |---|---|---|
 | `analyze` | Comprehensive security, performance, and quality analysis. | `chainguard analyze --fabric ./my-chaincode/` |
+| `analyze` | Analyze Solana programs for security vulnerabilities. | `chainguard analyze --solana ./my-program/` |
 | `scan` | Quick scan for high-severity vulnerabilities. | `chainguard scan ./contracts/` |
 | `audit` | Check for compliance with standards like ERC-20. | `chainguard audit --standards erc20 ./token.sol` |
 | `audit` | Check stablecoin-specific security issues. | `chainguard audit --standards stablecoin ./stablecoin.sol` |
 | `validate` | Use multiple LLMs to review and validate code for correctness. | `chainguard validate --consensus ./contract.go` |
 | `benchmark` | Analyze performance metrics like throughput and storage. | `chainguard benchmark --throughput ./chaincode/` |
+| `benchmark` | Analyze Solana program compute unit usage. | `chainguard benchmark --solana ./program.rs` |
 | `report` | Generate a detailed report from a previous analysis. | `chainguard report results.json -o report.html` |
 | `init` | Create a default `chainguard.toml` configuration file. | `chainguard init` |
 
@@ -183,6 +214,34 @@ We welcome contributions! Please read our `CONTRIBUTING.md` for details on how t
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+## 🌊 Solana Program Security
+
+ChainGuard provides comprehensive security analysis for Solana programs, detecting common vulnerabilities and performance issues:
+
+### Key Solana Security Checks:
+- **Account Validation**: Ensures proper validation of account ownership, signer status, and writability
+- **Arithmetic Safety**: Detects integer overflow/underflow vulnerabilities in balance calculations
+- **Cross-Program Invocation (CPI) Security**: Validates program IDs and prevents arbitrary program execution
+- **Signer Verification**: Ensures proper authorization checks before sensitive operations
+- **PDA Security**: Detects seed collision vulnerabilities and validates canonical bumps
+- **Type Confusion**: Identifies missing discriminators and account type validation
+- **Duplicate Mutable Accounts**: Prevents exploitation through duplicate account references
+- **Rent Exemption**: Ensures proper rent calculations to prevent account deletion
+- **Performance Optimization**: Identifies excessive CPI calls, large allocations, and compute unit waste
+
+### Example Usage:
+```bash
+# Analyze a Solana program
+chainguard analyze --solana ./my-program/src/lib.rs
+
+# The analysis will identify issues like:
+# - SOL-ACC-001: Missing account validation
+# - SOL-SIGN-001: Missing signer verification
+# - SOL-ARITH-001: Unsafe arithmetic operation
+# - SOL-CPI-001: Unvalidated cross-program invocation
+# - SOL-PERF-001: Multiple CPIs in close proximity
+```
+
 ## 🏦 Stablecoin Security
 
 ChainGuard includes comprehensive security checks specifically designed for stablecoin contracts:
@@ -213,6 +272,12 @@ chainguard analyze --standards stablecoin ./my-stablecoin.sol
 
 ### Security Vulnerabilities
 - **FABRIC-SEC-xxx**: Fabric-specific security issues
+- **SOL-xxx**: Solana-specific vulnerabilities
+  - **SOL-ACC-xxx**: Account validation issues
+  - **SOL-SIGN-xxx**: Signer verification problems
+  - **SOL-ARITH-xxx**: Arithmetic overflow/underflow
+  - **SOL-CPI-xxx**: Cross-program invocation vulnerabilities
+  - **SOL-PDA-xxx**: Program Derived Address issues
 - **TOKEN-SEC-xxx**: Token-related vulnerabilities
 - **CRYPTO-SEC-xxx**: Cryptographic weaknesses
 - **ACCESS-xxx**: Access control issues
@@ -220,12 +285,14 @@ chainguard analyze --standards stablecoin ./my-stablecoin.sol
 ### Performance Issues
 - **PERF-xxx**: General performance problems
 - **FABRIC-PERF-xxx**: Fabric-specific performance issues
+- **SOL-PERF-xxx**: Solana-specific performance issues
 - **STATE-xxx**: State management inefficiencies
 
 ### Compliance Violations
 - **ERC20-xxx**: ERC-20 standard violations
 - **ERC721-xxx**: ERC-721 standard violations
 - **FABRIC-COMP-xxx**: Fabric best practices violations
+- **SOL-COMP-xxx**: Solana best practices violations
 
 ## 🤝 Integration
 
