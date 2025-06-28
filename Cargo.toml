@@ -99,7 +99,7 @@ tera = "1.19"
 pdf = "0.8"
 pulldown-cmark = "0.9"
 printpdf = "0.6"
-lopdf = "0.31"
+lopdf = "0.36"
 
 # Database for tracking and caching
 rusqlite = { version = "0.31", features = ["bundled"] }
