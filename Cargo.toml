@@ -118,7 +118,7 @@ ort = "1.16"
 
 # WebAssembly support for sandboxed execution
 wasmtime = "26.0"
-wasmer = "4.2"
+wasmer = "6.0"
 
 # Git integration
 git2 = "0.18"
