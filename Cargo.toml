@@ -27,7 +27,7 @@ clap = { version = "4.5", features = ["derive", "env", "cargo"] }
 indicatif = "0.17"
 console = "0.15"
 dialoguer = "0.11"
-colored = "2.1"
+colored = "3.0"
 
 # Async runtime
 tokio = { version = "1.36", features = ["full"] }
