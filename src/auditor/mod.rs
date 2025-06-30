@@ -1,7 +1,7 @@
-use crate::{Result, ChainGuardError, Finding, Severity};
-use serde::{Serialize, Deserialize};
-use std::path::Path;
+use crate::{ChainGuardError, Finding, Result, Severity};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+use std::path::Path;
 
 pub struct Auditor {
     compliance_rules: HashMap<String, ComplianceFramework>,
@@ -50,45 +50,49 @@ impl Auditor {
             solana_compliance_enabled: false,
         }
     }
-    
+
     pub fn enable_fabric_compliance(&mut self) {
         self.fabric_compliance_enabled = true;
         self.load_fabric_compliance_rules();
     }
-    
+
     pub fn enable_solana_compliance(&mut self) {
         self.solana_compliance_enabled = true;
         self.load_solana_compliance_rules();
     }
-    
+
     pub fn load_framework(&mut self, framework_name: &str) -> Result<()> {
         let framework = match framework_name.to_lowercase().as_str() {
             "iso27001" => self.load_iso27001_framework(),
             "nist" => self.load_nist_framework(),
             "cis" => self.load_cis_framework(),
             "owasp" => self.load_owasp_framework(),
-            _ => return Err(ChainGuardError::Config(
-                format!("Unknown compliance framework: {}", framework_name)
-            )),
+            _ => {
+                return Err(ChainGuardError::Config(format!(
+                    "Unknown compliance framework: {}",
+                    framework_name
+                )))
+            }
         };
-        
-        self.compliance_rules.insert(framework_name.to_string(), framework);
+
+        self.compliance_rules
+            .insert(framework_name.to_string(), framework);
         Ok(())
     }
-    
+
     pub async fn audit(&self, path: &Path) -> Result<AuditResult> {
         let mut all_findings = Vec::new();
         let mut total_checks = 0;
         let mut passed_checks = 0;
-        
+
         // Read the file or directory
         let files = self.collect_files(path).await?;
-        
+
         // Run compliance checks
         for (_framework_name, framework) in &self.compliance_rules {
             for rule in &framework.rules {
                 total_checks += 1;
-                
+
                 let violations = self.check_rule(&files, rule).await?;
                 if violations.is_empty() {
                     passed_checks += 1;
@@ -97,19 +101,19 @@ impl Auditor {
                 }
             }
         }
-        
+
         // Run Fabric-specific compliance if enabled
         if self.fabric_compliance_enabled {
             let fabric_findings = self.audit_fabric_compliance(&files).await?;
             all_findings.extend(fabric_findings);
         }
-        
+
         let compliance_score = if total_checks > 0 {
             (passed_checks as f32 / total_checks as f32) * 100.0
         } else {
             100.0
         };
-        
+
         Ok(AuditResult {
             compliance_score,
             framework: self.get_framework_names(),
@@ -118,10 +122,10 @@ impl Auditor {
             total_checks,
         })
     }
-    
+
     async fn collect_files(&self, path: &Path) -> Result<Vec<(String, String)>> {
         let mut files = Vec::new();
-        
+
         if path.is_file() {
             let content = tokio::fs::read_to_string(path).await?;
             files.push((path.to_string_lossy().to_string(), content));
@@ -135,17 +139,17 @@ impl Auditor {
                 }
             }
         }
-        
+
         Ok(files)
     }
-    
+
     async fn check_rule(
         &self,
         files: &[(String, String)],
         rule: &ComplianceRule,
     ) -> Result<Vec<Finding>> {
         let mut findings = Vec::new();
-        
+
         for (file_path, content) in files {
             match &rule.check_type {
                 CheckType::CodePattern(pattern) => {
@@ -158,7 +162,7 @@ impl Auditor {
                         findings.push(self.create_finding(
                             file_path,
                             rule,
-                            format!("Required function '{}' not found", function)
+                            format!("Required function '{}' not found", function),
                         ));
                     }
                 }
@@ -174,10 +178,10 @@ impl Auditor {
                 }
             }
         }
-        
+
         Ok(findings)
     }
-    
+
     fn check_code_pattern(
         &self,
         content: &str,
@@ -185,7 +189,7 @@ impl Auditor {
         _rule: &ComplianceRule,
     ) -> Option<String> {
         use regex::Regex;
-        
+
         if let Ok(re) = Regex::new(pattern) {
             if re.is_match(content) {
                 return Some(format!("Code pattern '{}' found", pattern));
@@ -193,13 +197,13 @@ impl Auditor {
         }
         None
     }
-    
+
     fn check_function_presence(&self, content: &str, function: &str) -> bool {
-        content.contains(&format!("func {}", function)) ||
-        content.contains(&format!("function {}", function)) ||
-        content.contains(&format!("def {}", function))
+        content.contains(&format!("func {}", function))
+            || content.contains(&format!("function {}", function))
+            || content.contains(&format!("def {}", function))
     }
-    
+
     fn check_security_property(
         &self,
         content: &str,
@@ -226,7 +230,7 @@ impl Auditor {
         }
         None
     }
-    
+
     fn run_custom_check(
         &self,
         _content: &str,
@@ -236,10 +240,10 @@ impl Auditor {
         // Custom checks would be implemented here
         None
     }
-    
+
     async fn audit_fabric_compliance(&self, files: &[(String, String)]) -> Result<Vec<Finding>> {
         let mut findings = Vec::new();
-        
+
         for (file_path, content) in files {
             // Check Fabric best practices
             if !content.contains("GetCreator") {
@@ -255,37 +259,33 @@ impl Auditor {
                     code_snippet: None,
                     remediation: Some("Implement GetCreator() validation".to_string()),
                     references: vec![],
-                    ai_consensus: None
+                    ai_consensus: None,
                 });
             }
-            
+
             if content.contains("time.Now()") {
                 findings.push(Finding {
                     id: "FABRIC-COMP-002".to_string(),
                     severity: Severity::High,
                     category: "Compliance/Fabric".to_string(),
                     title: "Non-deterministic time usage".to_string(),
-                    description: "Using time.Now() violates Fabric determinism requirements".to_string(),
+                    description: "Using time.Now() violates Fabric determinism requirements"
+                        .to_string(),
                     file: file_path.clone(),
                     line: 1,
                     column: 1,
                     code_snippet: None,
                     remediation: Some("Use GetTxTimestamp() instead".to_string()),
                     references: vec![],
-                    ai_consensus: None
+                    ai_consensus: None,
                 });
             }
         }
-        
+
         Ok(findings)
     }
-    
-    fn create_finding(
-        &self,
-        file_path: &str,
-        rule: &ComplianceRule,
-        violation: String,
-    ) -> Finding {
+
+    fn create_finding(&self, file_path: &str, rule: &ComplianceRule, violation: String) -> Finding {
         Finding {
             id: rule.id.clone(),
             severity: rule.severity,
@@ -301,21 +301,22 @@ impl Auditor {
             ai_consensus: None,
         }
     }
-    
+
     fn should_audit_file(&self, path: &Path) -> bool {
         matches!(
             path.extension().and_then(|e| e.to_str()),
             Some("go") | Some("js") | Some("ts") | Some("sol") | Some("yaml") | Some("json")
         )
     }
-    
+
     fn get_framework_names(&self) -> String {
-        self.compliance_rules.keys()
+        self.compliance_rules
+            .keys()
             .cloned()
             .collect::<Vec<_>>()
             .join(", ")
     }
-    
+
     fn load_fabric_compliance_rules(&mut self) {
         let framework = ComplianceFramework {
             name: "Hyperledger Fabric Best Practices".to_string(),
@@ -333,14 +334,17 @@ impl Auditor {
                     category: "Determinism".to_string(),
                     description: "Avoid non-deterministic operations".to_string(),
                     severity: Severity::Critical,
-                    check_type: CheckType::CodePattern(r"time\.Now\(\)|rand\.|map\s+range".to_string()),
+                    check_type: CheckType::CodePattern(
+                        r"time\.Now\(\)|rand\.|map\s+range".to_string(),
+                    ),
                 },
             ],
         };
-        
-        self.compliance_rules.insert("fabric".to_string(), framework);
+
+        self.compliance_rules
+            .insert("fabric".to_string(), framework);
     }
-    
+
     fn load_solana_compliance_rules(&mut self) {
         let framework = ComplianceFramework {
             name: "Solana Best Practices".to_string(),
@@ -365,75 +369,70 @@ impl Auditor {
                     category: "Arithmetic".to_string(),
                     description: "Use checked arithmetic".to_string(),
                     severity: Severity::High,
-                    check_type: CheckType::CodePattern(r"checked_add|checked_sub|checked_mul".to_string()),
+                    check_type: CheckType::CodePattern(
+                        r"checked_add|checked_sub|checked_mul".to_string(),
+                    ),
                 },
             ],
         };
-        
-        self.compliance_rules.insert("solana".to_string(), framework);
+
+        self.compliance_rules
+            .insert("solana".to_string(), framework);
     }
-    
+
     fn load_iso27001_framework(&self) -> ComplianceFramework {
         ComplianceFramework {
             name: "ISO 27001".to_string(),
             version: "2022".to_string(),
-            rules: vec![
-                ComplianceRule {
-                    id: "ISO27001-A.8.24".to_string(),
-                    category: "Cryptography".to_string(),
-                    description: "Use of cryptography".to_string(),
-                    severity: Severity::High,
-                    check_type: CheckType::SecurityProperty("encryption_at_rest".to_string()),
-                },
-            ],
+            rules: vec![ComplianceRule {
+                id: "ISO27001-A.8.24".to_string(),
+                category: "Cryptography".to_string(),
+                description: "Use of cryptography".to_string(),
+                severity: Severity::High,
+                check_type: CheckType::SecurityProperty("encryption_at_rest".to_string()),
+            }],
         }
     }
-    
+
     fn load_nist_framework(&self) -> ComplianceFramework {
         ComplianceFramework {
             name: "NIST Cybersecurity Framework".to_string(),
             version: "1.1".to_string(),
-            rules: vec![
-                ComplianceRule {
-                    id: "NIST-PR.DS-1".to_string(),
-                    category: "Data Security".to_string(),
-                    description: "Data-at-rest protection".to_string(),
-                    severity: Severity::High,
-                    check_type: CheckType::SecurityProperty("encryption_at_rest".to_string()),
-                },
-            ],
+            rules: vec![ComplianceRule {
+                id: "NIST-PR.DS-1".to_string(),
+                category: "Data Security".to_string(),
+                description: "Data-at-rest protection".to_string(),
+                severity: Severity::High,
+                check_type: CheckType::SecurityProperty("encryption_at_rest".to_string()),
+            }],
         }
     }
-    
+
     fn load_cis_framework(&self) -> ComplianceFramework {
         ComplianceFramework {
             name: "CIS Controls".to_string(),
             version: "8".to_string(),
-            rules: vec![
-                ComplianceRule {
-                    id: "CIS-3.3".to_string(),
-                    category: "Data Protection".to_string(),
-                    description: "Configure Data Access Control".to_string(),
-                    severity: Severity::High,
-                    check_type: CheckType::FunctionPresence("AccessControl".to_string()),
-                },
-            ],
+            rules: vec![ComplianceRule {
+                id: "CIS-3.3".to_string(),
+                category: "Data Protection".to_string(),
+                description: "Configure Data Access Control".to_string(),
+                severity: Severity::High,
+                check_type: CheckType::FunctionPresence("AccessControl".to_string()),
+            }],
         }
     }
-    
+
     fn load_owasp_framework(&self) -> ComplianceFramework {
         ComplianceFramework {
             name: "OWASP Top 10".to_string(),
             version: "2021".to_string(),
-            rules: vec![
-                ComplianceRule {
-                    id: "OWASP-A03".to_string(),
-                    category: "Injection".to_string(),
-                    description: "Input validation required".to_string(),
-                    severity: Severity::Critical,
-                    check_type: CheckType::SecurityProperty("input_validation".to_string()),
-                },
-            ],
+            rules: vec![ComplianceRule {
+                id: "OWASP-A03".to_string(),
+                category: "Injection".to_string(),
+                description: "Input validation required".to_string(),
+                severity: Severity::Critical,
+                check_type: CheckType::SecurityProperty("input_validation".to_string()),
+            }],
         }
     }
-} 
+}

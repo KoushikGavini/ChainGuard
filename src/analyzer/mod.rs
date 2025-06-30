@@ -1,7 +1,7 @@
-pub mod security;
-pub mod performance;
 pub mod complexity;
 pub mod dependencies;
+pub mod performance;
+pub mod security;
 
 use crate::{Finding, Result};
 use std::path::Path;
@@ -44,66 +44,67 @@ impl Analyzer {
 
     pub async fn analyze_file(&mut self, path: &Path) -> Result<AnalysisResult> {
         info!("Analyzing file: {}", path.display());
-        
+
         let content = fs::read_to_string(path).await?;
         let mut findings = Vec::new();
         let mut metrics = AnalysisMetrics::default();
-        
+
         // Run security analysis
         debug!("Running security analysis");
         let security_findings = self.security_analyzer.analyze(&content, path)?;
         findings.extend(security_findings);
-        
+
         // Run performance analysis
         debug!("Running performance analysis");
         let perf_findings = self.performance_analyzer.analyze(&content, path)?;
         findings.extend(perf_findings);
-        
+
         // Run complexity analysis
         debug!("Running complexity analysis");
-        let (complexity_findings, complexity_metrics) = self.complexity_analyzer.analyze(&content, path)?;
+        let (complexity_findings, complexity_metrics) =
+            self.complexity_analyzer.analyze(&content, path)?;
         findings.extend(complexity_findings);
         metrics.cyclomatic_complexity = complexity_metrics.cyclomatic_complexity;
         metrics.code_duplication_ratio = complexity_metrics.duplication_ratio;
-        
+
         // Run dependency analysis
         debug!("Running dependency analysis");
         let dep_findings = self.dependency_analyzer.analyze(&content, path)?;
         findings.extend(dep_findings);
-        
+
         // Calculate scores
         metrics.total_lines = content.lines().count();
         metrics.security_score = calculate_security_score(&findings);
         metrics.performance_score = calculate_performance_score(&findings);
-        
+
         Ok(AnalysisResult { findings, metrics })
     }
-    
+
     pub async fn quick_scan(&self, path: &Path) -> Result<AnalysisResult> {
         info!("Quick scanning file: {}", path.display());
-        
+
         let content = fs::read_to_string(path).await?;
         let mut findings = Vec::new();
         let mut metrics = AnalysisMetrics::default();
-        
+
         // Only run critical security checks for quick scan
         debug!("Running quick security scan");
         let security_findings = self.security_analyzer.quick_scan(&content, path)?;
         findings.extend(security_findings);
-        
+
         // Basic metrics
         metrics.total_lines = content.lines().count();
         metrics.security_score = calculate_security_score(&findings);
-        
+
         Ok(AnalysisResult { findings, metrics })
     }
-    
+
     pub async fn scan_directory(&self, path: &Path) -> Result<Vec<AnalysisResult>> {
         info!("Scanning directory: {}", path.display());
-        
+
         let mut results = Vec::new();
         let mut stack = vec![path.to_path_buf()];
-        
+
         while let Some(current_path) = stack.pop() {
             if current_path.is_file() {
                 if self.should_analyze_file(&current_path) {
@@ -121,16 +122,16 @@ impl Analyzer {
                 }
             }
         }
-        
+
         Ok(results)
     }
 
     pub async fn analyze_directory(&mut self, path: &Path) -> Result<Vec<AnalysisResult>> {
         info!("Analyzing directory: {}", path.display());
-        
+
         let mut results = Vec::new();
         let mut entries = tokio::fs::read_dir(path).await?;
-        
+
         while let Some(entry) = entries.next_entry().await? {
             let path = entry.path();
             if path.is_file() && self.should_analyze_file(&path) {
@@ -145,10 +146,10 @@ impl Analyzer {
                 results.extend(sub_results);
             }
         }
-        
+
         Ok(results)
     }
-    
+
     fn should_analyze_file(&self, path: &Path) -> bool {
         match path.extension() {
             Some(ext) => {
@@ -161,19 +162,32 @@ impl Analyzer {
 }
 
 fn calculate_security_score(findings: &[Finding]) -> f64 {
-    let critical_count = findings.iter().filter(|f| f.severity == crate::Severity::Critical).count();
-    let high_count = findings.iter().filter(|f| f.severity == crate::Severity::High).count();
-    let medium_count = findings.iter().filter(|f| f.severity == crate::Severity::Medium).count();
-    
-    let score = 100.0 - (critical_count as f64 * 20.0) - (high_count as f64 * 10.0) - (medium_count as f64 * 5.0);
+    let critical_count = findings
+        .iter()
+        .filter(|f| f.severity == crate::Severity::Critical)
+        .count();
+    let high_count = findings
+        .iter()
+        .filter(|f| f.severity == crate::Severity::High)
+        .count();
+    let medium_count = findings
+        .iter()
+        .filter(|f| f.severity == crate::Severity::Medium)
+        .count();
+
+    let score = 100.0
+        - (critical_count as f64 * 20.0)
+        - (high_count as f64 * 10.0)
+        - (medium_count as f64 * 5.0);
     score.max(0.0)
 }
 
 fn calculate_performance_score(findings: &[Finding]) -> f64 {
-    let perf_findings = findings.iter()
+    let perf_findings = findings
+        .iter()
         .filter(|f| f.category.contains("performance"))
         .count();
-    
+
     let score = 100.0 - (perf_findings as f64 * 10.0);
     score.max(0.0)
-} 
+}

@@ -1,7 +1,7 @@
 use crate::{Finding, Result, Severity};
+use lazy_static::lazy_static;
 use regex::Regex;
 use std::path::Path;
-use lazy_static::lazy_static;
 
 pub struct PerformanceAnalyzer {
     query_patterns: Vec<QueryPattern>,
@@ -27,9 +27,11 @@ struct InefficiencyPattern {
 
 lazy_static! {
     static ref UNBOUNDED_QUERY: Regex = Regex::new(r"GetQueryResult[^}]+").unwrap();
-    static ref NESTED_LOOP: Regex = Regex::new(r"for\s+.*\s+in\s+.*\s*\{\s*for\s+.*\s+in\s+").unwrap();
-    static ref LARGE_ARRAY: Regex = Regex::new(r"make\s*\(\s*\[\s*\]\s*\w+\s*,\s*(\d{4,})\s*\)").unwrap();
-    static ref STRING_CONCAT: Regex = Regex::new(r#"(\w+)\s*=\s*\1\s*\+\s*"#).unwrap();
+    static ref NESTED_LOOP: Regex =
+        Regex::new(r"for\s+.*\s+in\s+.*\s*\{\s*for\s+.*\s+in\s+").unwrap();
+    static ref LARGE_ARRAY: Regex =
+        Regex::new(r"make\s*\(\s*\[\s*\]\s*\w+\s*,\s*(\d{4,})\s*\)").unwrap();
+    static ref STRING_CONCAT: Regex = Regex::new(r#"(\w+)\s*=\s*(\w+)\s*\+\s*"#).unwrap();
 }
 
 impl PerformanceAnalyzer {
@@ -42,16 +44,16 @@ impl PerformanceAnalyzer {
                 description: "Unbounded range query can cause performance issues".to_string(),
                 optimization: "Use pagination with limited range queries".to_string(),
             },
-
             QueryPattern {
                 name: "inefficient_composite_key".to_string(),
                 regex: Regex::new(r"CreateCompositeKey\s*\([^,]+,\s*\[\s*\]\s*\)").unwrap(),
                 severity: Severity::Low,
-                description: "Empty attributes in composite key reduce query efficiency".to_string(),
+                description: "Empty attributes in composite key reduce query efficiency"
+                    .to_string(),
                 optimization: "Add meaningful attributes to composite keys".to_string(),
             },
         ];
-        
+
         let inefficiency_patterns = vec![
             InefficiencyPattern {
                 name: "multiple_getstate".to_string(),
@@ -69,7 +71,8 @@ impl PerformanceAnalyzer {
                 name: "large_payload_storage".to_string(),
                 regex: Regex::new(r"PutState\s*\([^,]+,\s*[^)]*\[\d{5,}\]byte").unwrap(),
                 severity: Severity::High,
-                description: "Storing large payloads impacts network and storage performance".to_string(),
+                description: "Storing large payloads impacts network and storage performance"
+                    .to_string(),
             },
             InefficiencyPattern {
                 name: "synchronous_external_call".to_string(),
@@ -78,7 +81,7 @@ impl PerformanceAnalyzer {
                 description: "Synchronous external calls block transaction processing".to_string(),
             },
         ];
-        
+
         Self {
             query_patterns,
             inefficiency_patterns,
@@ -87,7 +90,7 @@ impl PerformanceAnalyzer {
 
     pub fn analyze(&self, content: &str, path: &Path) -> Result<Vec<Finding>> {
         let mut findings = Vec::new();
-        
+
         // Check query patterns
         for pattern in &self.query_patterns {
             for mat in pattern.regex.find_iter(content) {
@@ -110,7 +113,7 @@ impl PerformanceAnalyzer {
                 });
             }
         }
-        
+
         // Check inefficiency patterns
         for pattern in &self.inefficiency_patterns {
             for mat in pattern.regex.find_iter(content) {
@@ -123,7 +126,12 @@ impl PerformanceAnalyzer {
                     description: pattern.description.clone(),
                     file: path.display().to_string(),
                     line: line_number,
-                    column: mat.start() - content.lines().take(line_number - 1).map(|l| l.len() + 1).sum::<usize>(),
+                    column: mat.start()
+                        - content
+                            .lines()
+                            .take(line_number - 1)
+                            .map(|l| l.len() + 1)
+                            .sum::<usize>(),
                     code_snippet: Some(extract_snippet(content, line_number)),
                     remediation: Some("Optimize code for better performance".to_string()),
                     references: vec![],
@@ -131,12 +139,15 @@ impl PerformanceAnalyzer {
                 });
             }
         }
-        
+
         // Check for endorsement policy inefficiencies
         self.check_endorsement_patterns(content, path, &mut findings);
-        
+
         // Check for unbounded queries (missing pagination)
-        if UNBOUNDED_QUERY.is_match(content) && !content.contains("pageSize") && !content.contains("bookmark") {
+        if UNBOUNDED_QUERY.is_match(content)
+            && !content.contains("pageSize")
+            && !content.contains("bookmark")
+        {
             findings.push(Finding {
                 id: "PERF-QUERY-UNBOUNDED".to_string(),
                 severity: Severity::High,
@@ -152,13 +163,14 @@ impl PerformanceAnalyzer {
                 ai_consensus: None,
             });
         }
-        
+
         Ok(findings)
     }
-    
+
     fn check_endorsement_patterns(&self, content: &str, path: &Path, findings: &mut Vec<Finding>) {
         // Check for overly complex endorsement logic
-        let complex_endorsement = Regex::new(r"(GetMSPID|GetCreator)\s*\([^{]*\{[^}]{200,}").unwrap();
+        let complex_endorsement =
+            Regex::new(r"(GetMSPID|GetCreator)\s*\([^{]*\{[^}]{200,}").unwrap();
         for mat in complex_endorsement.find_iter(content) {
             let line_number = content[..mat.start()].lines().count();
             findings.push(Finding {
@@ -166,15 +178,18 @@ impl PerformanceAnalyzer {
                 severity: Severity::Medium,
                 category: "performance/endorsement".to_string(),
                 title: "Complex endorsement validation logic".to_string(),
-                description: "Complex endorsement checks impact transaction performance".to_string(),
+                description: "Complex endorsement checks impact transaction performance"
+                    .to_string(),
                 file: path.display().to_string(),
                 line: line_number,
                 column: 0,
                 code_snippet: Some(extract_snippet(content, line_number)),
-                remediation: Some("Consider using chaincode-level endorsement policies".to_string()),
+                remediation: Some(
+                    "Consider using chaincode-level endorsement policies".to_string(),
+                ),
                 references: vec![],
-                    ai_consensus: None
-                });
+                ai_consensus: None,
+            });
         }
     }
 }
@@ -183,11 +198,11 @@ fn extract_snippet(content: &str, line: usize) -> String {
     let lines: Vec<&str> = content.lines().collect();
     let start = line.saturating_sub(2).max(1);
     let end = (line + 2).min(lines.len());
-    
+
     lines[start - 1..end]
         .iter()
         .enumerate()
         .map(|(i, line)| format!("{:4} | {}", start + i, line))
         .collect::<Vec<_>>()
         .join("\n")
-} 
+}

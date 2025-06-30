@@ -1,8 +1,8 @@
-use crate::{Result, ChainGuardError, Finding, Severity};
-use std::path::Path;
-use serde::{Serialize, Deserialize};
-use std::collections::HashMap;
+use crate::{ChainGuardError, Finding, Result, Severity};
 use regex::Regex;
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use std::path::Path;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Rule {
@@ -26,128 +26,146 @@ impl RuleManager {
             rules: HashMap::new(),
             custom_rules: HashMap::new(),
         };
-        
+
         manager.load_default_rules();
         Ok(manager)
     }
-    
+
     pub fn list_rules(&self, category: Option<&str>, all: bool) -> Result<Vec<Rule>> {
-        let mut rules: Vec<Rule> = self.rules.values()
+        let mut rules: Vec<Rule> = self
+            .rules
+            .values()
             .chain(self.custom_rules.values())
             .filter(|r| {
-                let category_match = category.map_or(true, |c| r.category.to_lowercase().contains(&c.to_lowercase()));
+                let category_match = category.map_or(true, |c| {
+                    r.category.to_lowercase().contains(&c.to_lowercase())
+                });
                 let enabled_match = all || r.enabled;
                 category_match && enabled_match
             })
             .cloned()
             .collect();
-        
+
         rules.sort_by(|a, b| a.id.cmp(&b.id));
         Ok(rules)
     }
-    
+
     pub fn enable_rule(&mut self, pattern: &str) -> Result<usize> {
         let regex = Regex::new(pattern)
             .map_err(|e| ChainGuardError::Config(format!("Invalid pattern: {}", e)))?;
-        
+
         let mut count = 0;
-        
+
         for rule in self.rules.values_mut() {
             if regex.is_match(&rule.id) {
                 rule.enabled = true;
                 count += 1;
             }
         }
-        
+
         for rule in self.custom_rules.values_mut() {
             if regex.is_match(&rule.id) {
                 rule.enabled = true;
                 count += 1;
             }
         }
-        
+
         Ok(count)
     }
-    
+
     pub fn disable_rule(&mut self, pattern: &str) -> Result<usize> {
         let regex = Regex::new(pattern)
             .map_err(|e| ChainGuardError::Config(format!("Invalid pattern: {}", e)))?;
-        
+
         let mut count = 0;
-        
+
         for rule in self.rules.values_mut() {
             if regex.is_match(&rule.id) {
                 rule.enabled = false;
                 count += 1;
             }
         }
-        
+
         for rule in self.custom_rules.values_mut() {
             if regex.is_match(&rule.id) {
                 rule.enabled = false;
                 count += 1;
             }
         }
-        
+
         Ok(count)
     }
-    
+
     pub fn import_rules(&mut self, path: &Path) -> Result<usize> {
         let content = std::fs::read_to_string(path)?;
-        let imported_rules: Vec<Rule> = if path.extension().map_or(false, |e| e == "yaml" || e == "yml") {
-            serde_yaml::from_str(&content)
-                .map_err(|e| ChainGuardError::Config(format!("Failed to parse rules YAML: {}", e)))?
+        let imported_rules: Vec<Rule> = if path
+            .extension()
+            .map_or(false, |e| e == "yaml" || e == "yml")
+        {
+            serde_yaml::from_str(&content).map_err(|e| {
+                ChainGuardError::Config(format!("Failed to parse rules YAML: {}", e))
+            })?
         } else {
-            serde_json::from_str(&content)
-                .map_err(|e| ChainGuardError::Config(format!("Failed to parse rules JSON: {}", e)))?
+            serde_json::from_str(&content).map_err(|e| {
+                ChainGuardError::Config(format!("Failed to parse rules JSON: {}", e))
+            })?
         };
-        
+
         let count = imported_rules.len();
         for mut rule in imported_rules {
             rule.custom = true;
             self.custom_rules.insert(rule.id.clone(), rule);
         }
-        
+
         Ok(count)
     }
-    
+
     pub fn export_rules(&self, path: &Path, custom_only: bool) -> Result<()> {
         let rules: Vec<Rule> = if custom_only {
             self.custom_rules.values().cloned().collect()
         } else {
-            self.rules.values()
+            self.rules
+                .values()
                 .chain(self.custom_rules.values())
                 .cloned()
                 .collect()
         };
-        
-        let content = if path.extension().map_or(false, |e| e == "yaml" || e == "yml") {
-            serde_yaml::to_string(&rules)
-                .map_err(|e| ChainGuardError::Config(format!("Failed to serialize rules to YAML: {}", e)))?
+
+        let content = if path
+            .extension()
+            .map_or(false, |e| e == "yaml" || e == "yml")
+        {
+            serde_yaml::to_string(&rules).map_err(|e| {
+                ChainGuardError::Config(format!("Failed to serialize rules to YAML: {}", e))
+            })?
         } else {
-            serde_json::to_string_pretty(&rules)
-                .map_err(|e| ChainGuardError::Config(format!("Failed to serialize rules to JSON: {}", e)))?
+            serde_json::to_string_pretty(&rules).map_err(|e| {
+                ChainGuardError::Config(format!("Failed to serialize rules to JSON: {}", e))
+            })?
         };
-        
+
         std::fs::write(path, content)?;
         Ok(())
     }
-    
+
     pub fn validate_rules_file(&self, path: &Path) -> Result<()> {
         let content = std::fs::read_to_string(path)?;
-        
+
         // Try to parse as YAML or JSON
-        if path.extension().map_or(false, |e| e == "yaml" || e == "yml") {
+        if path
+            .extension()
+            .map_or(false, |e| e == "yaml" || e == "yml")
+        {
             let _: Vec<Rule> = serde_yaml::from_str(&content)
                 .map_err(|e| ChainGuardError::Config(format!("Invalid rules YAML: {}", e)))?;
         } else {
             let _: Vec<Rule> = serde_json::from_str(&content)
                 .map_err(|e| ChainGuardError::Config(format!("Invalid rules JSON: {}", e)))?;
         }
-        
+
         Ok(())
     }
-    
+
     fn load_default_rules(&mut self) {
         // Security rules
         self.add_rule(Rule {
@@ -159,7 +177,7 @@ impl RuleManager {
             pattern: Some(r"time\.Now\(\)|rand\.|math/rand".to_string()),
             custom: false,
         });
-        
+
         self.add_rule(Rule {
             id: "FABRIC-SEC-002".to_string(),
             category: "security".to_string(),
@@ -169,7 +187,7 @@ impl RuleManager {
             pattern: Some(r"var\s+\w+\s+=".to_string()),
             custom: false,
         });
-        
+
         self.add_rule(Rule {
             id: "FABRIC-SEC-003".to_string(),
             category: "security".to_string(),
@@ -179,7 +197,7 @@ impl RuleManager {
             pattern: Some(r"GetPrivateData.*PutState".to_string()),
             custom: false,
         });
-        
+
         // Performance rules
         self.add_rule(Rule {
             id: "FABRIC-PERF-001".to_string(),
@@ -190,7 +208,7 @@ impl RuleManager {
             pattern: Some(r"GetQueryResult\(|GetQueryResultWithPagination\(".to_string()),
             custom: false,
         });
-        
+
         self.add_rule(Rule {
             id: "FABRIC-PERF-002".to_string(),
             category: "performance".to_string(),
@@ -200,7 +218,7 @@ impl RuleManager {
             pattern: Some(r"for\s*\{|while\s*\(".to_string()),
             custom: false,
         });
-        
+
         // Compliance rules
         self.add_rule(Rule {
             id: "FABRIC-COMP-001".to_string(),
@@ -211,7 +229,7 @@ impl RuleManager {
             pattern: None,
             custom: false,
         });
-        
+
         // Quality rules
         self.add_rule(Rule {
             id: "FABRIC-QUAL-001".to_string(),
@@ -222,7 +240,7 @@ impl RuleManager {
             pattern: None,
             custom: false,
         });
-        
+
         // Token standard rules
         self.add_rule(Rule {
             id: "TOKEN-SEC-001".to_string(),
@@ -234,34 +252,38 @@ impl RuleManager {
             custom: false,
         });
     }
-    
+
     fn add_rule(&mut self, rule: Rule) {
         self.rules.insert(rule.id.clone(), rule);
     }
-    
+
     pub fn get_enabled_rules(&self) -> Vec<&Rule> {
-        self.rules.values()
+        self.rules
+            .values()
             .chain(self.custom_rules.values())
             .filter(|r| r.enabled)
             .collect()
     }
-    
+
     pub fn apply_rules(&self, content: &str, file_path: &str) -> Vec<Finding> {
         let mut findings = Vec::new();
-        
+
         for rule in self.get_enabled_rules() {
             if let Some(pattern) = &rule.pattern {
                 if let Ok(regex) = Regex::new(pattern) {
                     for mat in regex.find_iter(content) {
                         let line = content[..mat.start()].lines().count();
                         let column = mat.start() - content[..mat.start()].rfind('\n').unwrap_or(0);
-                        
+
                         findings.push(Finding {
                             id: rule.id.clone(),
                             severity: rule.severity,
                             category: format!("Rules/{}", rule.category),
                             title: rule.description.clone(),
-                            description: format!("Rule {} triggered at {}:{}", rule.id, line, column),
+                            description: format!(
+                                "Rule {} triggered at {}:{}",
+                                rule.id, line, column
+                            ),
                             file: file_path.to_string(),
                             line,
                             column,
@@ -274,7 +296,7 @@ impl RuleManager {
                 }
             }
         }
-        
+
         findings
     }
-} 
+}

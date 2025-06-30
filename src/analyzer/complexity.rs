@@ -1,6 +1,6 @@
 use crate::{Finding, Result, Severity};
 use std::path::Path;
-use tree_sitter::{Parser, Node};
+use tree_sitter::{Node, Parser};
 
 pub struct ComplexityAnalyzer {
     parser: Parser,
@@ -17,12 +17,18 @@ pub struct ComplexityMetrics {
 impl ComplexityAnalyzer {
     pub fn new() -> Self {
         let mut parser = Parser::new();
-        parser.set_language(tree_sitter_go::language()).expect("Error loading Go grammar");
-        
+        parser
+            .set_language(tree_sitter_go::language())
+            .expect("Error loading Go grammar");
+
         Self { parser }
     }
 
-    pub fn analyze(&mut self, content: &str, path: &Path) -> Result<(Vec<Finding>, ComplexityMetrics)> {
+    pub fn analyze(
+        &mut self,
+        content: &str,
+        path: &Path,
+    ) -> Result<(Vec<Finding>, ComplexityMetrics)> {
         let mut findings = Vec::new();
         let mut metrics = ComplexityMetrics {
             cyclomatic_complexity: 0.0,
@@ -30,26 +36,34 @@ impl ComplexityAnalyzer {
             function_count: 0,
             max_function_complexity: 0,
         };
-        
+
         // Parse the code
-        let tree = self.parser.parse(content, None)
+        let tree = self
+            .parser
+            .parse(content, None)
             .ok_or_else(|| crate::ChainGuardError::Parse("Failed to parse Go code".to_string()))?;
-        
+
         // Analyze functions
-        self.analyze_functions(&tree.root_node(), content, path, &mut findings, &mut metrics);
-        
+        self.analyze_functions(
+            &tree.root_node(),
+            content,
+            path,
+            &mut findings,
+            &mut metrics,
+        );
+
         // Detect code duplication
         let duplication = self.detect_duplication(content);
         metrics.duplication_ratio = duplication.ratio;
         for dup in duplication.findings {
             findings.push(dup);
         }
-        
+
         // Calculate average complexity
         if metrics.function_count > 0 {
             metrics.cyclomatic_complexity /= metrics.function_count as f64;
         }
-        
+
         Ok((findings, metrics))
     }
 
@@ -66,13 +80,13 @@ impl ComplexityAnalyzer {
             metrics.function_count += 1;
             metrics.cyclomatic_complexity += complexity as f64;
             metrics.max_function_complexity = metrics.max_function_complexity.max(complexity);
-            
+
             // Get function name
             let name_node = node.child_by_field_name("name");
             let function_name = name_node
                 .and_then(|n| n.utf8_text(content.as_bytes()).ok())
                 .unwrap_or("anonymous");
-            
+
             // Check complexity thresholds
             if complexity > 15 {
                 let start = node.start_position();
@@ -98,7 +112,10 @@ impl ComplexityAnalyzer {
                     id: "COMPLEX-CYCLOMATIC-MEDIUM".to_string(),
                     severity: Severity::Medium,
                     category: "complexity/cyclomatic".to_string(),
-                    title: format!("Moderate cyclomatic complexity in function '{}'", function_name),
+                    title: format!(
+                        "Moderate cyclomatic complexity in function '{}'",
+                        function_name
+                    ),
                     description: format!("Function has cyclomatic complexity of {}", complexity),
                     file: path.display().to_string(),
                     line: start.row + 1,
@@ -109,11 +126,11 @@ impl ComplexityAnalyzer {
                     ai_consensus: None,
                 });
             }
-            
+
             // Check for dead code
             self.check_dead_code(node, content, path, findings);
         }
-        
+
         // Recurse through children
         let mut cursor = node.walk();
         for child in node.children(&mut cursor) {
@@ -123,13 +140,16 @@ impl ComplexityAnalyzer {
 
     fn calculate_cyclomatic_complexity(&self, node: &Node, _content: &str) -> usize {
         let mut complexity = 1; // Base complexity
-        
+
         fn count_node_complexity(node: &Node) -> usize {
             let mut local_complexity = 0;
-            
+
             match node.kind() {
-                "if_statement" | "for_statement" | "range_statement" | 
-                "switch_statement" | "type_switch_statement" => {
+                "if_statement"
+                | "for_statement"
+                | "range_statement"
+                | "switch_statement"
+                | "type_switch_statement" => {
                     local_complexity += 1;
                 }
                 "case_clause" => {
@@ -146,24 +166,30 @@ impl ComplexityAnalyzer {
                 }
                 _ => {}
             }
-            
+
             // Count complexity of all children
             let mut cursor = node.walk();
             for child in node.children(&mut cursor) {
                 local_complexity += count_node_complexity(&child);
             }
-            
+
             local_complexity
         }
-        
+
         complexity + count_node_complexity(node)
     }
 
-    fn check_dead_code(&self, node: &Node, content: &str, path: &Path, findings: &mut Vec<Finding>) {
+    fn check_dead_code(
+        &self,
+        node: &Node,
+        content: &str,
+        path: &Path,
+        findings: &mut Vec<Finding>,
+    ) {
         // Check for unreachable code after return statements
         let mut cursor = node.walk();
         let mut found_return = false;
-        
+
         for child in node.children(&mut cursor) {
             if found_return && child.kind() != "comment" {
                 let start = child.start_position();
@@ -176,13 +202,18 @@ impl ComplexityAnalyzer {
                     file: path.display().to_string(),
                     line: start.row + 1,
                     column: start.column,
-                    code_snippet: Some(child.utf8_text(content.as_bytes()).unwrap_or("").to_string()),
+                    code_snippet: Some(
+                        child
+                            .utf8_text(content.as_bytes())
+                            .unwrap_or("")
+                            .to_string(),
+                    ),
                     remediation: Some("Remove unreachable code".to_string()),
                     references: vec![],
-                    ai_consensus: None
+                    ai_consensus: None,
                 });
             }
-            
+
             if child.kind() == "return_statement" {
                 found_return = true;
             }
@@ -193,34 +224,36 @@ impl ComplexityAnalyzer {
         let mut findings = Vec::new();
         let lines: Vec<&str> = content.lines().collect();
         let mut duplicates = std::collections::HashMap::new();
-        
+
         // Simple line-based duplication detection
         for i in 0..lines.len() {
             let window_size = 5; // Minimum duplicate block size
             if i + window_size > lines.len() {
                 continue;
             }
-            
+
             let block: Vec<&str> = lines[i..i + window_size].to_vec();
             let block_str = block.join("\n");
-            
+
             // Skip small or trivial blocks
             if block_str.len() < 50 || block_str.trim().is_empty() {
                 continue;
             }
-            
-            duplicates.entry(block_str.clone())
+
+            duplicates
+                .entry(block_str.clone())
                 .or_insert_with(Vec::new)
                 .push(i + 1);
         }
-        
-        let total_duplicate_lines = duplicates.values()
+
+        let total_duplicate_lines = duplicates
+            .values()
             .filter(|locations| locations.len() > 1)
             .map(|locations| locations.len() * 5)
             .sum::<usize>();
-        
+
         let ratio = total_duplicate_lines as f64 / lines.len() as f64;
-        
+
         for (block, locations) in duplicates {
             if locations.len() > 1 {
                 findings.push(Finding {
@@ -228,31 +261,38 @@ impl ComplexityAnalyzer {
                     severity: Severity::Low,
                     category: "complexity/duplication".to_string(),
                     title: "Code duplication detected".to_string(),
-                    description: format!("Similar code block found in {} locations: lines {}", 
-                        locations.len(), 
-                        locations.iter().map(|l| l.to_string()).collect::<Vec<_>>().join(", ")
+                    description: format!(
+                        "Similar code block found in {} locations: lines {}",
+                        locations.len(),
+                        locations
+                            .iter()
+                            .map(|l| l.to_string())
+                            .collect::<Vec<_>>()
+                            .join(", ")
                     ),
                     file: String::new(),
                     line: locations[0],
                     column: 0,
                     code_snippet: Some(block),
-                    remediation: Some("Extract duplicate code into a reusable function".to_string()),
+                    remediation: Some(
+                        "Extract duplicate code into a reusable function".to_string(),
+                    ),
                     references: vec![],
                     ai_consensus: None,
                 });
             }
         }
-        
+
         DuplicationResult { findings, ratio }
     }
 
     fn extract_function_snippet(&self, node: &Node, content: &str) -> String {
         let start_line = node.start_position().row;
         let end_line = node.start_position().row + 5; // Show first 5 lines
-        
+
         let lines: Vec<&str> = content.lines().collect();
         let snippet_lines = &lines[start_line..end_line.min(lines.len())];
-        
+
         snippet_lines
             .iter()
             .enumerate()
@@ -265,4 +305,4 @@ impl ComplexityAnalyzer {
 struct DuplicationResult {
     findings: Vec<Finding>,
     ratio: f64,
-} 
+}
