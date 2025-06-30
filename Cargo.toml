@@ -135,7 +135,7 @@ quickcheck = "1.0"
 
 # Terminal UI enhancements
 ratatui = "0.25"
-crossterm = "0.27"
+crossterm = "0.29"
 
 # Parallel processing
 crossbeam = "0.8"
