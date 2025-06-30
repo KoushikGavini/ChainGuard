@@ -1,6 +1,6 @@
 use crate::{Finding, Result, Severity};
-use std::path::Path;
 use regex::Regex;
+use std::path::Path;
 
 pub struct SlopsquattingDetector {
     import_regex: Regex,
@@ -10,7 +10,7 @@ pub struct SlopsquattingDetector {
 impl SlopsquattingDetector {
     pub fn new() -> Self {
         let import_regex = Regex::new(r#"import\s*(?:\(([^)]+)\)|"([^"]+)")"#).unwrap();
-        
+
         // Known packages and their common misspellings/variations
         let known_packages = vec![
             (
@@ -22,27 +22,27 @@ impl SlopsquattingDetector {
                     "github.com/hyperledger/fabrik-chaincode-go".to_string(), // 'k' instead of 'c'
                     "github.com/hyperleger/fabric-chaincode-go".to_string(),  // Missing 'd'
                     "github.com/hyperledge/fabric-chaincode-go".to_string(),  // Missing 'r'
-                ]
+                ],
             ),
             (
                 "github.com/hyperledger/fabric-protos-go".to_string(),
                 vec![
-                    "github.com/hyperledger/fabric-protоs-go".to_string(),    // Cyrillic 'o'
-                    "github.com/hyperledger/fabric-protos-g0".to_string(),    // Zero instead of 'o'
-                    "github.com/hyperledger/fabric-pr0tos-go".to_string(),    // Zero in 'protos'
-                ]
+                    "github.com/hyperledger/fabric-protоs-go".to_string(), // Cyrillic 'o'
+                    "github.com/hyperledger/fabric-protos-g0".to_string(), // Zero instead of 'o'
+                    "github.com/hyperledger/fabric-pr0tos-go".to_string(), // Zero in 'protos'
+                ],
             ),
             (
                 "github.com/golang/protobuf".to_string(),
                 vec![
-                    "github.com/golang/protоbuf".to_string(),                 // Cyrillic 'o'
-                    "github.com/golang/pr0tobuf".to_string(),                 // Zero instead of 'o'
-                    "github.com/golang/protobuff".to_string(),                // Extra 'f'
-                    "github.com/goland/protobuf".to_string(),                 // Missing 'g'
-                ]
+                    "github.com/golang/protоbuf".to_string(),  // Cyrillic 'o'
+                    "github.com/golang/pr0tobuf".to_string(),  // Zero instead of 'o'
+                    "github.com/golang/protobuff".to_string(), // Extra 'f'
+                    "github.com/goland/protobuf".to_string(),  // Missing 'g'
+                ],
             ),
         ];
-        
+
         Self {
             import_regex,
             known_packages,
@@ -51,10 +51,10 @@ impl SlopsquattingDetector {
 
     pub fn detect(&self, content: &str, path: &Path) -> Result<Vec<Finding>> {
         let mut findings = Vec::new();
-        
+
         // Extract imports
         let imports = self.extract_imports(content);
-        
+
         // Check each import for slopsquatting
         for import in &imports {
             // Check against known packages
@@ -73,15 +73,16 @@ impl SlopsquattingDetector {
                         line: 0,
                         column: 0,
                         code_snippet: None,
-                        remediation: Some(format!("Replace with legitimate package: {}", legitimate)),
-                        references: vec![
-                            "https://snyk.io/blog/typosquatting-attacks/".to_string()
-                        ],
+                        remediation: Some(format!(
+                            "Replace with legitimate package: {}",
+                            legitimate
+                        )),
+                        references: vec!["https://snyk.io/blog/typosquatting-attacks/".to_string()],
                         ai_consensus: None,
                     });
                 }
             }
-            
+
             // Check for homograph attacks
             if self.contains_homographs(import) {
                 findings.push(Finding {
@@ -104,7 +105,7 @@ impl SlopsquattingDetector {
                     ai_consensus: None,
                 });
             }
-            
+
             // Check for suspicious variations
             if self.is_suspicious_variation(import) {
                 findings.push(Finding {
@@ -126,13 +127,13 @@ impl SlopsquattingDetector {
                 });
             }
         }
-        
+
         Ok(findings)
     }
 
     fn extract_imports(&self, content: &str) -> Vec<String> {
         let mut imports = Vec::new();
-        
+
         for cap in self.import_regex.captures_iter(content) {
             if let Some(multi_import) = cap.get(1) {
                 for line in multi_import.as_str().lines() {
@@ -146,7 +147,7 @@ impl SlopsquattingDetector {
                 imports.push(single_import.as_str().to_string());
             }
         }
-        
+
         imports
     }
 
@@ -164,13 +165,13 @@ impl SlopsquattingDetector {
             ('1', 'l'), // One instead of 'l'
             ('1', 'i'), // One instead of 'i'
         ];
-        
+
         for (homograph, _) in homographs {
             if import.contains(homograph) {
                 return true;
             }
         }
-        
+
         false
     }
 
@@ -194,20 +195,20 @@ impl SlopsquattingDetector {
             r"fabr1c",
             r"cha1ncode",
         ];
-        
+
         for pattern in suspicious_patterns {
             if import.contains(pattern) {
                 return true;
             }
         }
-        
+
         // Check edit distance from known packages
         for (legitimate, _) in &self.known_packages {
             if self.levenshtein_distance(import, legitimate) <= 2 && import != legitimate {
                 return true;
             }
         }
-        
+
         false
     }
 
@@ -215,14 +216,14 @@ impl SlopsquattingDetector {
         let len1 = s1.chars().count();
         let len2 = s2.chars().count();
         let mut matrix = vec![vec![0; len2 + 1]; len1 + 1];
-        
+
         for i in 0..=len1 {
             matrix[i][0] = i;
         }
         for j in 0..=len2 {
             matrix[0][j] = j;
         }
-        
+
         for (i, c1) in s1.chars().enumerate() {
             for (j, c2) in s2.chars().enumerate() {
                 let cost = if c1 == c2 { 0 } else { 1 };
@@ -231,7 +232,7 @@ impl SlopsquattingDetector {
                     .min(matrix[i][j] + cost);
             }
         }
-        
+
         matrix[len1][len2]
     }
-} 
+}

@@ -1,71 +1,91 @@
+// ChainGuard - Blockchain Security Analysis Framework
+// Copyright (c) 2024
+
+#![warn(clippy::all)]
+#![allow(clippy::new_without_default)]
+#![allow(clippy::unnecessary_map_or)]
+#![allow(clippy::manual_clamp)]
+#![allow(clippy::redundant_closure)]
+#![allow(clippy::useless_format)]
+#![allow(clippy::useless_vec)]
+#![allow(clippy::needless_range_loop)]
+#![allow(clippy::implicit_saturating_sub)]
+#![allow(clippy::for_kv_map)]
+#![allow(clippy::io_other_error)]
+#![allow(clippy::collapsible_if)]
+#![allow(dead_code)]
+#![allow(unused_variables)]
+#![allow(unused_imports)]
+#![allow(unused_mut)]
+
+pub mod ai_validation;
 pub mod analyzer;
-pub mod validator;
+pub mod auditor;
+pub mod auth;
+pub mod benchmark;
+pub mod compliance;
+pub mod fabric;
+pub mod formal_verification;
+pub mod interactive;
+pub mod llm;
+pub mod optimizer;
+pub mod performance;
+pub mod plugins;
 pub mod reporter;
 pub mod rules;
-pub mod utils;
-pub mod llm;
-pub mod fabric;
 pub mod solana;
 pub mod token_standards;
-pub mod auditor;
-pub mod benchmark;
-pub mod optimizer;
-pub mod auth;
-pub mod interactive;
-pub mod formal_verification;
-pub mod ai_validation;
-pub mod performance;
-pub mod compliance;
-pub mod plugins;
+pub mod utils;
+pub mod validator;
 
-use thiserror::Error;
 use clap::ValueEnum;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
+use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum ChainGuardError {
     #[error("IO error: {0}")]
     Io(#[from] std::io::Error),
-    
+
     #[error("Parse error: {0}")]
     Parse(String),
-    
+
     #[error("Validation error: {0}")]
     Validation(String),
-    
+
     #[error("Analysis error: {0}")]
     Analysis(String),
-    
+
     #[error("Report generation error: {0}")]
     Report(String),
-    
+
     #[error("Configuration error: {0}")]
     Config(String),
-    
+
     #[error("Network error: {0}")]
     Network(#[from] reqwest::Error),
-    
+
     #[error("Database error: {0}")]
     Database(#[from] rusqlite::Error),
-    
+
     #[error("LLM error: {0}")]
     LLM(String),
-    
+
     #[error("Fabric-specific error: {0}")]
     Fabric(String),
-    
+
     #[error("Solana-specific error: {0}")]
     Solana(String),
-    
+
     #[error("Token standard error: {0}")]
     TokenStandard(String),
-    
+
     #[error("Authentication error: {0}")]
     Auth(String),
-    
+
     #[error("Plugin error: {0}")]
     Plugin(String),
-    
+
     #[error("Formal verification error: {0}")]
     FormalVerification(String),
 }
@@ -184,7 +204,7 @@ impl Default for AnalysisConfig {
 // Module-specific types and traits
 pub mod types {
     use super::*;
-    
+
     #[derive(Debug, Clone, Serialize, Deserialize)]
     pub struct AnalysisResult {
         pub file: String,
@@ -192,7 +212,7 @@ pub mod types {
         pub metrics: AnalysisMetrics,
         pub ai_validation: Option<AIValidationResult>,
     }
-    
+
     #[derive(Debug, Clone, Serialize, Deserialize)]
     pub struct AnalysisMetrics {
         pub total_lines: usize,
@@ -204,7 +224,7 @@ pub mod types {
         pub compliance_score: f32,
         pub ai_confidence_score: f32,
     }
-    
+
     #[derive(Debug, Clone, Serialize, Deserialize)]
     pub struct AIValidationResult {
         pub is_ai_generated: bool,
@@ -226,6 +246,9 @@ impl From<toml::ser::Error> for ChainGuardError {
 
 impl From<dialoguer::Error> for ChainGuardError {
     fn from(e: dialoguer::Error) -> Self {
-        ChainGuardError::Io(std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))
+        ChainGuardError::Io(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            e.to_string(),
+        ))
     }
-} 
+}

@@ -1,6 +1,6 @@
-use crate::{Result, Finding, Severity};
-use tree_sitter::Tree;
+use crate::{Finding, Result, Severity};
 use regex::Regex;
+use tree_sitter::Tree;
 
 pub struct AccountValidator {
     patterns: Vec<AccountPattern>,
@@ -42,16 +42,16 @@ impl AccountValidator {
             ],
         }
     }
-    
+
     pub fn analyze(&self, content: &str, tree: &Tree) -> Result<Vec<Finding>> {
         let mut findings = Vec::new();
-        
+
         // Check each pattern
         for account_pattern in &self.patterns {
             for mat in account_pattern.pattern.find_iter(content) {
                 let pos = mat.start();
                 let (line, column) = self.get_line_column(content, pos);
-                
+
                 findings.push(Finding {
                     id: account_pattern.id.clone(),
                     severity: account_pattern.severity,
@@ -64,23 +64,23 @@ impl AccountValidator {
                     code_snippet: Some(self.get_code_snippet(content, line)),
                     remediation: Some(self.get_remediation(&account_pattern.id)),
                     references: vec![
-                        "https://docs.solana.com/developing/programming-model/accounts".to_string()
+                        "https://docs.solana.com/developing/programming-model/accounts".to_string(),
                     ],
                     ai_consensus: None,
                 });
             }
         }
-        
+
         // Additional complex checks
         findings.extend(self.check_discriminator_pattern(content)?);
         findings.extend(self.check_account_close_pattern(content)?);
-        
+
         Ok(findings)
     }
-    
+
     fn check_discriminator_pattern(&self, content: &str) -> Result<Vec<Finding>> {
         let mut findings = Vec::new();
-        
+
         // Check for accounts that should have discriminators
         if content.contains("borsh::BorshDeserialize") || content.contains("anchor_lang") {
             if !content.contains("discriminator") && !content.contains("account_discriminator") {
@@ -89,36 +89,36 @@ impl AccountValidator {
                     severity: Severity::High,
                     category: "Solana/AccountValidation".to_string(),
                     title: "Missing account discriminator".to_string(),
-                    description: 
-                        "Account types should have discriminators to prevent type confusion attacks".to_string(),
+                    description:
+                        "Account types should have discriminators to prevent type confusion attacks"
+                            .to_string(),
                     file: "".to_string(),
                     line: 1,
                     column: 1,
                     code_snippet: None,
                     remediation: Some(
-                        "Add an 8-byte discriminator field at the beginning of account data".to_string()
+                        "Add an 8-byte discriminator field at the beginning of account data"
+                            .to_string(),
                     ),
-                    references: vec![
-                        "https://www.anchor-lang.com/docs/account-types".to_string()
-                    ],
+                    references: vec!["https://www.anchor-lang.com/docs/account-types".to_string()],
                     ai_consensus: None,
                 });
             }
         }
-        
+
         Ok(findings)
     }
-    
+
     fn check_account_close_pattern(&self, content: &str) -> Result<Vec<Finding>> {
         let mut findings = Vec::new();
-        
+
         // Check for account closing patterns
         let close_pattern = Regex::new(r"lamports\.borrow_mut\(\)\s*=\s*0").unwrap();
-        
+
         for mat in close_pattern.find_iter(content) {
             let pos = mat.start();
             let (line, column) = self.get_line_column(content, pos);
-            
+
             // Check if data is also cleared
             let context = self.get_context_around(content, pos, 200);
             if !context.contains("data.borrow_mut().fill(0)") && !context.contains("assign") {
@@ -127,7 +127,7 @@ impl AccountValidator {
                     severity: Severity::High,
                     category: "Solana/AccountValidation".to_string(),
                     title: "Incomplete account closure".to_string(),
-                    description: 
+                    description:
                         "Account closed without clearing data or reassigning ownership. This could lead to account resurrection attacks".to_string(),
                     file: "".to_string(),
                     line,
@@ -143,23 +143,30 @@ impl AccountValidator {
                 });
             }
         }
-        
+
         Ok(findings)
     }
-    
+
     fn get_remediation(&self, id: &str) -> String {
         match id {
-            "SOL-ACC-002" => "Use named account structs or constants for account indices".to_string(),
-            "SOL-ACC-003" => "Use Rent::get()?.minimum_balance(data_len) for proper rent calculations".to_string(),
-            "SOL-ACC-004" => "Use a proper initialization flag or discriminator in account data".to_string(),
+            "SOL-ACC-002" => {
+                "Use named account structs or constants for account indices".to_string()
+            }
+            "SOL-ACC-003" => {
+                "Use Rent::get()?.minimum_balance(data_len) for proper rent calculations"
+                    .to_string()
+            }
+            "SOL-ACC-004" => {
+                "Use a proper initialization flag or discriminator in account data".to_string()
+            }
             _ => "Follow Solana account validation best practices".to_string(),
         }
     }
-    
+
     fn get_line_column(&self, content: &str, pos: usize) -> (usize, usize) {
         let mut line = 1;
         let mut column = 1;
-        
+
         for (i, ch) in content.chars().enumerate() {
             if i == pos {
                 break;
@@ -171,15 +178,15 @@ impl AccountValidator {
                 column += 1;
             }
         }
-        
+
         (line, column)
     }
-    
+
     fn get_code_snippet(&self, content: &str, line: usize) -> String {
         let lines: Vec<&str> = content.lines().collect();
         let start = if line > 2 { line - 2 } else { 1 };
         let end = std::cmp::min(line + 2, lines.len());
-        
+
         lines[start - 1..end]
             .iter()
             .enumerate()
@@ -187,10 +194,14 @@ impl AccountValidator {
             .collect::<Vec<_>>()
             .join("\n")
     }
-    
+
     fn get_context_around(&self, content: &str, pos: usize, context_size: usize) -> String {
-        let start = if pos > context_size { pos - context_size } else { 0 };
+        let start = if pos > context_size {
+            pos - context_size
+        } else {
+            0
+        };
         let end = std::cmp::min(pos + context_size, content.len());
         content[start..end].to_string()
     }
-} 
+}

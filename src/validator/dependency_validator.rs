@@ -1,7 +1,7 @@
 use crate::{Finding, Result, Severity};
-use std::path::Path;
-use std::collections::HashSet;
 use regex::Regex;
+use std::collections::HashSet;
+use std::path::Path;
 
 pub struct DependencyValidator {
     import_regex: Regex,
@@ -19,17 +19,15 @@ struct VulnerablePackage {
 impl DependencyValidator {
     pub async fn new() -> Result<Self> {
         let import_regex = Regex::new(r#"import\s*(?:\(([^)]+)\)|"([^"]+)")"#).unwrap();
-        
+
         // In a real implementation, this would fetch from a vulnerability database
-        let known_vulnerabilities = vec![
-            VulnerablePackage {
-                package: "github.com/dgrijalva/jwt-go".to_string(),
-                versions: vec!["< 4.0.0".to_string()],
-                cve: "CVE-2020-26160".to_string(),
-                description: "JWT signature validation vulnerability".to_string(),
-            },
-        ];
-        
+        let known_vulnerabilities = vec![VulnerablePackage {
+            package: "github.com/dgrijalva/jwt-go".to_string(),
+            versions: vec!["< 4.0.0".to_string()],
+            cve: "CVE-2020-26160".to_string(),
+            description: "JWT signature validation vulnerability".to_string(),
+        }];
+
         Ok(Self {
             import_regex,
             known_vulnerabilities,
@@ -37,16 +35,16 @@ impl DependencyValidator {
     }
 
     pub async fn validate(
-        &self, 
-        content: &str, 
+        &self,
+        content: &str,
         path: &Path,
-        trusted_packages: &HashSet<String>
+        trusted_packages: &HashSet<String>,
     ) -> Result<Vec<Finding>> {
         let mut findings = Vec::new();
-        
+
         // Extract imports
         let imports = self.extract_imports(content);
-        
+
         // Validate each import
         for import in &imports {
             // Check for hallucinated packages
@@ -56,17 +54,22 @@ impl DependencyValidator {
                     severity: Severity::Critical,
                     category: "validation/dependencies".to_string(),
                     title: "Hallucinated package detected".to_string(),
-                    description: format!("Package '{}' appears to be AI-generated and doesn't exist", import),
+                    description: format!(
+                        "Package '{}' appears to be AI-generated and doesn't exist",
+                        import
+                    ),
                     file: path.display().to_string(),
                     line: 0,
                     column: 0,
                     code_snippet: None,
-                    remediation: Some("Use valid package names from official repositories".to_string()),
+                    remediation: Some(
+                        "Use valid package names from official repositories".to_string(),
+                    ),
                     references: vec![],
                     ai_consensus: None,
                 });
             }
-            
+
             // Check against known vulnerabilities
             for vuln in &self.known_vulnerabilities {
                 if import.starts_with(&vuln.package) {
@@ -86,7 +89,7 @@ impl DependencyValidator {
                     });
                 }
             }
-            
+
             // Verify package structure
             if !self.is_valid_package_structure(import) {
                 findings.push(Finding {
@@ -99,19 +102,21 @@ impl DependencyValidator {
                     line: 0,
                     column: 0,
                     code_snippet: None,
-                    remediation: Some("Ensure package paths follow Go module conventions".to_string()),
+                    remediation: Some(
+                        "Ensure package paths follow Go module conventions".to_string(),
+                    ),
                     references: vec![],
                     ai_consensus: None,
                 });
             }
         }
-        
+
         Ok(findings)
     }
 
     fn extract_imports(&self, content: &str) -> HashSet<String> {
         let mut imports = HashSet::new();
-        
+
         for cap in self.import_regex.captures_iter(content) {
             if let Some(multi_import) = cap.get(1) {
                 for line in multi_import.as_str().lines() {
@@ -125,7 +130,7 @@ impl DependencyValidator {
                 imports.insert(single_import.as_str().to_string());
             }
         }
-        
+
         imports
     }
 
@@ -137,13 +142,13 @@ impl DependencyValidator {
             r"github\.com/fabric/.*",                               // Wrong org
             r"hyperledger\.io/.*",                                  // Wrong domain
         ];
-        
+
         for pattern in hallucination_patterns {
             if Regex::new(pattern).unwrap().is_match(import) {
                 return true;
             }
         }
-        
+
         false
     }
 
@@ -152,21 +157,22 @@ impl DependencyValidator {
         if !import.contains("/") {
             return true;
         }
-        
+
         // Check for valid domain-based imports
-        if import.starts_with("github.com/") || 
-           import.starts_with("golang.org/") ||
-           import.starts_with("google.golang.org/") {
+        if import.starts_with("github.com/")
+            || import.starts_with("golang.org/")
+            || import.starts_with("google.golang.org/")
+        {
             // Validate structure: domain/org/repo/...
             let parts: Vec<&str> = import.split('/').collect();
             return parts.len() >= 3;
         }
-        
+
         // Check for other valid patterns
         if import.contains(".") && import.contains("/") {
             return true;
         }
-        
+
         false
     }
-} 
+}

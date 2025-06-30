@@ -1,4 +1,4 @@
-use crate::{Finding, Result, Severity, ChainGuardError};
+use crate::{ChainGuardError, Finding, Result, Severity};
 use regex::Regex;
 use std::path::Path;
 use tree_sitter::{Parser, Query, QueryCursor};
@@ -48,15 +48,18 @@ struct SecurityPattern {
 impl SecurityAnalyzer {
     pub fn new() -> Self {
         let mut parser = Parser::new();
-        parser.set_language(tree_sitter_go::language()).expect("Error loading Go grammar");
-        
+        parser
+            .set_language(tree_sitter_go::language())
+            .expect("Error loading Go grammar");
+
         let nondeterminism_patterns = vec![
             NondeterminismPattern {
                 name: "random_usage".to_string(),
                 regex: Regex::new(r"math/rand|crypto/rand|rand\.\w+").unwrap(),
                 severity: Severity::Critical,
                 description: "Random number generation breaks determinism in chaincode".to_string(),
-                remediation: "Use deterministic values from transaction context or ledger state".to_string(),
+                remediation: "Use deterministic values from transaction context or ledger state"
+                    .to_string(),
             },
             NondeterminismPattern {
                 name: "timestamp_usage".to_string(),
@@ -70,24 +73,27 @@ impl SecurityAnalyzer {
                 regex: Regex::new(r"for\s+\w+\s*,?\s*\w*\s*:=\s*range\s+\w+\s*\{").unwrap(),
                 severity: Severity::Medium,
                 description: "Map iteration order is non-deterministic in Go".to_string(),
-                remediation: "Sort map keys before iteration or use ordered data structures".to_string(),
+                remediation: "Sort map keys before iteration or use ordered data structures"
+                    .to_string(),
             },
             NondeterminismPattern {
                 name: "external_api_call".to_string(),
                 regex: Regex::new(r"http\.Get|http\.Post|net\.Dial|rpc\.").unwrap(),
                 severity: Severity::Critical,
                 description: "External API calls break determinism and consensus".to_string(),
-                remediation: "Use oracles or off-chain data through deterministic methods".to_string(),
+                remediation: "Use oracles or off-chain data through deterministic methods"
+                    .to_string(),
             },
             NondeterminismPattern {
                 name: "file_system_access".to_string(),
                 regex: Regex::new(r"os\.Open|ioutil\.ReadFile|os\.Create|os\.WriteFile").unwrap(),
                 severity: Severity::Critical,
                 description: "File system operations are non-deterministic".to_string(),
-                remediation: "Store data in the ledger or use chaincode lifecycle for static data".to_string(),
+                remediation: "Store data in the ledger or use chaincode lifecycle for static data"
+                    .to_string(),
             },
         ];
-        
+
         let concurrency_patterns = vec![
             ConcurrencyPattern {
                 name: "goroutine_usage".to_string(),
@@ -108,7 +114,7 @@ impl SecurityAnalyzer {
                 description: "Channel operations can introduce non-determinism".to_string(),
             },
         ];
-        
+
         let ledger_patterns = vec![
             LedgerPattern {
                 name: "phantom_read".to_string(),
@@ -129,7 +135,7 @@ impl SecurityAnalyzer {
                 description: "Private data may be exposed to unauthorized parties".to_string(),
             },
         ];
-        
+
         let patterns = vec![
             SecurityPattern {
                 id: "SEC-VULN-001".to_string(),
@@ -137,7 +143,8 @@ impl SecurityAnalyzer {
                 severity: Severity::Critical,
                 title: "Hardcoded credentials detected".to_string(),
                 description: "Hardcoded passwords or secrets found in code".to_string(),
-                remediation: "Use environment variables or secure key management systems".to_string(),
+                remediation: "Use environment variables or secure key management systems"
+                    .to_string(),
             },
             SecurityPattern {
                 id: "SEC-VULN-002".to_string(),
@@ -169,10 +176,11 @@ impl SecurityAnalyzer {
                 severity: Severity::High,
                 title: "Unsafe operation detected".to_string(),
                 description: "Use of unsafe operations that could compromise security".to_string(),
-                remediation: "Review and replace unsafe operations with safe alternatives".to_string(),
+                remediation: "Review and replace unsafe operations with safe alternatives"
+                    .to_string(),
             },
         ];
-        
+
         Self {
             parser,
             nondeterminism_patterns,
@@ -184,7 +192,7 @@ impl SecurityAnalyzer {
 
     pub fn analyze(&mut self, content: &str, path: &Path) -> Result<Vec<Finding>> {
         let mut findings = Vec::new();
-        
+
         // Check for nondeterminism patterns
         for pattern in &self.nondeterminism_patterns {
             for mat in pattern.regex.find_iter(content) {
@@ -197,28 +205,36 @@ impl SecurityAnalyzer {
                     description: pattern.description.clone(),
                     file: path.display().to_string(),
                     line: line_number,
-                    column: mat.start() - content.lines().take(line_number - 1).map(|l| l.len() + 1).sum::<usize>(),
+                    column: mat.start()
+                        - content
+                            .lines()
+                            .take(line_number - 1)
+                            .map(|l| l.len() + 1)
+                            .sum::<usize>(),
                     code_snippet: Some(extract_code_snippet(content, line_number, 3)),
                     remediation: Some(pattern.remediation.clone()),
                     references: vec![
-                        "https://hyperledger-fabric.readthedocs.io/en/latest/chaincode4ade.html".to_string()
+                        "https://hyperledger-fabric.readthedocs.io/en/latest/chaincode4ade.html"
+                            .to_string(),
                     ],
                     ai_consensus: None,
                 });
             }
         }
-        
+
         // Check for concurrency issues using tree-sitter
-        let tree = self.parser.parse(content, None)
+        let tree = self
+            .parser
+            .parse(content, None)
             .ok_or_else(|| ChainGuardError::Parse("Failed to parse Go code".to_string()))?;
-        
+
         for pattern in &self.concurrency_patterns {
             let query = Query::new(tree_sitter_go::language(), &pattern.query)
                 .map_err(|e| ChainGuardError::Parse(format!("Invalid query: {}", e)))?;
-            
+
             let mut cursor = QueryCursor::new();
             let matches = cursor.matches(&query, tree.root_node(), content.as_bytes());
-            
+
             for mat in matches {
                 for capture in mat.captures {
                     let start = capture.node.start_position();
@@ -232,14 +248,16 @@ impl SecurityAnalyzer {
                         line: start.row + 1,
                         column: start.column,
                         code_snippet: Some(extract_code_snippet(content, start.row + 1, 3)),
-                        remediation: Some("Ensure chaincode execution is deterministic".to_string()),
+                        remediation: Some(
+                            "Ensure chaincode execution is deterministic".to_string(),
+                        ),
                         references: vec![],
                         ai_consensus: None,
                     });
                 }
             }
         }
-        
+
         // Check for ledger interaction issues
         for pattern in &self.ledger_patterns {
             for mat in pattern.regex.find_iter(content) {
@@ -252,7 +270,12 @@ impl SecurityAnalyzer {
                     description: pattern.description.clone(),
                     file: path.display().to_string(),
                     line: line_number,
-                    column: mat.start() - content.lines().take(line_number - 1).map(|l| l.len() + 1).sum::<usize>(),
+                    column: mat.start()
+                        - content
+                            .lines()
+                            .take(line_number - 1)
+                            .map(|l| l.len() + 1)
+                            .sum::<usize>(),
                     code_snippet: Some(extract_code_snippet(content, line_number, 3)),
                     remediation: Some("Review ledger interaction patterns".to_string()),
                     references: vec![],
@@ -260,27 +283,29 @@ impl SecurityAnalyzer {
                 });
             }
         }
-        
+
         // Additional security checks
         findings.extend(self.check_crypto_issues(content, path)?);
         findings.extend(self.check_access_control(content, path)?);
         findings.extend(self.check_input_validation(content, path)?);
-        
+
         Ok(findings)
     }
 
     pub fn quick_scan(&self, content: &str, path: &Path) -> Result<Vec<Finding>> {
         let mut findings = Vec::new();
-        
+
         // Only check for critical security issues in quick scan
-        let critical_patterns = self.patterns.iter()
+        let critical_patterns = self
+            .patterns
+            .iter()
             .filter(|p| p.severity == Severity::Critical || p.severity == Severity::High);
-        
+
         for pattern in critical_patterns {
             for mat in pattern.pattern.find_iter(content) {
                 let line = content[..mat.start()].lines().count();
                 let column = mat.start() - content[..mat.start()].rfind('\n').unwrap_or(0);
-                
+
                 findings.push(Finding {
                     id: pattern.id.clone(),
                     severity: pattern.severity,
@@ -293,17 +318,17 @@ impl SecurityAnalyzer {
                     code_snippet: Some(self.get_code_snippet(content, line)),
                     remediation: Some(pattern.remediation.clone()),
                     references: vec![],
-                    ai_consensus: None
+                    ai_consensus: None,
                 });
             }
         }
-        
+
         Ok(findings)
     }
-    
+
     fn check_crypto_issues(&self, content: &str, path: &Path) -> Result<Vec<Finding>> {
         let mut findings = Vec::new();
-        
+
         // Check for weak crypto algorithms
         let weak_crypto = vec![
             ("MD5", "MD5 is cryptographically broken"),
@@ -311,7 +336,7 @@ impl SecurityAnalyzer {
             ("DES", "DES encryption is too weak"),
             ("RC4", "RC4 has known vulnerabilities"),
         ];
-        
+
         for (algo, desc) in weak_crypto {
             if content.contains(algo) {
                 findings.push(Finding {
@@ -324,25 +349,30 @@ impl SecurityAnalyzer {
                     line: 1,
                     column: 1,
                     code_snippet: None,
-                    remediation: Some("Use strong cryptographic algorithms like SHA-256 or AES".to_string()),
-                    references: vec!["https://owasp.org/www-project-cryptographic-storage-cheat-sheet/".to_string()],
+                    remediation: Some(
+                        "Use strong cryptographic algorithms like SHA-256 or AES".to_string(),
+                    ),
+                    references: vec![
+                        "https://owasp.org/www-project-cryptographic-storage-cheat-sheet/"
+                            .to_string(),
+                    ],
                     ai_consensus: None,
                 });
             }
         }
-        
+
         Ok(findings)
     }
-    
+
     fn check_access_control(&self, content: &str, path: &Path) -> Result<Vec<Finding>> {
         let mut findings = Vec::new();
-        
+
         // Check for missing access control
-        let has_auth = content.contains("authenticate") || 
-                      content.contains("authorize") ||
-                      content.contains("GetCreator") ||
-                      content.contains("checkAuth");
-        
+        let has_auth = content.contains("authenticate")
+            || content.contains("authorize")
+            || content.contains("GetCreator")
+            || content.contains("checkAuth");
+
         if !has_auth && (content.contains("func ") || content.contains("function ")) {
             findings.push(Finding {
                 id: "SEC-ACCESS-001".to_string(),
@@ -354,29 +384,31 @@ impl SecurityAnalyzer {
                 line: 1,
                 column: 1,
                 code_snippet: None,
-                remediation: Some("Implement proper authentication and authorization checks".to_string()),
+                remediation: Some(
+                    "Implement proper authentication and authorization checks".to_string(),
+                ),
                 references: vec![],
-                ai_consensus: None
-                });
+                ai_consensus: None,
+            });
         }
-        
+
         Ok(findings)
     }
-    
+
     fn check_input_validation(&self, content: &str, path: &Path) -> Result<Vec<Finding>> {
         let mut findings = Vec::new();
-        
+
         // Check for input validation
-        let has_validation = content.contains("validate") || 
-                           content.contains("sanitize") ||
-                           content.contains("check") ||
-                           content.contains("verify");
-        
-        let has_user_input = content.contains("request") ||
-                           content.contains("input") ||
-                           content.contains("param") ||
-                           content.contains("args");
-        
+        let has_validation = content.contains("validate")
+            || content.contains("sanitize")
+            || content.contains("check")
+            || content.contains("verify");
+
+        let has_user_input = content.contains("request")
+            || content.contains("input")
+            || content.contains("param")
+            || content.contains("args");
+
         if has_user_input && !has_validation {
             findings.push(Finding {
                 id: "SEC-INPUT-001".to_string(),
@@ -389,19 +421,21 @@ impl SecurityAnalyzer {
                 column: 1,
                 code_snippet: None,
                 remediation: Some("Validate and sanitize all user inputs".to_string()),
-                references: vec!["https://owasp.org/www-project-input-validation-cheat-sheet/".to_string()],
-                ai_consensus: None
-                });
+                references: vec![
+                    "https://owasp.org/www-project-input-validation-cheat-sheet/".to_string(),
+                ],
+                ai_consensus: None,
+            });
         }
-        
+
         Ok(findings)
     }
-    
+
     fn get_code_snippet(&self, content: &str, line: usize) -> String {
         let lines: Vec<&str> = content.lines().collect();
         let start = if line > 2 { line - 2 } else { 1 };
         let end = std::cmp::min(line + 2, lines.len());
-        
+
         lines[start - 1..end]
             .iter()
             .enumerate()
@@ -415,11 +449,11 @@ fn extract_code_snippet(content: &str, line: usize, context: usize) -> String {
     let lines: Vec<&str> = content.lines().collect();
     let start = line.saturating_sub(context).max(1);
     let end = (line + context).min(lines.len());
-    
+
     lines[start - 1..end]
         .iter()
         .enumerate()
         .map(|(i, line)| format!("{:4} | {}", start + i, line))
         .collect::<Vec<_>>()
         .join("\n")
-} 
+}
