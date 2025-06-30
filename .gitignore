@@ -30,6 +30,9 @@ reports/
 *.html
 *.pdf
 *.csv
+# But keep template files
+!src/reporter/templates/*.html
+!src/reporter/templates/*.md
 
 # API Keys and Secrets
 .env
