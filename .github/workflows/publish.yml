@@ -13,7 +13,9 @@ jobs:
       - uses: actions/checkout@v4
       
       - name: Install Z3
-        run: sudo apt-get update && sudo apt-get install -y z3 libz3-dev
+        run: |
+          sudo apt-get update && sudo apt-get install -y z3 libz3-dev
+          echo "Z3_SYS_Z3_HEADER=/usr/include/z3.h" >> $GITHUB_ENV
       
       - uses: dtolnay/rust-toolchain@stable
       

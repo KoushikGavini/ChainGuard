@@ -81,13 +81,16 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y z3 libz3-dev
+          echo "Z3_SYS_Z3_HEADER=/usr/include/z3.h" >> $GITHUB_ENV
           if [[ "${{ matrix.target }}" == "x86_64-unknown-linux-musl" ]]; then
             sudo apt-get install -y musl-tools
           fi
       
       - name: Install Z3 (macOS)
         if: matrix.os == 'macos-latest'
-        run: brew install z3
+        run: |
+          brew install z3
+          echo "Z3_SYS_Z3_HEADER=$(brew --prefix)/include/z3.h" >> $GITHUB_ENV
       
       - name: Install Z3 (Windows)
         if: matrix.os == 'windows-latest'
