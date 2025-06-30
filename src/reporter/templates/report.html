@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FabricGuard Security Report</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        .header {
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .metric-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #3498db;
+        }
+        .severity-critical {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .severity-high {
+            color: #e67e22;
+            font-weight: bold;
+        }
+        .severity-medium {
+            color: #f39c12;
+        }
+        .severity-low {
+            color: #95a5a6;
+        }
+        .finding {
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .finding.critical {
+            border-left-color: #e74c3c;
+            background: #fee;
+        }
+        .finding.high {
+            border-left-color: #e67e22;
+            background: #fef5e7;
+        }
+        .code-snippet {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+        .recommendation {
+            background: #e8f4f8;
+            border: 1px solid #b8e0ec;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .priority-urgent {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .priority-high {
+            color: #e67e22;
+            font-weight: bold;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛡️ FabricGuard Security Report</h1>
+            <p><strong>Generated:</strong> {{metadata.timestamp}}</p>
+            <p><strong>Files Analyzed:</strong> {{metadata.files_analyzed}} | <strong>Total Lines:</strong> {{metadata.total_lines}}</p>
+        </div>
+
+        <h2>📊 Summary</h2>
+        <div class="summary-grid">
+            <div class="metric-card">
+                <div class="metric-value">{{summary.total_findings}}</div>
+                <div>Total Findings</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value severity-critical">{{summary.critical_findings}}</div>
+                <div>Critical</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value severity-high">{{summary.high_findings}}</div>
+                <div>High</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value severity-medium">{{summary.medium_findings}}</div>
+                <div>Medium</div>
+            </div>
+        </div>
+
+        <div class="summary-grid">
+            <div class="metric-card">
+                <div class="metric-value">{{summary.security_score}}/100</div>
+                <div>Security Score</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">{{summary.ai_validation_score}}/100</div>
+                <div>AI Validation Score</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">{{summary.complexity_score}}/100</div>
+                <div>Code Quality Score</div>
+            </div>
+        </div>
+
+        <h2>🚨 Findings</h2>
+        {{#each findings}}
+        <div class="finding {{#if (eq severity "Critical")}}critical{{/if}} {{#if (eq severity "High")}}high{{/if}}">
+            <h3>
+                <span class="severity-{{lowercase severity}}">{{severity}}</span>
+                {{title}}
+            </h3>
+            <p><strong>ID:</strong> {{id}} | <strong>Category:</strong> {{category}}</p>
+            <p><strong>File:</strong> {{file}}:{{line}}:{{column}}</p>
+            <p>{{description}}</p>
+            {{#if code_snippet}}
+            <pre class="code-snippet">{{code_snippet}}</pre>
+            {{/if}}
+            {{#if remediation}}
+            <p><strong>Remediation:</strong> {{remediation}}</p>
+            {{/if}}
+        </div>
+        {{/each}}
+
+        <h2>💡 Recommendations</h2>
+        {{#each recommendations}}
+        <div class="recommendation">
+            <h3><span class="priority-{{lowercase priority}}">{{priority}}</span> - {{category}}</h3>
+            <p>{{description}}</p>
+            <p><strong>Impact:</strong> {{impact}}</p>
+        </div>
+        {{/each}}
+
+        <div class="footer">
+            <p>Generated by FabricGuard v{{metadata.tool_version}}</p>
+        </div>
+    </div>
+</body>
+</html> 
