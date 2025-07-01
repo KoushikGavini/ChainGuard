@@ -256,7 +256,7 @@ enum Commands {
         /// Path to chaincode file or directory
         path: PathBuf,
 
-        /// Target platform (fabric, solana, ethereum, etc.)
+        /// Target platform (fabric, solana, etc.)
         #[arg(long, default_value = "fabric")]
         platform: String,
 
