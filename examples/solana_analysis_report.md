@@ -28,7 +28,7 @@ This report presents the security analysis results for your Solana program. Chai
 
 - **ID:** `SOL-ACC-001`
 - **Category:** Solana/AccountValidation
-- **Location:** `vulnerable_solana_program.rs:22:19`
+- **Location:** `vulnerable_solana_program.rs.example:22:19`
 
 Account used without proper validation. This could allow attackers to pass arbitrary accounts leading to fund theft or program manipulation.
 
@@ -48,7 +48,7 @@ Account used without proper validation. This could allow attackers to pass arbit
 
 - **ID:** `SOL-SIGN-TRANSFER`
 - **Category:** Solana/SignerCheck
-- **Location:** `vulnerable_solana_program.rs:42:5`
+- **Location:** `vulnerable_solana_program.rs.example:42:5`
 
 Transfer operation found without prior signer verification. This could allow unauthorized users to perform privileged actions.
 
@@ -68,7 +68,7 @@ Transfer operation found without prior signer verification. This could allow una
 
 - **ID:** `SOL-CPI-001`
 - **Category:** Solana/CPI
-- **Location:** `vulnerable_solana_program.rs:43:5`
+- **Location:** `vulnerable_solana_program.rs.example:43:5`
 
 CPI performed without validating target program ID. This could allow attackers to redirect calls to malicious programs.
 
@@ -80,7 +80,7 @@ CPI performed without validating target program ID. This could allow attackers t
 
 - **ID:** `SOL-ARITH-BAL-SUBTRACTION`
 - **Category:** Solana/Arithmetic
-- **Location:** `vulnerable_solana_program.rs:37:27`
+- **Location:** `vulnerable_solana_program.rs.example:37:27`
 
 Unsafe subtraction operation detected on what appears to be a balance or lamports value. This could lead to overflow/underflow allowing attackers to mint tokens or drain accounts.
 
@@ -100,7 +100,7 @@ Unsafe subtraction operation detected on what appears to be a balance or lamport
 
 - **ID:** `SOL-ARITH-MULTIPLICATION`
 - **Category:** Solana/Arithmetic
-- **Location:** `vulnerable_solana_program.rs:29:18`
+- **Location:** `vulnerable_solana_program.rs.example:29:18`
 
 Unsafe multiplication operation detected. This could lead to integer overflow/underflow vulnerabilities.
 
@@ -110,7 +110,7 @@ Unsafe multiplication operation detected. This could lead to integer overflow/un
 
 - **ID:** `SOL-OWN-001`
 - **Category:** Solana/Ownership
-- **Location:** `vulnerable_solana_program.rs:32:28`
+- **Location:** `vulnerable_solana_program.rs.example:32:28`
 
 Account data accessed without verifying program ownership. This could allow manipulation of accounts owned by other programs.
 
@@ -120,7 +120,7 @@ Account data accessed without verifying program ownership. This could allow mani
 
 - **ID:** `SOL-TYPE-001`
 - **Category:** Solana/TypeSafety
-- **Location:** `vulnerable_solana_program.rs:35:19`
+- **Location:** `vulnerable_solana_program.rs.example:35:19`
 
 Account deserialization without type verification. This could allow attackers to pass wrong account types leading to logic errors.
 
@@ -130,7 +130,7 @@ Account deserialization without type verification. This could allow attackers to
 
 - **ID:** `SOL-ACC-006`
 - **Category:** Solana/AccountValidation
-- **Location:** `vulnerable_solana_program.rs:40:5`
+- **Location:** `vulnerable_solana_program.rs.example:40:5`
 
 Account closed without clearing data or reassigning ownership. This could lead to account resurrection attacks.
 

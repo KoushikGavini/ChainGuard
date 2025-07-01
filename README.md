@@ -118,15 +118,15 @@ Total Findings: 15
 Critical: 4 | High: 7 | Medium: 3 | Low: 1 | Info: 0
 
 [Critical] SOL-ACC-001 - Missing account validation
-  File: vulnerable_solana_program.rs:22
+  File: vulnerable_solana_program.rs.example:22
   Account used without proper validation
 
 [Critical] SOL-SIGN-001 - Missing signer verification  
-  File: vulnerable_solana_program.rs:26
+  File: vulnerable_solana_program.rs.example:26
   Sensitive operation 'transfer' performed without verifying signer
 
 [High] SOL-ARITH-001 - Unsafe arithmetic operation
-  File: vulnerable_solana_program.rs:29
+  File: vulnerable_solana_program.rs.example:29
   Unchecked multiplication operation detected
 ```
 
