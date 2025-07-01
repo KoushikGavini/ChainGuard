@@ -17,6 +17,7 @@
 #![allow(unused_variables)]
 #![allow(unused_imports)]
 #![allow(unused_mut)]
+#![allow(clippy::uninlined_format_args)]
 
 pub mod ai_validation;
 pub mod analyzer;
