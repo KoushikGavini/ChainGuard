@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multi-LLM consensus validation for AI-generated code
 - Performance benchmarking and optimization suggestions
 - Compliance auditing with multiple framework support
-- Support for ERC-20, ERC-721, ERC-1155, and ERC-777 token standards
+- Foundation for future ERC token standard support (ERC-20, ERC-721, ERC-1155, ERC-777)
 - Stablecoin-specific security checks
 - Multiple output formats: JSON, HTML, PDF, CSV, SARIF, Markdown
 - Interactive mode for real-time validation
@@ -38,7 +38,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Platform Support
 - Hyperledger Fabric chaincode (Go, JavaScript, TypeScript)
 - Solana programs (Rust)
-- Ethereum smart contracts (Solidity)
 - General blockchain security analysis
 
 [Unreleased]: https://github.com/KoushikGavini/ChainGuard/compare/v0.1.0...HEAD

@@ -2,7 +2,7 @@
 
 > Advanced security analysis and AI code review platform for blockchain smart contracts
 
-ChainGuard is a comprehensive security analysis tool designed specifically for blockchain developers. It provides deep vulnerability detection, AI-powered code review, and performance optimization for smart contracts across multiple blockchain platforms including Hyperledger Fabric, Solana, and Ethereum.
+ChainGuard is a comprehensive security analysis tool designed specifically for blockchain developers. It provides deep vulnerability detection, AI-powered code review, and performance optimization for smart contracts across multiple blockchain platforms including Hyperledger Fabric and Solana.
 
 [![CI](https://github.com/KoushikGavini/ChainGuard/workflows/CI/badge.svg)](https://github.com/KoushikGavini/ChainGuard/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)

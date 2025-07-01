@@ -1,7 +1,7 @@
 # GitHub Repository Settings
 
 ## Description
-Advanced security analysis and AI code review platform for blockchain smart contracts. Supports Hyperledger Fabric, Solana, and Ethereum with 50+ vulnerability detectors.
+Advanced security analysis and AI code review platform for blockchain smart contracts. Supports Hyperledger Fabric and Solana with 50+ vulnerability detectors.
 
 ## Topics
 - blockchain
@@ -9,14 +9,12 @@ Advanced security analysis and AI code review platform for blockchain smart cont
 - smart-contracts
 - solana
 - hyperledger-fabric
-- ethereum
 - rust
 - security-audit
 - static-analysis
 - vulnerability-scanner
 - code-review
 - ai-powered
-- solidity
 - chaincode
 - defi
 
