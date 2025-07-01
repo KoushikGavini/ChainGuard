@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multiple output formats: JSON, HTML, PDF, CSV, SARIF, Markdown
 - Interactive mode for real-time validation
 - Formal verification capabilities using Z3
-- Cross-platform support (Windows, macOS, Linux)
+- Cross-platform support (macOS, Linux)
 
 ### Security Checks
 - Account validation and ownership verification
