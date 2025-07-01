@@ -171,10 +171,7 @@ impl LLMManager {
             }
 
             // Clone provider references into a Vec to use after lock is dropped
-            let provider_list: Vec<Arc<dyn LLMProvider>> = providers
-                .values()
-                .cloned()
-                .collect();
+            let provider_list: Vec<Arc<dyn LLMProvider>> = providers.values().cloned().collect();
 
             // Drop the lock explicitly
             drop(providers);
@@ -184,10 +181,12 @@ impl LLMManager {
                 let code = code.to_string();
                 let context = context.clone();
 
-                let task =
-                    tokio::spawn(
-                        async move { (provider.name().to_string(), provider.analyze_code(&code, &context).await) },
-                    );
+                let task = tokio::spawn(async move {
+                    (
+                        provider.name().to_string(),
+                        provider.analyze_code(&code, &context).await,
+                    )
+                });
 
                 tasks.push(task);
             }
@@ -293,10 +292,7 @@ impl LLMManager {
             }
 
             // Clone provider references into a Vec to use after lock is dropped
-            let provider_list: Vec<Arc<dyn LLMProvider>> = providers
-                .values()
-                .cloned()
-                .collect();
+            let provider_list: Vec<Arc<dyn LLMProvider>> = providers.values().cloned().collect();
 
             // Drop the lock explicitly
             drop(providers);
