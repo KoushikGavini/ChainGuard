@@ -82,7 +82,7 @@ From the root of the project directory, run the following command after building
 ./target/release/chainguard analyze test_chaincode.go --fabric
 
 # Analyze Solana program
-./target/release/chainguard analyze examples/vulnerable_solana_program.rs --solana
+./target/release/chainguard analyze examples/vulnerable_solana_program.rs.example --solana
 ```
 
 These commands analyze the sample files using ChainGuard's platform-specific rules.
