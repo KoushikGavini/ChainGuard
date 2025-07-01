@@ -78,8 +78,7 @@ impl Validator {
                     category: "validation/imports".to_string(),
                     title: "Suspicious import detected".to_string(),
                     description: format!(
-                        "Import '{}' appears to be a variation of a trusted package",
-                        import_path
+                        "Import '{import_path}' appears to be a variation of a trusted package"
                     ),
                     file: String::new(),
                     line: 0,

@@ -66,16 +66,14 @@ impl SlopsquattingDetector {
                         category: "validation/slopsquatting".to_string(),
                         title: "Slopsquatting attack detected".to_string(),
                         description: format!(
-                            "Import '{}' is a malicious variation of legitimate package '{}'",
-                            import, legitimate
+                            "Import '{import}' is a malicious variation of legitimate package '{legitimate}'"
                         ),
                         file: path.display().to_string(),
                         line: 0,
                         column: 0,
                         code_snippet: None,
                         remediation: Some(format!(
-                            "Replace with legitimate package: {}",
-                            legitimate
+                            "Replace with legitimate package: {legitimate}"
                         )),
                         references: vec!["https://snyk.io/blog/typosquatting-attacks/".to_string()],
                         ai_consensus: None,
@@ -91,8 +89,7 @@ impl SlopsquattingDetector {
                     category: "validation/slopsquatting".to_string(),
                     title: "Homograph attack detected".to_string(),
                     description: format!(
-                        "Import '{}' contains visually similar characters that may be malicious",
-                        import
+                        "Import '{import}' contains visually similar characters that may be malicious"
                     ),
                     file: path.display().to_string(),
                     line: 0,
@@ -114,8 +111,7 @@ impl SlopsquattingDetector {
                     category: "validation/slopsquatting".to_string(),
                     title: "Suspicious package name variation".to_string(),
                     description: format!(
-                        "Import '{}' appears to be a variation of a known package",
-                        import
+                        "Import '{import}' appears to be a variation of a known package"
                     ),
                     file: path.display().to_string(),
                     line: 0,
