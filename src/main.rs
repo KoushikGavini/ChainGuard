@@ -2,6 +2,7 @@
 #![allow(clippy::too_many_arguments)]
 #![allow(clippy::needless_borrows_for_generic_args)]
 #![allow(clippy::unnecessary_map_or)]
+#![allow(clippy::uninlined_format_args)]
 
 use chainguard::{
     analyzer::Analyzer, fabric::FabricAnalyzer, llm::LLMManager, reporter::Reporter,
