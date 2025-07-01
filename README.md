@@ -32,9 +32,6 @@ ChainGuard is a comprehensive security analysis tool designed specifically for b
   
   # Ubuntu/Debian
   sudo apt-get install z3 libz3-dev
-  
-  # Windows
-  choco install z3
   ```
 
 ### Install from Pre-built Binaries (Recommended)
