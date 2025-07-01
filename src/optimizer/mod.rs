@@ -57,9 +57,9 @@ impl Optimizer {
             "fabric" => {
                 suggestions.extend(self.analyze_fabric_optimizations(&content).await?);
             }
-                    // "ethereum" => {
-        //     suggestions.extend(self.analyze_ethereum_optimizations(&content).await?);
-        // }
+            // "ethereum" => {
+            //     suggestions.extend(self.analyze_ethereum_optimizations(&content).await?);
+            // }
             _ => {
                 suggestions.extend(self.analyze_generic_optimizations(&content).await?);
             }
