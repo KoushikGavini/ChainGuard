@@ -4,12 +4,10 @@
 
 ChainGuard is a comprehensive security analysis tool designed specifically for blockchain developers. It provides deep vulnerability detection, AI-powered code review, and performance optimization for smart contracts across multiple blockchain platforms including Hyperledger Fabric and Solana.
 
-[![CI](https://github.com/KoushikGavini/ChainGuard/workflows/CI/badge.svg)](https://github.com/KoushikGavini/ChainGuard/actions)
+[![CI](https://github.com/KoushikGavini/ChainGuard/actions/workflows/rust.yml/badge.svg)](https://github.com/KoushikGavini/ChainGuard/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=flat&logo=rust&logoColor=white)](https://www.rust-lang.org/)
-[![crates.io](https://img.shields.io/crates/v/chainguard.svg)](https://crates.io/crates/chainguard)
-[![codecov](https://codecov.io/gh/KoushikGavini/ChainGuard/branch/main/graph/badge.svg)](https://codecov.io/gh/KoushikGavini/ChainGuard)
-[![Security Audit](https://github.com/KoushikGavini/ChainGuard/workflows/Security%20Audit/badge.svg)](https://github.com/KoushikGavini/ChainGuard/actions)
+[![Security Audit](https://github.com/KoushikGavini/ChainGuard/actions/workflows/security-audit.yml/badge.svg)](https://github.com/KoushikGavini/ChainGuard/actions)
 
 ## Key Features
 
@@ -34,7 +32,10 @@ ChainGuard is a comprehensive security analysis tool designed specifically for b
   sudo apt-get install z3 libz3-dev
   ```
 
-### Install from Pre-built Binaries (Recommended)
+### Install from Pre-built Binaries (Coming Soon)
+Pre-built binaries will be available in future releases. For now, please build from source.
+
+<!---
 Download the latest release for your platform from the [releases page](https://github.com/KoushikGavini/ChainGuard/releases).
 
 ```bash
@@ -44,11 +45,7 @@ tar xzf chainguard-x86_64-unknown-linux-gnu.tar.gz
 sudo mv chainguard /usr/local/bin/
 chainguard --version
 ```
-
-### Install from Crates.io
-```bash
-cargo install chainguard
-```
+-->
 
 ### Build from Source
 Requires Rust 1.70+ (install via [rustup.rs](https://rustup.rs/))
@@ -309,10 +306,11 @@ chainguard analyze --standards stablecoin ./my-stablecoin.sol
 
 ## Integration
 
-### IDE Integration [Coming Soon]
-- **VSCode**: Install the ChainGuard extension
-- **IntelliJ**: Available in JetBrains marketplace
-- **Vim**: Use the chainGuard.vim plugin
+### IDE Integration (Planned)
+IDE extensions are planned for future releases:
+- **VSCode**: ChainGuard extension (planned)
+- **IntelliJ**: JetBrains marketplace integration (planned)
+- **Vim**: chainGuard.vim plugin (planned)
 
 ### Git Hooks
 ```bash
