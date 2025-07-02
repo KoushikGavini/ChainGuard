@@ -572,3 +572,20 @@ pub struct FabricAnalysisResult {
     pub fabric_best_practices_score: f32,
     pub optimization_suggestions: Vec<String>,
 }
+
+impl From<FabricAnalysisResult> for crate::analyzer::AnalysisResult {
+    fn from(fabric_result: FabricAnalysisResult) -> Self {
+        crate::analyzer::AnalysisResult {
+            findings: fabric_result.findings,
+            metrics: crate::analyzer::AnalysisMetrics {
+                total_files: 1,
+                total_lines: 0, // This would need to be tracked during analysis
+                cyclomatic_complexity: 0.0, // Not tracked in Fabric analyzer
+                code_duplication_ratio: 0.0, // Not tracked in Fabric analyzer
+                security_score: fabric_result.security_score as f64,
+                performance_score: fabric_result.performance_score as f64,
+                ai_validation_score: 0.0, // Not tracked in Fabric analyzer
+            },
+        }
+    }
+}

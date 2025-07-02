@@ -960,25 +960,61 @@ async fn scan_command(
     );
 
     progress.set_message("Initializing scanner...");
-    let analyzer = Analyzer::new();
+    let mut results: Vec<AnalysisResult> = Vec::new();
 
     if fabric {
         progress.set_message("Loading Fabric-specific rules...");
-        // Initialize Fabric analyzer
-    }
-
-    if solana {
+        let mut fabric_analyzer = FabricAnalyzer::new()?;
+        
+        progress.set_message("Scanning for Fabric vulnerabilities...");
+        if path.is_file() {
+            let fabric_result = fabric_analyzer.analyze_chaincode(&path).await?;
+            results.push(fabric_result.into());
+        } else {
+            // Scan directory for .go files
+            let mut entries = tokio::fs::read_dir(&path).await?;
+            while let Some(entry) = entries.next_entry().await? {
+                let file_path = entry.path();
+                if file_path.extension().map_or(false, |ext| ext == "go") {
+                    match fabric_analyzer.analyze_chaincode(&file_path).await {
+                        Ok(result) => results.push(result.into()),
+                        Err(e) => tracing::warn!("Failed to scan {}: {}", file_path.display(), e),
+                    }
+                }
+            }
+        }
+    } else if solana {
         progress.set_message("Loading Solana-specific rules...");
-        // Initialize Solana analyzer
-    }
-
-    progress.set_message("Scanning for vulnerabilities...");
-
-    let results = if path.is_file() {
-        vec![analyzer.quick_scan(&path).await?]
+        let mut solana_analyzer = SolanaAnalyzer::new()?;
+        
+        progress.set_message("Scanning for Solana vulnerabilities...");
+        if path.is_file() {
+            let solana_result = solana_analyzer.analyze_program(&path).await?;
+            results.push(solana_result.into());
+        } else {
+            // Scan directory for .rs files
+            let mut entries = tokio::fs::read_dir(&path).await?;
+            while let Some(entry) = entries.next_entry().await? {
+                let file_path = entry.path();
+                if file_path.extension().map_or(false, |ext| ext == "rs") {
+                    match solana_analyzer.analyze_program(&file_path).await {
+                        Ok(result) => results.push(result.into()),
+                        Err(e) => tracing::warn!("Failed to scan {}: {}", file_path.display(), e),
+                    }
+                }
+            }
+        }
     } else {
-        analyzer.scan_directory(&path).await?
-    };
+        // Generic scan
+        progress.set_message("Scanning for vulnerabilities...");
+        let analyzer = Analyzer::new();
+        
+        if path.is_file() {
+            results.push(analyzer.quick_scan(&path).await?);
+        } else {
+            results = analyzer.scan_directory(&path).await?;
+        }
+    }
 
     progress.finish_with_message("Scan complete!");
 

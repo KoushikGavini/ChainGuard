@@ -667,3 +667,20 @@ pub struct SolanaAnalysisResult {
     pub best_practices_score: f32,
     pub optimization_suggestions: Vec<String>,
 }
+
+impl From<SolanaAnalysisResult> for crate::analyzer::AnalysisResult {
+    fn from(solana_result: SolanaAnalysisResult) -> Self {
+        crate::analyzer::AnalysisResult {
+            findings: solana_result.findings,
+            metrics: crate::analyzer::AnalysisMetrics {
+                total_files: 1,
+                total_lines: 0, // This would need to be tracked during analysis
+                cyclomatic_complexity: 0.0, // Not tracked in Solana analyzer
+                code_duplication_ratio: 0.0, // Not tracked in Solana analyzer
+                security_score: solana_result.security_score as f64,
+                performance_score: solana_result.performance_score as f64,
+                ai_validation_score: 0.0, // Not tracked in Solana analyzer
+            },
+        }
+    }
+}
