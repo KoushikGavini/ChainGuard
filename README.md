@@ -2,7 +2,7 @@
 
 > Advanced security analysis and AI code review platform for blockchain smart contracts
 
-ChainGuard is a comprehensive security analysis tool designed specifically for blockchain developers. It provides deep vulnerability detection, AI-powered code review, and performance optimization for smart contracts across multiple blockchain platforms including Hyperledger Fabric and Solana.
+ChainGuard is a comprehensive security analysis tool designed specifically for non-Ethereum blockchain developers. It provides deep vulnerability detection, AI-powered code review, and performance optimization for smart contracts across multiple blockchain platforms including Hyperledger Fabric, Solana, Cosmos, Polkadot, Cardano, NEAR, Sui, and Aptos.
 
 [![CI](https://github.com/KoushikGavini/ChainGuard/actions/workflows/rust.yml/badge.svg)](https://github.com/KoushikGavini/ChainGuard/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -11,14 +11,26 @@ ChainGuard is a comprehensive security analysis tool designed specifically for b
 
 ## Key Features
 
-- **Review and Harden AI-Generated Code**: The core of ChainGuard. It's designed to help developers review, validate, and harden smart contracts produced by AI, catching subtle flaws, hallucinations, and vulnerabilities that models can introduce.
-- **Multi-LLM Consensus Analysis**: Plug in API keys for multiple LLM providers (ChatGPT, Claude, Gemini) to get a robust, consensus-based analysis. This is critical for validating the logic and security of AI-generated code.
-- **Comprehensive Smart Contract Auditing**: Goes beyond security to analyze for correctness, performance bottlenecks, and compliance with best practices.
-- **Stablecoin Security Analysis**: Specialized checks for stablecoin contracts including collateralization, oracle security, minting controls, flash loan protection, and peg stability mechanisms.
-- **Hyperledger Fabric Support**: Analysis of Fabric chaincode for common issues including nondeterministic operations (timestamps, randomness, global state), potential private data exposure, basic MVCC conflict detection, and platform-specific vulnerabilities.
-- **Solana Program Support**: Comprehensive analysis of Solana programs including account validation, signer checks, arithmetic overflow/underflow detection, CPI security, PDA vulnerabilities, and compute unit optimization.
-- **Performance & Optimization Insights**: Analyzes transaction throughput and storage efficiency, providing actionable, AI-powered suggestions for optimization.
-- **Flexible Reporting**: Generates detailed reports in JSON, Markdown, HTML, and SARIF to integrate seamlessly into your development and CI/CD workflows.
+### 🌐 Non-Ethereum Blockchain Focus
+- **Hyperledger Fabric**: Enterprise chaincode analysis with determinism checking, endorsement policies, private data security, and MVCC compliance
+- **Solana**: Advanced Rust program analysis with account validation, CPI security, PDA vulnerabilities, and compute optimization
+- **Cosmos/CosmWasm**: IBC security, governance attack prevention, staking/slashing validation, and authz module security
+- **Polkadot/Substrate**: Parachain security, cross-consensus messaging, runtime upgrades, and treasury governance
+- **Cardano**: Plutus script analysis, UTxO model validation, native token security, and stake pool operations
+- **NEAR**: Rust/AssemblyScript contract analysis, sharding security, and cross-contract calls
+- **Sui**: Move language security, object-centric programming model, and consensus mechanism analysis
+- **Aptos**: Move VM security, parallel execution safety, and resource account validation
+
+### 🤖 AI-Powered Analysis
+- **Multi-LLM Consensus Analysis**: Leverage multiple AI providers (ChatGPT, Claude, Gemini) for robust, consensus-based security analysis
+- **AI-Generated Code Validation**: Specialized detection of hallucinations, logic errors, and security vulnerabilities in AI-produced smart contracts
+- **Blockchain-Specific AI Prompts**: Custom AI prompts tailored for each blockchain platform's unique security considerations
+
+### 🔍 Comprehensive Security Analysis
+- **Platform-Specific Vulnerabilities**: Deep understanding of each blockchain's unique attack vectors and security requirements
+- **Cross-Chain Security**: Analysis of bridge contracts, IBC protocols, and multi-chain applications
+- **DeFi Security**: Specialized checks for AMMs, lending protocols, stablecoins, and yield farming contracts
+- **Performance & Optimization**: Platform-specific performance analysis and optimization suggestions
 
 ## Installation
 

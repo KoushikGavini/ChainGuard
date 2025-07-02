@@ -79,6 +79,16 @@ pub mod token_standards;
 pub mod utils;
 pub mod validator;
 
+// New blockchain platform modules
+pub mod cosmos;
+pub mod polkadot;
+pub mod cardano;
+pub mod near;
+pub mod sui;
+pub mod aptos;
+pub mod avalanche;
+pub mod algorand;
+
 use clap::ValueEnum;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;

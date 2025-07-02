@@ -55,6 +55,14 @@ impl FabricAnalyzer {
         findings.extend(self.check_mvcc_compliance(&content, &tree)?);
         findings.extend(self.check_dos_vulnerabilities(&content, &tree)?);
         findings.extend(self.check_channel_isolation(&content, &tree)?);
+        
+        // Enhanced Fabric-specific checks
+        findings.extend(self.check_chaincode_lifecycle(&content, &tree)?);
+        findings.extend(self.check_peer_configuration(&content, &tree)?);
+        findings.extend(self.check_orderer_security(&content, &tree)?);
+        findings.extend(self.check_msp_configuration(&content, &tree)?);
+        findings.extend(self.check_tls_configuration(&content, &tree)?);
+        findings.extend(self.check_ledger_backup_security(&content, &tree)?);
 
         // Run determinism analysis
         let determinism_issues = self.determinism_analyzer.analyze(&content, &tree)?;

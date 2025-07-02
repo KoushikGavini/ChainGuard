@@ -70,6 +70,30 @@ enum Commands {
         #[arg(long)]
         solana: bool,
 
+        /// Enable Cosmos/CosmWasm-specific analysis
+        #[arg(long)]
+        cosmos: bool,
+
+        /// Enable Polkadot/Substrate-specific analysis
+        #[arg(long)]
+        polkadot: bool,
+
+        /// Enable Cardano-specific analysis
+        #[arg(long)]
+        cardano: bool,
+
+        /// Enable NEAR-specific analysis
+        #[arg(long)]
+        near: bool,
+
+        /// Enable Sui-specific analysis
+        #[arg(long)]
+        sui: bool,
+
+        /// Enable Aptos-specific analysis
+        #[arg(long)]
+        aptos: bool,
+
         /// Enable AI-generated code validation
         #[arg(long)]
         ai_validate: bool,
