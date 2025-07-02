@@ -14,7 +14,7 @@ impl ERC20Validator {
 
     pub fn validate(&self, content: &str) -> Result<Vec<Finding>> {
         let mut findings = vec![];
-        
+
         // Check for required functions
         for func in self.required_functions() {
             if !self.function_exists(content, &func) {
@@ -31,13 +31,16 @@ impl ERC20Validator {
                     line: 0,
                     column: 0,
                     code_snippet: None,
-                    remediation: Some(format!("Implement the {} function according to ERC-20 standard", func.name)),
+                    remediation: Some(format!(
+                        "Implement the {} function according to ERC-20 standard",
+                        func.name
+                    )),
                     references: vec!["https://eips.ethereum.org/EIPS/eip-20".to_string()],
                     ai_consensus: None,
                 });
             }
         }
-        
+
         // Check for required events
         for event in self.required_events() {
             if !self.event_exists(content, &event) {
@@ -60,10 +63,10 @@ impl ERC20Validator {
                 });
             }
         }
-        
+
         Ok(findings)
     }
-    
+
     fn function_exists(&self, content: &str, func: &FunctionSignature) -> bool {
         let pattern = format!(r"function\s+{}\s*\(", regex::escape(&func.name));
         match crate::utils::create_regex(&pattern) {
@@ -71,7 +74,7 @@ impl ERC20Validator {
             Err(_) => false,
         }
     }
-    
+
     fn event_exists(&self, content: &str, event: &EventSignature) -> bool {
         let pattern = format!(r"event\s+{}\s*\(", regex::escape(&event.name));
         match crate::utils::create_regex(&pattern) {

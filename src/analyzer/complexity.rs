@@ -36,21 +36,31 @@ impl ComplexityAnalyzer {
         // Set language based on file extension
         let extension = path.extension().and_then(|e| e.to_str()).unwrap_or("");
         match extension {
-            "go" => self.parser.set_language(tree_sitter_go::language())
-                .map_err(|e| crate::ChainGuardError::Parse(format!("Failed to set Go language: {}", e)))?,
+            "go" => self
+                .parser
+                .set_language(tree_sitter_go::language())
+                .map_err(|e| {
+                    crate::ChainGuardError::Parse(format!("Failed to set Go language: {}", e))
+                })?,
             // TODO: Re-enable Rust support once tree-sitter version conflict is resolved
             // "rs" => self.parser.set_language(tree_sitter_rust::language())
             //     .map_err(|e| crate::ChainGuardError::Parse(format!("Failed to set Rust language: {}", e)))?,
-            "js" | "ts" => self.parser.set_language(tree_sitter_javascript::language())
-                .map_err(|e| crate::ChainGuardError::Parse(format!("Failed to set JavaScript language: {}", e)))?,
+            "js" | "ts" => self
+                .parser
+                .set_language(tree_sitter_javascript::language())
+                .map_err(|e| {
+                    crate::ChainGuardError::Parse(format!(
+                        "Failed to set JavaScript language: {}",
+                        e
+                    ))
+                })?,
             _ => return Ok((findings, metrics)), // Skip unsupported files
         }
 
         // Parse the code
-        let tree = self
-            .parser
-            .parse(content, None)
-            .ok_or_else(|| crate::ChainGuardError::Parse(format!("Failed to parse {} code", extension)))?;
+        let tree = self.parser.parse(content, None).ok_or_else(|| {
+            crate::ChainGuardError::Parse(format!("Failed to parse {} code", extension))
+        })?;
 
         // Analyze functions
         self.analyze_functions(
@@ -87,11 +97,11 @@ impl ComplexityAnalyzer {
         // Support function detection for multiple languages
         let is_function = match node.kind() {
             "function_declaration" | "method_declaration" => true, // Go
-            "function_item" => true, // Rust
+            "function_item" => true,                               // Rust
             "method_definition" => true, // JavaScript/TypeScript (function_declaration already covered above)
             _ => false,
         };
-        
+
         if is_function {
             let complexity = self.calculate_cyclomatic_complexity(node, content);
             metrics.function_count += 1;
@@ -171,10 +181,7 @@ impl ComplexityAnalyzer {
                     local_complexity += 1;
                 }
                 // Rust control flow
-                "if_expression"
-                | "while_expression"
-                | "for_expression"
-                | "loop_expression"
+                "if_expression" | "while_expression" | "for_expression" | "loop_expression"
                 | "match_expression" => {
                     local_complexity += 1;
                 }

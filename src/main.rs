@@ -5,9 +5,13 @@
 #![allow(clippy::uninlined_format_args)]
 
 use chainguard::{
-    analyzer::{Analyzer, AnalysisResult}, fabric::FabricAnalyzer, llm::LLMManager, 
+    analyzer::{AnalysisResult, Analyzer},
+    fabric::FabricAnalyzer,
+    llm::LLMManager,
     reporter::Reporter,
-    solana::SolanaAnalyzer, token_standards::TokenStandardsValidator, validator::Validator,
+    solana::SolanaAnalyzer,
+    token_standards::TokenStandardsValidator,
+    validator::Validator,
     AnalysisConfig, ChainGuardError, OutputFormat, Result, Severity,
 };
 use clap::{Parser, Subcommand, ValueEnum};
@@ -881,8 +885,10 @@ async fn report_command(
         ReportFormat::Csv => OutputFormat::Csv,
         ReportFormat::Sarif => OutputFormat::Sarif,
     };
-    
-    reporter.save_report(&report, &output, output_format).await?;
+
+    reporter
+        .save_report(&report, &output, output_format)
+        .await?;
 
     if !quiet {
         println!("✅ Report generated: {}", output.display());
