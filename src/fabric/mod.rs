@@ -499,16 +499,7 @@ impl FabricAnalyzer {
     }
 
     fn get_code_snippet(&self, content: &str, line: usize) -> String {
-        let lines: Vec<&str> = content.lines().collect();
-        let start = if line > 2 { line - 2 } else { 1 };
-        let end = std::cmp::min(line + 2, lines.len());
-
-        lines[start - 1..end]
-            .iter()
-            .enumerate()
-            .map(|(i, l)| format!("{:4} | {}", start + i, l))
-            .collect::<Vec<_>>()
-            .join("\n")
+        crate::utils::get_code_snippet(content, line)
     }
 
     fn get_context_around(&self, content: &str, pos: usize, context_size: usize) -> String {

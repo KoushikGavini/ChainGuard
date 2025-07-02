@@ -138,10 +138,10 @@ impl ComplexityAnalyzer {
         }
     }
 
-    fn calculate_cyclomatic_complexity(&self, node: &Node, _content: &str) -> usize {
+    fn calculate_cyclomatic_complexity(&self, node: &Node, content: &str) -> usize {
         let mut complexity = 1; // Base complexity
 
-        fn count_node_complexity(node: &Node) -> usize {
+        fn count_node_complexity(node: &Node, content_bytes: &[u8]) -> usize {
             let mut local_complexity = 0;
 
             match node.kind() {
@@ -157,7 +157,7 @@ impl ComplexityAnalyzer {
                 }
                 "binary_expression" => {
                     if let Some(child) = node.child(1) {
-                        if let Ok(operator) = child.utf8_text(&[]) {
+                        if let Ok(operator) = child.utf8_text(content_bytes) {
                             if operator == "&&" || operator == "||" {
                                 local_complexity += 1;
                             }
@@ -170,13 +170,13 @@ impl ComplexityAnalyzer {
             // Count complexity of all children
             let mut cursor = node.walk();
             for child in node.children(&mut cursor) {
-                local_complexity += count_node_complexity(&child);
+                local_complexity += count_node_complexity(&child, content_bytes);
             }
 
             local_complexity
         }
 
-        complexity + count_node_complexity(node)
+        complexity + count_node_complexity(node, content.as_bytes())
     }
 
     fn check_dead_code(
