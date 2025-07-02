@@ -19,6 +19,9 @@ Cargo.lock
 Thumbs.db
 *.log
 
+# Internal development files
+CRITICAL_ISSUES.md
+
 # Project specific
 .chainguard-cache/
 chainguard.toml
