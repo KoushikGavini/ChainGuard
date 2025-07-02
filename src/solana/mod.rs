@@ -23,10 +23,9 @@ pub struct SolanaAnalyzer {
 
 impl SolanaAnalyzer {
     pub fn new() -> Result<Self> {
-        let mut parser = Parser::new();
-        // TODO: Fix tree-sitter version conflicts - temporarily disabled
-        // parser.set_language(tree_sitter_rust::language())
-        //     .map_err(|e| ChainGuardError::Parse(format!("Failed to set Rust language: {}", e)))?;
+        let parser = Parser::new();
+        // TODO: tree-sitter-rust has version conflicts with tree-sitter 0.20.x
+        // For now, we'll rely on regex-based analysis only
 
         Ok(Self {
             parser,
@@ -43,42 +42,20 @@ impl SolanaAnalyzer {
         let content = tokio::fs::read_to_string(path).await?;
         let mut findings = Vec::new();
 
-        // Parse the program
-        let tree = self
-            .parser
-            .parse(&content, None)
-            .ok_or_else(|| ChainGuardError::Parse("Failed to parse Solana program".to_string()))?;
+        // Run all Solana-specific analyses using regex-based approach
+        findings.extend(self.check_account_validation(&content)?);
+        findings.extend(self.check_signer_verification(&content)?);
+        findings.extend(self.check_owner_checks(&content)?);
+        findings.extend(self.check_arithmetic_operations(&content)?);
+        findings.extend(self.check_cpi_vulnerabilities(&content)?);
+        findings.extend(self.check_pda_vulnerabilities(&content)?);
+        findings.extend(self.check_sysvar_usage(&content)?);
+        findings.extend(self.check_rent_exemption(&content)?);
+        findings.extend(self.check_type_confusion(&content)?);
+        findings.extend(self.check_duplicate_mutable_accounts(&content)?);
 
-        // Run all Solana-specific analyses
-        findings.extend(self.check_account_validation(&content, &tree)?);
-        findings.extend(self.check_signer_verification(&content, &tree)?);
-        findings.extend(self.check_owner_checks(&content, &tree)?);
-        findings.extend(self.check_arithmetic_operations(&content, &tree)?);
-        findings.extend(self.check_cpi_vulnerabilities(&content, &tree)?);
-        findings.extend(self.check_pda_vulnerabilities(&content, &tree)?);
-        findings.extend(self.check_sysvar_usage(&content, &tree)?);
-        findings.extend(self.check_rent_exemption(&content, &tree)?);
-        findings.extend(self.check_type_confusion(&content, &tree)?);
-        findings.extend(self.check_duplicate_mutable_accounts(&content, &tree)?);
-
-        // Run sub-analyzers
-        let account_issues = self.account_validator.analyze(&content, &tree)?;
-        findings.extend(account_issues);
-
-        let cpi_issues = self.cpi_analyzer.analyze(&content, &tree)?;
-        findings.extend(cpi_issues);
-
-        let signer_issues = self.signer_analyzer.analyze(&content, &tree)?;
-        findings.extend(signer_issues);
-
-        let ownership_issues = self.ownership_analyzer.analyze(&content, &tree)?;
-        findings.extend(ownership_issues);
-
-        let arithmetic_issues = self.arithmetic_analyzer.analyze(&content, &tree)?;
-        findings.extend(arithmetic_issues);
-
-        let performance_issues = self.performance_analyzer.analyze(&content, &tree)?;
-        findings.extend(performance_issues);
+        // TODO: Sub-analyzers currently require tree-sitter, skip for now
+        // Once tree-sitter version conflict is resolved, re-enable these
 
         Ok(SolanaAnalysisResult {
             findings: findings.clone(),
@@ -89,11 +66,7 @@ impl SolanaAnalyzer {
         })
     }
 
-    fn check_account_validation(
-        &self,
-        content: &str,
-        tree: &tree_sitter::Tree,
-    ) -> Result<Vec<Finding>> {
+    fn check_account_validation(&self, content: &str) -> Result<Vec<Finding>> {
         let mut findings = Vec::new();
 
         // Check for missing account validation
@@ -150,11 +123,7 @@ impl SolanaAnalyzer {
         Ok(findings)
     }
 
-    fn check_signer_verification(
-        &self,
-        content: &str,
-        tree: &tree_sitter::Tree,
-    ) -> Result<Vec<Finding>> {
+    fn check_signer_verification(&self, content: &str) -> Result<Vec<Finding>> {
         let mut findings = Vec::new();
 
         // Check for operations that should require signer verification
@@ -209,7 +178,7 @@ impl SolanaAnalyzer {
         Ok(findings)
     }
 
-    fn check_owner_checks(&self, content: &str, tree: &tree_sitter::Tree) -> Result<Vec<Finding>> {
+    fn check_owner_checks(&self, content: &str) -> Result<Vec<Finding>> {
         let mut findings = Vec::new();
 
         // Check for program-owned account operations without owner verification
@@ -257,11 +226,7 @@ impl SolanaAnalyzer {
         Ok(findings)
     }
 
-    fn check_arithmetic_operations(
-        &self,
-        content: &str,
-        tree: &tree_sitter::Tree,
-    ) -> Result<Vec<Finding>> {
+    fn check_arithmetic_operations(&self, content: &str) -> Result<Vec<Finding>> {
         let mut findings = Vec::new();
 
         // Check for unsafe arithmetic operations
@@ -334,11 +299,7 @@ impl SolanaAnalyzer {
         Ok(findings)
     }
 
-    fn check_cpi_vulnerabilities(
-        &self,
-        content: &str,
-        tree: &tree_sitter::Tree,
-    ) -> Result<Vec<Finding>> {
+    fn check_cpi_vulnerabilities(&self, content: &str) -> Result<Vec<Finding>> {
         let mut findings = Vec::new();
 
         // Check for Cross-Program Invocation vulnerabilities
@@ -380,11 +341,7 @@ impl SolanaAnalyzer {
         Ok(findings)
     }
 
-    fn check_pda_vulnerabilities(
-        &self,
-        content: &str,
-        tree: &tree_sitter::Tree,
-    ) -> Result<Vec<Finding>> {
+    fn check_pda_vulnerabilities(&self, content: &str) -> Result<Vec<Finding>> {
         let mut findings = Vec::new();
 
         // Check for PDA seed vulnerabilities
@@ -426,7 +383,7 @@ impl SolanaAnalyzer {
         Ok(findings)
     }
 
-    fn check_sysvar_usage(&self, content: &str, tree: &tree_sitter::Tree) -> Result<Vec<Finding>> {
+    fn check_sysvar_usage(&self, content: &str) -> Result<Vec<Finding>> {
         let mut findings = Vec::new();
 
         // Check for deprecated sysvar usage
@@ -468,11 +425,7 @@ impl SolanaAnalyzer {
         Ok(findings)
     }
 
-    fn check_rent_exemption(
-        &self,
-        content: &str,
-        tree: &tree_sitter::Tree,
-    ) -> Result<Vec<Finding>> {
+    fn check_rent_exemption(&self, content: &str) -> Result<Vec<Finding>> {
         let mut findings = Vec::new();
 
         // Check for proper rent exemption handling
@@ -516,11 +469,7 @@ impl SolanaAnalyzer {
         Ok(findings)
     }
 
-    fn check_type_confusion(
-        &self,
-        content: &str,
-        tree: &tree_sitter::Tree,
-    ) -> Result<Vec<Finding>> {
+    fn check_type_confusion(&self, content: &str) -> Result<Vec<Finding>> {
         let mut findings = Vec::new();
 
         // Check for potential type confusion vulnerabilities
@@ -563,11 +512,7 @@ impl SolanaAnalyzer {
         Ok(findings)
     }
 
-    fn check_duplicate_mutable_accounts(
-        &self,
-        content: &str,
-        tree: &tree_sitter::Tree,
-    ) -> Result<Vec<Finding>> {
+    fn check_duplicate_mutable_accounts(&self, content: &str) -> Result<Vec<Finding>> {
         let mut findings = Vec::new();
 
         // Check for duplicate mutable accounts vulnerability
@@ -630,16 +575,7 @@ impl SolanaAnalyzer {
     }
 
     fn get_code_snippet(&self, content: &str, line: usize) -> String {
-        let lines: Vec<&str> = content.lines().collect();
-        let start = if line > 2 { line - 2 } else { 1 };
-        let end = std::cmp::min(line + 2, lines.len());
-
-        lines[start - 1..end]
-            .iter()
-            .enumerate()
-            .map(|(i, l)| format!("{:4} | {}", start + i, l))
-            .collect::<Vec<_>>()
-            .join("\n")
+        crate::utils::get_code_snippet(content, line)
     }
 
     fn get_context_around(&self, content: &str, pos: usize, context_size: usize) -> String {
