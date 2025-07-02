@@ -19,6 +19,46 @@
 #![allow(unused_mut)]
 #![allow(clippy::uninlined_format_args)]
 
+// Error handling macros
+#[macro_export]
+macro_rules! try_regex {
+    ($pattern:expr) => {{
+        match $crate::utils::create_regex($pattern) {
+            Ok(regex) => regex,
+            Err(e) => {
+                tracing::warn!("Failed to compile regex '{}': {}", $pattern, e);
+                continue;
+            }
+        }
+    }};
+}
+
+#[macro_export]
+macro_rules! safe_unwrap {
+    ($expr:expr, $default:expr) => {{
+        match $expr {
+            Some(val) => val,
+            None => {
+                tracing::debug!("Unwrap failed, using default: {:?}", $default);
+                $default
+            }
+        }
+    }};
+}
+
+#[macro_export]
+macro_rules! try_or_continue {
+    ($expr:expr) => {{
+        match $expr {
+            Ok(val) => val,
+            Err(e) => {
+                tracing::debug!("Operation failed, skipping: {}", e);
+                continue;
+            }
+        }
+    }};
+}
+
 pub mod ai_validation;
 pub mod analyzer;
 pub mod auditor;

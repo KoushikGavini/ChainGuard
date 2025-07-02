@@ -1,4 +1,6 @@
 use std::path::Path;
+use regex::Regex;
+use crate::{ChainGuardError, Result};
 
 pub fn is_go_file(path: &Path) -> bool {
     path.extension()
@@ -38,4 +40,27 @@ pub fn extract_line_context(content: &str, line_number: usize, context_lines: us
 // Convenience function for getting code snippets with default context
 pub fn get_code_snippet(content: &str, line: usize) -> String {
     extract_line_context(content, line, 2)
+}
+
+// Safe regex creation with proper error handling
+pub fn create_regex(pattern: &str) -> Result<Regex> {
+    Regex::new(pattern)
+        .map_err(|e| ChainGuardError::Parse(format!("Invalid regex pattern '{}': {}", pattern, e)))
+}
+
+// Create regex that should never fail - panics in debug mode, returns None in release
+pub fn create_static_regex(pattern: &str) -> Option<Regex> {
+    match Regex::new(pattern) {
+        Ok(regex) => Some(regex),
+        Err(e) => {
+            #[cfg(debug_assertions)]
+            panic!("Static regex '{}' failed to compile: {}", pattern, e);
+            
+            #[cfg(not(debug_assertions))]
+            {
+                eprintln!("Warning: Static regex '{}' failed to compile: {}", pattern, e);
+                None
+            }
+        }
+    }
 }

@@ -26,61 +26,79 @@ struct InefficiencyPattern {
 }
 
 lazy_static! {
-    static ref UNBOUNDED_QUERY: Regex = Regex::new(r"GetQueryResult[^}]+").unwrap();
-    static ref NESTED_LOOP: Regex =
-        Regex::new(r"for\s+.*\s+in\s+.*\s*\{\s*for\s+.*\s+in\s+").unwrap();
-    static ref LARGE_ARRAY: Regex =
-        Regex::new(r"make\s*\(\s*\[\s*\]\s*\w+\s*,\s*(\d{4,})\s*\)").unwrap();
-    static ref STRING_CONCAT: Regex = Regex::new(r#"(\w+)\s*=\s*(\w+)\s*\+\s*"#).unwrap();
+    static ref UNBOUNDED_QUERY: Option<Regex> = crate::utils::create_static_regex(r"GetQueryResult[^}]+");
+    static ref NESTED_LOOP: Option<Regex> =
+        crate::utils::create_static_regex(r"for\s+.*\s+in\s+.*\s*\{\s*for\s+.*\s+in\s+");
+    static ref LARGE_ARRAY: Option<Regex> =
+        crate::utils::create_static_regex(r"make\s*\(\s*\[\s*\]\s*\w+\s*,\s*(\d{4,})\s*\)");
+    static ref STRING_CONCAT: Option<Regex> = crate::utils::create_static_regex(r#"(\w+)\s*=\s*(\w+)\s*\+\s*"#);
 }
 
 impl PerformanceAnalyzer {
     pub fn new() -> Self {
-        let query_patterns = vec![
-            QueryPattern {
+        let mut query_patterns = vec![];
+        
+        // Create patterns with error handling
+        if let Ok(regex) = crate::utils::create_regex(r#"GetStateByRange\s*\(\s*""\s*,\s*""\s*\)"#) {
+            query_patterns.push(QueryPattern {
                 name: "unbounded_range_query".to_string(),
-                regex: Regex::new(r#"GetStateByRange\s*\(\s*""\s*,\s*""\s*\)"#).unwrap(),
+                regex,
                 severity: Severity::High,
                 description: "Unbounded range query can cause performance issues".to_string(),
                 optimization: "Use pagination with limited range queries".to_string(),
-            },
-            QueryPattern {
+            });
+        }
+        
+        if let Ok(regex) = crate::utils::create_regex(r"CreateCompositeKey\s*\([^,]+,\s*\[\s*\]\s*\)") {
+            query_patterns.push(QueryPattern {
                 name: "inefficient_composite_key".to_string(),
-                regex: Regex::new(r"CreateCompositeKey\s*\([^,]+,\s*\[\s*\]\s*\)").unwrap(),
+                regex,
                 severity: Severity::Low,
                 description: "Empty attributes in composite key reduce query efficiency"
                     .to_string(),
                 optimization: "Add meaningful attributes to composite keys".to_string(),
-            },
-        ];
+            });
+        }
 
-        let inefficiency_patterns = vec![
-            InefficiencyPattern {
+        let mut inefficiency_patterns = vec![];
+        
+        // Create inefficiency patterns with error handling
+        if let Ok(regex) = crate::utils::create_regex(r"(GetState\s*\([^)]+\)[^{]*){3,}") {
+            inefficiency_patterns.push(InefficiencyPattern {
                 name: "multiple_getstate".to_string(),
-                regex: Regex::new(r"(GetState\s*\([^)]+\)[^{]*){3,}").unwrap(),
+                regex,
                 severity: Severity::Medium,
                 description: "Multiple sequential GetState calls can be optimized".to_string(),
-            },
-            InefficiencyPattern {
+            });
+        }
+        
+        if let Ok(regex) = crate::utils::create_regex(r"for\s+.*\{[^}]*json\.(Marshal|Unmarshal)") {
+            inefficiency_patterns.push(InefficiencyPattern {
                 name: "json_in_loop".to_string(),
-                regex: Regex::new(r"for\s+.*\{[^}]*json\.(Marshal|Unmarshal)").unwrap(),
+                regex,
                 severity: Severity::Medium,
                 description: "JSON operations in loops are computationally expensive".to_string(),
-            },
-            InefficiencyPattern {
+            });
+        }
+        
+        if let Ok(regex) = crate::utils::create_regex(r"PutState\s*\([^,]+,\s*[^)]*\[\d{5,}\]byte") {
+            inefficiency_patterns.push(InefficiencyPattern {
                 name: "large_payload_storage".to_string(),
-                regex: Regex::new(r"PutState\s*\([^,]+,\s*[^)]*\[\d{5,}\]byte").unwrap(),
+                regex,
                 severity: Severity::High,
                 description: "Storing large payloads impacts network and storage performance"
                     .to_string(),
-            },
-            InefficiencyPattern {
+            });
+        }
+        
+        if let Ok(regex) = crate::utils::create_regex(r"(http\.|net\.Dial|rpc\.)") {
+            inefficiency_patterns.push(InefficiencyPattern {
                 name: "synchronous_external_call".to_string(),
-                regex: Regex::new(r"(http\.|net\.Dial|rpc\.)").unwrap(),
+                regex,
                 severity: Severity::Critical,
                 description: "Synchronous external calls block transaction processing".to_string(),
-            },
-        ];
+            });
+        }
 
         Self {
             query_patterns,
@@ -144,10 +162,11 @@ impl PerformanceAnalyzer {
         self.check_endorsement_patterns(content, path, &mut findings);
 
         // Check for unbounded queries (missing pagination)
-        if UNBOUNDED_QUERY.is_match(content)
-            && !content.contains("pageSize")
-            && !content.contains("bookmark")
-        {
+        if let Some(ref regex) = *UNBOUNDED_QUERY {
+            if regex.is_match(content)
+                && !content.contains("pageSize")
+                && !content.contains("bookmark")
+            {
             findings.push(Finding {
                 id: "PERF-QUERY-UNBOUNDED".to_string(),
                 severity: Severity::High,
@@ -162,6 +181,7 @@ impl PerformanceAnalyzer {
                 references: vec![],
                 ai_consensus: None,
             });
+            }
         }
 
         Ok(findings)
@@ -169,8 +189,10 @@ impl PerformanceAnalyzer {
 
     fn check_endorsement_patterns(&self, content: &str, path: &Path, findings: &mut Vec<Finding>) {
         // Check for overly complex endorsement logic
-        let complex_endorsement =
-            Regex::new(r"(GetMSPID|GetCreator)\s*\([^{]*\{[^}]{200,}").unwrap();
+        let complex_endorsement = match crate::utils::create_regex(r"(GetMSPID|GetCreator)\s*\([^{]*\{[^}]{200,}") {
+            Ok(regex) => regex,
+            Err(_) => return, // Skip this check if regex fails
+        };
         for mat in complex_endorsement.find_iter(content) {
             let line_number = content[..mat.start()].lines().count();
             findings.push(Finding {

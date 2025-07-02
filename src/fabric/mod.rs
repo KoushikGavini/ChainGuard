@@ -97,7 +97,10 @@ impl FabricAnalyzer {
         let time_patterns = vec![r"time\.Now\(\)", r"time\.Unix\(", r"rand\.", r"math/rand"];
 
         for pattern in time_patterns {
-            let regex = Regex::new(pattern).unwrap();
+            let regex = match crate::utils::create_regex(pattern) {
+                Ok(r) => r,
+                Err(_) => continue, // Skip invalid patterns
+            };
             for mat in regex.find_iter(content) {
                 let pos = mat.start();
                 let (line, column) = self.get_line_column(content, pos);
@@ -156,7 +159,10 @@ impl FabricAnalyzer {
         for match_ in matches {
             for capture in match_.captures {
                 let node = capture.node;
-                let text = node.utf8_text(content.as_bytes()).unwrap();
+                let text = match node.utf8_text(content.as_bytes()) {
+                    Ok(t) => t,
+                    Err(_) => continue, // Skip nodes that can't be decoded
+                };
 
                 // Check if it's a mutable global variable
                 if !text.starts_with("const") {
@@ -200,7 +206,10 @@ impl FabricAnalyzer {
         ];
 
         for pattern in rich_query_patterns {
-            let regex = Regex::new(pattern).unwrap();
+            let regex = match crate::utils::create_regex(pattern) {
+                Ok(r) => r,
+                Err(_) => continue,
+            };
             for mat in regex.find_iter(content) {
                 let pos = mat.start();
                 let (line, column) = self.get_line_column(content, pos);
