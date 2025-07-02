@@ -1,5 +1,5 @@
 use crate::{analyzer::AnalysisResult, AnalysisConfig, Finding, OutputFormat, Result, Severity};
-use handlebars::{Handlebars, Helper, Context, RenderContext, Output, HelperResult};
+use handlebars::{Context, Handlebars, Helper, HelperResult, Output, RenderContext};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::Path;

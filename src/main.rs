@@ -965,7 +965,7 @@ async fn scan_command(
     if fabric {
         progress.set_message("Loading Fabric-specific rules...");
         let mut fabric_analyzer = FabricAnalyzer::new()?;
-        
+
         progress.set_message("Scanning for Fabric vulnerabilities...");
         if path.is_file() {
             let fabric_result = fabric_analyzer.analyze_chaincode(&path).await?;
@@ -986,7 +986,7 @@ async fn scan_command(
     } else if solana {
         progress.set_message("Loading Solana-specific rules...");
         let mut solana_analyzer = SolanaAnalyzer::new()?;
-        
+
         progress.set_message("Scanning for Solana vulnerabilities...");
         if path.is_file() {
             let solana_result = solana_analyzer.analyze_program(&path).await?;
@@ -1008,7 +1008,7 @@ async fn scan_command(
         // Generic scan
         progress.set_message("Scanning for vulnerabilities...");
         let analyzer = Analyzer::new();
-        
+
         if path.is_file() {
             results.push(analyzer.quick_scan(&path).await?);
         } else {
