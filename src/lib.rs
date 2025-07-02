@@ -293,3 +293,9 @@ impl From<dialoguer::Error> for ChainGuardError {
         ))
     }
 }
+
+impl From<serde_json::Error> for ChainGuardError {
+    fn from(e: serde_json::Error) -> Self {
+        ChainGuardError::Report(format!("JSON serialization error: {}", e))
+    }
+}

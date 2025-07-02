@@ -5,7 +5,8 @@
 #![allow(clippy::uninlined_format_args)]
 
 use chainguard::{
-    analyzer::Analyzer, fabric::FabricAnalyzer, llm::LLMManager, reporter::Reporter,
+    analyzer::{Analyzer, AnalysisResult}, fabric::FabricAnalyzer, llm::LLMManager, 
+    reporter::Reporter,
     solana::SolanaAnalyzer, token_standards::TokenStandardsValidator, validator::Validator,
     AnalysisConfig, ChainGuardError, OutputFormat, Result, Severity,
 };
@@ -853,12 +854,39 @@ async fn report_command(
     output: PathBuf,
     quiet: bool,
 ) -> Result<()> {
-    println!("{}", style("📊 Report Generation").bold().cyan());
-    println!("{}", style("━".repeat(50)).dim());
+    if !quiet {
+        println!("{}", style("📊 Report Generation").bold().cyan());
+        println!("{}", style("━".repeat(50)).dim());
+    }
 
     let reporter = Reporter::new();
 
-    // TODO: Load results and generate report
+    // Load analysis results from JSON file
+    let content = tokio::fs::read_to_string(&input).await?;
+    let analysis_result: AnalysisResult = serde_json::from_str(&content)
+        .map_err(|e| ChainGuardError::Report(format!("Failed to parse analysis results: {}", e)))?;
+
+    // Create a report from the single analysis result
+    let results = vec![analysis_result];
+    let config = AnalysisConfig::default();
+    let report = reporter.generate_report(&results, &config)?;
+
+    // Save report in requested format
+    let output_format = match format {
+        ReportFormat::Html => OutputFormat::Html,
+        ReportFormat::Json => OutputFormat::Json,
+        ReportFormat::Markdown => OutputFormat::Markdown,
+        ReportFormat::Pdf => OutputFormat::Pdf,
+        ReportFormat::Xml => OutputFormat::Xml,
+        ReportFormat::Csv => OutputFormat::Csv,
+        ReportFormat::Sarif => OutputFormat::Sarif,
+    };
+    
+    reporter.save_report(&report, &output, output_format).await?;
+
+    if !quiet {
+        println!("✅ Report generated: {}", output.display());
+    }
 
     Ok(())
 }

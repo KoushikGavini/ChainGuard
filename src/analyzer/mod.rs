@@ -8,7 +8,7 @@ use std::path::Path;
 use tokio::fs;
 use tracing::{debug, info};
 
-#[derive(Debug)]
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 pub struct AnalysisResult {
     pub findings: Vec<Finding>,
     pub metrics: AnalysisMetrics,
