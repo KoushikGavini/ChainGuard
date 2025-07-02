@@ -8,7 +8,7 @@ use chainguard::{
     analyzer::{AnalysisResult, Analyzer},
     fabric::FabricAnalyzer,
     llm::LLMManager,
-    reporter::Reporter,
+    reporter::{Report, Reporter},
     solana::SolanaAnalyzer,
     token_standards::TokenStandardsValidator,
     validator::Validator,
@@ -237,7 +237,7 @@ enum Commands {
         input: PathBuf,
 
         /// Report format
-        #[arg(short, long, value_enum, default_value = "html")]
+        #[arg(short = 'f', long, value_enum, default_value = "html")]
         format: ReportFormat,
 
         /// Report template to use
@@ -253,8 +253,8 @@ enum Commands {
         examples: bool,
 
         /// Output file path
-        #[arg(short, long)]
-        output: PathBuf,
+        #[arg(long)]
+        output_file: PathBuf,
     },
 
     /// AI-powered performance optimization suggestions
@@ -617,7 +617,7 @@ async fn main() -> Result<()> {
             template,
             remediation,
             examples,
-            output,
+            output_file,
         } => {
             report_command(
                 input,
@@ -625,7 +625,7 @@ async fn main() -> Result<()> {
                 template,
                 remediation,
                 examples,
-                output,
+                output_file,
                 cli.quiet,
             )
             .await?;
@@ -855,7 +855,7 @@ async fn report_command(
     template: String,
     remediation: bool,
     examples: bool,
-    output: PathBuf,
+    output_file: PathBuf,
     quiet: bool,
 ) -> Result<()> {
     if !quiet {
@@ -865,15 +865,10 @@ async fn report_command(
 
     let reporter = Reporter::new();
 
-    // Load analysis results from JSON file
+    // Load report from JSON file
     let content = tokio::fs::read_to_string(&input).await?;
-    let analysis_result: AnalysisResult = serde_json::from_str(&content)
-        .map_err(|e| ChainGuardError::Report(format!("Failed to parse analysis results: {}", e)))?;
-
-    // Create a report from the single analysis result
-    let results = vec![analysis_result];
-    let config = AnalysisConfig::default();
-    let report = reporter.generate_report(&results, &config)?;
+    let report: Report = serde_json::from_str(&content)
+        .map_err(|e| ChainGuardError::Report(format!("Failed to parse report: {}", e)))?;
 
     // Save report in requested format
     let output_format = match format {
@@ -887,11 +882,11 @@ async fn report_command(
     };
 
     reporter
-        .save_report(&report, &output, output_format)
+        .save_report(&report, &output_file, output_format)
         .await?;
 
     if !quiet {
-        println!("✅ Report generated: {}", output.display());
+        println!("✅ Report generated: {}", output_file.display());
     }
 
     Ok(())

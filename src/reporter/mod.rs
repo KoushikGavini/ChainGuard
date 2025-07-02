@@ -1,5 +1,5 @@
 use crate::{analyzer::AnalysisResult, AnalysisConfig, Finding, OutputFormat, Result, Severity};
-use handlebars::Handlebars;
+use handlebars::{Handlebars, Helper, Context, RenderContext, Output, HelperResult};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::Path;
@@ -49,6 +49,10 @@ pub struct Recommendation {
 impl Reporter {
     pub fn new() -> Self {
         let mut handlebars = Handlebars::new();
+
+        // Register helpers
+        handlebars.register_helper("lowercase", Box::new(lowercase_helper));
+        handlebars.register_helper("eq", Box::new(eq_helper));
 
         // Register default templates
         let html_template = include_str!("templates/report.html");
@@ -571,4 +575,29 @@ impl Report {
             self.summary.complexity_score
         )
     }
+}
+
+fn lowercase_helper(
+    h: &Helper,
+    _: &Handlebars,
+    _: &Context,
+    _: &mut RenderContext,
+    out: &mut dyn Output,
+) -> HelperResult {
+    let param = h.param(0).and_then(|v| v.value().as_str()).unwrap_or("");
+    out.write(&param.to_lowercase())?;
+    Ok(())
+}
+
+fn eq_helper(
+    h: &Helper,
+    _: &Handlebars,
+    _: &Context,
+    _: &mut RenderContext,
+    _: &mut dyn Output,
+) -> HelperResult {
+    let param1 = h.param(0).and_then(|v| v.value().as_str()).unwrap_or("");
+    let param2 = h.param(1).and_then(|v| v.value().as_str()).unwrap_or("");
+    // For eq helper, we just need to return Ok(()) since handlebars uses the return value for conditionals
+    Ok(())
 }
