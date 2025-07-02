@@ -103,7 +103,6 @@ lopdf = "0.36"
 
 # Database for tracking and caching
 rusqlite = { version = "0.31", features = ["bundled"] }
-diesel = { version = "2.1", features = ["sqlite", "r2d2"] }
 redis = "0.24"
 rocksdb = "0.21"
 
