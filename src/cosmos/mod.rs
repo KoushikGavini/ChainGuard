@@ -4,10 +4,10 @@ use serde::{Deserialize, Serialize};
 use std::path::Path;
 
 pub mod cosmwasm;
-pub mod ibc;
-pub mod governance;
-pub mod staking;
 pub mod distribution;
+pub mod governance;
+pub mod ibc;
+pub mod staking;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CosmosAnalysisResult {
@@ -76,7 +76,7 @@ impl CosmosAnalyzer {
                 code_snippet: None,
                 remediation: Some("Add proper admin validation checks".to_string()),
                 references: vec![
-                    "https://docs.cosmwasm.com/docs/1.0/smart-contracts/migration/".to_string()
+                    "https://docs.cosmwasm.com/docs/1.0/smart-contracts/migration/".to_string(),
                 ],
                 ai_consensus: None,
             });
@@ -101,9 +101,7 @@ impl CosmosAnalyzer {
                 column: 1,
                 code_snippet: None,
                 remediation: Some("Add packet validation before processing".to_string()),
-                references: vec![
-                    "https://ibc.cosmos.network/main/ibc/overview.html".to_string()
-                ],
+                references: vec!["https://ibc.cosmos.network/main/ibc/overview.html".to_string()],
                 ai_consensus: None,
             });
         }
@@ -155,4 +153,4 @@ impl CosmosAnalyzer {
         // Implementation for governance security score
         100.0
     }
-} 
+}

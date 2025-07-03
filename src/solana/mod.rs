@@ -53,7 +53,7 @@ impl SolanaAnalyzer {
         findings.extend(self.check_rent_exemption(&content)?);
         findings.extend(self.check_type_confusion(&content)?);
         findings.extend(self.check_duplicate_mutable_accounts(&content)?);
-        
+
         // Enhanced Solana-specific checks
         findings.extend(self.check_anchor_vulnerabilities(&content)?);
         findings.extend(self.check_token_program_integration(&content)?);

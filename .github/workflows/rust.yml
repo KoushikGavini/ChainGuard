@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        rust: [stable, beta]
+        rust: [1.82.0]
     steps:
       - uses: actions/checkout@v4
       
@@ -126,7 +126,9 @@ jobs:
           sudo apt-get update && sudo apt-get install -y z3 libz3-dev
           echo "Z3_SYS_Z3_HEADER=/usr/include/z3.h" >> $GITHUB_ENV
       
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.82.0
       
       - name: Install tarpaulin
         run: cargo install cargo-tarpaulin

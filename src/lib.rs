@@ -80,14 +80,14 @@ pub mod utils;
 pub mod validator;
 
 // New blockchain platform modules
-pub mod cosmos;
-pub mod polkadot;
-pub mod cardano;
-pub mod near;
-pub mod sui;
+pub mod algorand;
 pub mod aptos;
 pub mod avalanche;
-pub mod algorand;
+pub mod cardano;
+pub mod cosmos;
+pub mod near;
+pub mod polkadot;
+pub mod sui;
 
 use clap::ValueEnum;
 use serde::{Deserialize, Serialize};

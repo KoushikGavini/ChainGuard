@@ -89,8 +89,9 @@ jobs:
           echo "Z3_SYS_Z3_HEADER=$(brew --prefix)/include/z3.h" >> $GITHUB_ENV
       
       - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@master
         with:
+          toolchain: 1.82.0
           targets: ${{ matrix.target }}
       
       - name: Build

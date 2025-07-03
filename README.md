@@ -60,7 +60,7 @@ chainguard --version
 -->
 
 ### Build from Source
-Requires Rust 1.70+ (install via [rustup.rs](https://rustup.rs/))
+Requires Rust 1.82+ (install via [rustup.rs](https://rustup.rs/))
 
 ```bash
 # Clone the repository
