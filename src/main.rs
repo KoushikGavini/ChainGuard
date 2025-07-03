@@ -1,7 +1,6 @@
 #![allow(unused_variables)]
 #![allow(clippy::too_many_arguments)]
 #![allow(clippy::needless_borrows_for_generic_args)]
-
 #![allow(clippy::uninlined_format_args)]
 
 use chainguard::{
