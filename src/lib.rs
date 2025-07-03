@@ -3,7 +3,6 @@
 
 #![warn(clippy::all)]
 #![allow(clippy::new_without_default)]
-#![allow(clippy::unnecessary_map_or)]
 #![allow(clippy::manual_clamp)]
 #![allow(clippy::redundant_closure)]
 #![allow(clippy::useless_format)]
@@ -11,7 +10,6 @@
 #![allow(clippy::needless_range_loop)]
 #![allow(clippy::implicit_saturating_sub)]
 #![allow(clippy::for_kv_map)]
-#![allow(clippy::io_other_error)]
 #![allow(clippy::collapsible_if)]
 #![allow(dead_code)]
 #![allow(unused_variables)]
