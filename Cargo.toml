@@ -10,6 +10,7 @@ keywords = ["blockchain", "security", "hyperledger", "fabric", "cli"]
 categories = ["command-line-utilities", "development-tools"]
 readme = "README.md"
 homepage = "https://github.com/KoushikGavini/ChainGuard"
+rust-version = "1.82"
 
 # This is a binary crate (CLI tool), not a library
 [[bin]]

@@ -21,6 +21,7 @@ Thumbs.db
 
 # Internal development files
 CRITICAL_ISSUES.md
+CLAUDE.md
 
 # Project specific
 .chainguard-cache/
