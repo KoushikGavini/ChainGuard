@@ -4,7 +4,7 @@ ChainGuard provides comprehensive report generation capabilities in multiple for
 
 ## Available Report Formats
 
-### 1. **JSON Format** (✅ Working)
+### 1. **JSON Format** (Working)
 Perfect for CI/CD integration and programmatic processing.
 
 ```bash
@@ -17,7 +17,7 @@ Perfect for CI/CD integration and programmatic processing.
 - Easy integration with other tools
 - Includes confidence scores and AI consensus data
 
-### 2. **Markdown Format** (✅ Working)
+### 2. **Markdown Format** (Working)
 Great for documentation and GitHub/GitLab integration.
 
 ```bash
@@ -30,7 +30,7 @@ Great for documentation and GitHub/GitLab integration.
 - Includes code snippets with syntax highlighting
 - Executive summary with key metrics
 
-### 3. **Table Format** (✅ Default)
+### 3. **Table Format** (Default)
 Console-friendly output for quick reviews.
 
 ```bash

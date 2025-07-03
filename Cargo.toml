@@ -64,7 +64,7 @@ blake3 = "1.5"
 regex = "1.10"
 hex = "0.4"
 base64 = "0.21"
-ring = "0.17.12"  # Force newer version to fix RUSTSEC-2025-0009
+ring = "0.17.14"  # Updated to latest version
 
 # HTTP client for LLM APIs and package verification
 reqwest = { version = "0.12", features = ["json", "rustls-tls"] }
@@ -108,7 +108,8 @@ rocksdb = "0.21"
 
 # Formal verification and symbolic execution
 z3 = "0.12"
-smt2parser = "0.1"
+# Use updated smt2parser or alternative
+# smt2parser = "0.1"
 
 # Machine learning for anomaly detection
 # candle-core = "0.3"
@@ -148,8 +149,8 @@ metrics = "0.22"
 flate2 = "1.0"
 zstd = "0.13"
 
-# Cache
-cached = "0.51"
+# Cache - updated to avoid unmaintained packages
+cached = "0.53"  # Updated version
 moka = { version = "0.12", features = ["future", "sync"] }
 
 # Plugin system

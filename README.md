@@ -2,7 +2,7 @@
 
 > Advanced security analysis and AI code review platform for blockchain smart contracts
 
-ChainGuard is a comprehensive security analysis tool designed specifically for non-Ethereum blockchain developers. It provides deep vulnerability detection, AI-powered code review, and performance optimization for smart contracts across multiple blockchain platforms including Hyperledger Fabric, Solana, Cosmos, Polkadot, Cardano, NEAR, Sui, and Aptos.
+ChainGuard is a comprehensive security analysis tool designed specifically for non-Ethereum blockchain developers. It provides deep vulnerability detection, AI-powered code review, and performance optimization for smart contracts on Hyperledger Fabric and Solana platforms.
 
 [![CI](https://github.com/KoushikGavini/ChainGuard/actions/workflows/rust.yml/badge.svg)](https://github.com/KoushikGavini/ChainGuard/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -11,25 +11,17 @@ ChainGuard is a comprehensive security analysis tool designed specifically for n
 
 ## Key Features
 
-### 🌐 Non-Ethereum Blockchain Focus
+### Non-Ethereum Blockchain Focus
 - **Hyperledger Fabric**: Enterprise chaincode analysis with determinism checking, endorsement policies, private data security, and MVCC compliance
 - **Solana**: Advanced Rust program analysis with account validation, CPI security, PDA vulnerabilities, and compute optimization
-- **Cosmos/CosmWasm**: IBC security, governance attack prevention, staking/slashing validation, and authz module security
-- **Polkadot/Substrate**: Parachain security, cross-consensus messaging, runtime upgrades, and treasury governance
-- **Cardano**: Plutus script analysis, UTxO model validation, native token security, and stake pool operations
-- **NEAR**: Rust/AssemblyScript contract analysis, sharding security, and cross-contract calls
-- **Sui**: Move language security, object-centric programming model, and consensus mechanism analysis
-- **Aptos**: Move VM security, parallel execution safety, and resource account validation
 
-### 🤖 AI-Powered Analysis
+### AI-Powered Analysis
 - **Multi-LLM Consensus Analysis**: Leverage multiple AI providers (ChatGPT, Claude, Gemini) for robust, consensus-based security analysis
 - **AI-Generated Code Validation**: Specialized detection of hallucinations, logic errors, and security vulnerabilities in AI-produced smart contracts
 - **Blockchain-Specific AI Prompts**: Custom AI prompts tailored for each blockchain platform's unique security considerations
 
-### 🔍 Comprehensive Security Analysis
+### Comprehensive Security Analysis
 - **Platform-Specific Vulnerabilities**: Deep understanding of each blockchain's unique attack vectors and security requirements
-- **Cross-Chain Security**: Analysis of bridge contracts, IBC protocols, and multi-chain applications
-- **DeFi Security**: Specialized checks for AMMs, lending protocols, stablecoins, and yield farming contracts
 - **Performance & Optimization**: Platform-specific performance analysis and optimization suggestions
 
 ## Installation
@@ -99,7 +91,7 @@ You will see a summary of the findings directly in your terminal, similar to thi
 
 For Fabric chaincode:
 ```text
-🔍 Chainguard Analysis
+Chainguard Analysis
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ...
 ChainGuard Analysis Report
@@ -118,7 +110,7 @@ Critical: 0 | High: 2 | Medium: 0 | Low: 0 | Info: 0
 
 For Solana programs:
 ```text
-🔍 Chainguard Analysis
+Chainguard Analysis
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ...
 ChainGuard Analysis Report
@@ -147,13 +139,11 @@ ChainGuard offers a rich set of commands for different analysis needs.
 
 | Command | Description | Example |
 |---|---|---|
-| `analyze` | Comprehensive security, performance, and quality analysis. | `chainguard analyze --fabric ./my-chaincode/` |
+| `analyze` | Analyze Fabric chaincode for security vulnerabilities. | `chainguard analyze --fabric ./my-chaincode/` |
 | `analyze` | Analyze Solana programs for security vulnerabilities. | `chainguard analyze --solana ./my-program/` |
 | `scan` | Quick scan for high-severity vulnerabilities. | `chainguard scan ./contracts/` |
-| `audit` | Check for compliance with standards like ERC-20. | `chainguard audit --standards erc20 ./token.sol` |
-| `audit` | Check stablecoin-specific security issues. | `chainguard audit --standards stablecoin ./stablecoin.sol` |
 | `validate` | Use multiple LLMs to review and validate code for correctness. | `chainguard validate --consensus ./contract.go` |
-| `benchmark` | Analyze performance metrics like throughput and storage. | `chainguard benchmark --throughput ./chaincode/` |
+| `benchmark` | Analyze Fabric chaincode performance metrics. | `chainguard benchmark --fabric ./chaincode/` |
 | `benchmark` | Analyze Solana program compute unit usage. | `chainguard benchmark --solana ./program.rs` |
 | `report` | Generate a detailed report from a previous analysis. | `chainguard report results.json -o report.html` |
 | `init` | Create a default `chainguard.toml` configuration file. | `chainguard init` |
@@ -194,19 +184,30 @@ ChainGuard can be easily integrated into your CI/CD pipeline to automate securit
 
 ### GitHub Actions Example
 ```yaml
-- name: Run ChainGuard Analysis
+- name: Run ChainGuard Analysis for Fabric
   run: |
-    chainguard analyze ./contracts/ \
+    chainguard analyze ./chaincode/ \
       --fabric \
       --severity high \
       --exit-code \
-      --output-file results.sarif \
+      --output-file fabric-results.sarif \
+      --format sarif
+
+- name: Run ChainGuard Analysis for Solana
+  run: |
+    chainguard analyze ./programs/ \
+      --solana \
+      --severity high \
+      --exit-code \
+      --output-file solana-results.sarif \
       --format sarif
 
 - name: Upload SARIF to GitHub Security
   uses: github/codeql-action/upload-sarif@v2
   with:
-    sarif_file: results.sarif
+    sarif_file: |
+      fabric-results.sarif
+      solana-results.sarif
 ```
 
 ## Configuration
@@ -224,8 +225,11 @@ You can also run ChainGuard within a Docker container.
 # Build the Docker image
 docker build -t chainguard .
 
-# Run analysis on a local directory
-docker run -v $(pwd):/workspace chainguard analyze /workspace/my-project
+# Run Fabric analysis on a local directory
+docker run -v $(pwd):/workspace chainguard analyze --fabric /workspace/chaincode
+
+# Run Solana analysis on a local directory
+docker run -v $(pwd):/workspace chainguard analyze --solana /workspace/program
 ```
 
 ## Contributing
@@ -248,21 +252,19 @@ ChainGuard provides comprehensive security analysis for Solana programs, detecti
 - **PDA Security**: Detects seed collision vulnerabilities and validates canonical bumps
 - **Type Confusion**: Identifies missing discriminators and account type validation
 - **Duplicate Mutable Accounts**: Prevents exploitation through duplicate account references
-- **Rent Exemption**: Ensures proper rent calculations to prevent account deletion
-- **Performance Optimization**: Identifies excessive CPI calls, large allocations, and compute unit waste
 
-### Example Usage:
-```bash
-# Analyze a Solana program
-chainguard analyze --solana ./my-program/src/lib.rs
+## Hyperledger Fabric Security
 
-# The analysis will identify issues like:
-# - SOL-ACC-001: Missing account validation
-# - SOL-SIGN-001: Missing signer verification
-# - SOL-ARITH-001: Unsafe arithmetic operation
-# - SOL-CPI-001: Unvalidated cross-program invocation
-# - SOL-PERF-001: Multiple CPIs in close proximity
-```
+ChainGuard provides extensive security analysis for Fabric chaincode, focusing on enterprise-specific concerns:
+
+### Key Fabric Security Checks:
+- **Determinism**: Ensures chaincode execution produces consistent results across peers
+- **Endorsement Policy**: Validates proper usage of endorsement policies and access controls
+- **Private Data**: Detects mishandling of private data collections and privacy leaks
+- **MVCC**: Identifies potential conflicts in multi-version concurrency control
+- **State DB**: Analyzes state database access patterns and potential bottlenecks
+- **Access Control**: Validates proper implementation of chaincode access control
+- **Upgrade Safety**: Ensures safe chaincode upgrade paths and state compatibility
 
 ## Stablecoin Security
 
@@ -290,7 +292,7 @@ chainguard analyze --standards stablecoin ./my-stablecoin.sol
 # - STABLE-FLASH-001: Missing reentrancy protection
 ```
 
-## 🔍 Analysis Categories
+## Analysis Categories
 
 ### Security Vulnerabilities
 - **FABRIC-SEC-xxx**: Fabric-specific security issues
@@ -369,11 +371,6 @@ cargo test
 # Run with debug logging
 RUST_LOG=debug cargo run -- analyze ./test-contracts/
 ```
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 
 ## Support
 

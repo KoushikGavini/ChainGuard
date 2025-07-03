@@ -53,16 +53,16 @@ impl SolanaAnalyzer {
         findings.extend(self.check_rent_exemption(&content)?);
         findings.extend(self.check_type_confusion(&content)?);
         findings.extend(self.check_duplicate_mutable_accounts(&content)?);
-        
-        // Enhanced Solana-specific checks
-        findings.extend(self.check_anchor_vulnerabilities(&content)?);
-        findings.extend(self.check_token_program_integration(&content)?);
-        findings.extend(self.check_metaplex_security(&content)?);
-        findings.extend(self.check_oracle_manipulation(&content)?);
-        findings.extend(self.check_flash_loan_protection(&content)?);
-        findings.extend(self.check_compute_budget_optimization(&content)?);
-        findings.extend(self.check_validator_economics(&content)?);
-        findings.extend(self.check_mev_protection(&content)?);
+
+        // Remove calls to non-existent methods
+        // findings.extend(self.check_anchor_vulnerabilities(&content)?);
+        // findings.extend(self.check_token_program_integration(&content)?);
+        // findings.extend(self.check_metaplex_security(&content)?);
+        // findings.extend(self.check_oracle_manipulation(&content)?);
+        // findings.extend(self.check_flash_loan_protection(&content)?);
+        // findings.extend(self.check_compute_budget_optimization(&content)?);
+        // findings.extend(self.check_validator_economics(&content)?);
+        // findings.extend(self.check_mev_protection(&content)?);
 
         // TODO: Sub-analyzers currently require tree-sitter, skip for now
         // Once tree-sitter version conflict is resolved, re-enable these

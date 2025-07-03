@@ -70,30 +70,6 @@ enum Commands {
         #[arg(long)]
         solana: bool,
 
-        /// Enable Cosmos/CosmWasm-specific analysis
-        #[arg(long)]
-        cosmos: bool,
-
-        /// Enable Polkadot/Substrate-specific analysis
-        #[arg(long)]
-        polkadot: bool,
-
-        /// Enable Cardano-specific analysis
-        #[arg(long)]
-        cardano: bool,
-
-        /// Enable NEAR-specific analysis
-        #[arg(long)]
-        near: bool,
-
-        /// Enable Sui-specific analysis
-        #[arg(long)]
-        sui: bool,
-
-        /// Enable Aptos-specific analysis
-        #[arg(long)]
-        aptos: bool,
-
         /// Enable AI-generated code validation
         #[arg(long)]
         ai_validate: bool,
@@ -731,7 +707,7 @@ async fn analyze_command(
     threads: Option<usize>,
     quiet: bool,
 ) -> Result<i32> {
-    println!("{}", style("🔍 Chainguard Analysis").bold().cyan());
+    println!("{}", style("Chainguard Analysis").bold().cyan());
     println!("{}", style("━".repeat(50)).dim());
 
     // Load or create configuration
@@ -910,7 +886,7 @@ async fn report_command(
         .await?;
 
     if !quiet {
-        println!("✅ Report generated: {}", output_file.display());
+        println!("Report generated: {}", output_file.display());
     }
 
     Ok(())
@@ -922,10 +898,7 @@ async fn init_command(
     examples: bool,
     force: bool,
 ) -> Result<()> {
-    println!(
-        "{}",
-        style("⚙️  Configuration Initialization").bold().cyan()
-    );
+    println!("{}", style("Configuration Initialization").bold().cyan());
     println!("{}", style("━".repeat(50)).dim());
 
     if config_path.exists() && !force {
@@ -942,7 +915,7 @@ async fn init_command(
 
     tokio::fs::write(&config_path, content).await?;
 
-    println!("✅ Configuration file created: {}", config_path.display());
+    println!("Configuration file created: {}", config_path.display());
 
     Ok(())
 }
@@ -972,7 +945,7 @@ async fn scan_command(
     quiet: bool,
 ) -> Result<i32> {
     if !quiet {
-        println!("{}", style("🔍 Quick Security Scan").bold().cyan());
+        println!("{}", style("Quick Security Scan").bold().cyan());
         println!("{}", style("━".repeat(50)).dim());
     }
 
@@ -1157,7 +1130,7 @@ async fn benchmark_command(
     quiet: bool,
 ) -> Result<()> {
     if !quiet {
-        println!("{}", style("⚡ Performance Benchmark").bold().cyan());
+        println!("{}", style("Performance Benchmark").bold().cyan());
         println!("{}", style("━".repeat(50)).dim());
     }
 
@@ -1265,7 +1238,7 @@ async fn optimize_command(
     if auto_apply && !suggestions.is_empty() {
         progress.set_message("Applying optimizations...");
         let applied = optimizer.apply_suggestions(&suggestions).await?;
-        println!("✅ Applied {} optimizations", applied);
+        println!("Applied {} optimizations", applied);
     }
 
     progress.finish_with_message("Optimization complete!");
@@ -1307,12 +1280,12 @@ async fn auth_command(command: AuthCommands) -> Result<()> {
             };
 
             auth_manager.set_api_key(&service, &api_key).await?;
-            println!("✅ API key for {} saved successfully", service);
+            println!("API key for {} saved successfully", service);
         }
 
         AuthCommands::Remove { service } => {
             auth_manager.remove_api_key(&service).await?;
-            println!("✅ API key for {} removed", service);
+            println!("API key for {} removed", service);
         }
 
         AuthCommands::List => {
@@ -1328,8 +1301,8 @@ async fn auth_command(command: AuthCommands) -> Result<()> {
             if let Some(svc) = service {
                 println!("Testing connection to {}...", svc);
                 match auth_manager.test_connection(&svc).await {
-                    Ok(_) => println!("✅ {} connection successful", svc),
-                    Err(e) => println!("❌ {} connection failed: {}", svc, e),
+                    Ok(_) => println!("{} connection successful", svc),
+                    Err(e) => println!("{} connection failed: {}", svc, e),
                 }
             } else {
                 // Test all services
@@ -1337,8 +1310,8 @@ async fn auth_command(command: AuthCommands) -> Result<()> {
                 for svc in services {
                     println!("Testing {}...", svc);
                     match auth_manager.test_connection(&svc).await {
-                        Ok(_) => println!("  ✅ Success"),
-                        Err(e) => println!("  ❌ Failed: {}", e),
+                        Ok(_) => println!("  Success"),
+                        Err(e) => println!("  Failed: {}", e),
                     }
                 }
             }
@@ -1379,12 +1352,12 @@ async fn rules_command(command: RulesCommands) -> Result<()> {
 
         RulesCommands::Enable { rule } => {
             let count = rule_manager.enable_rule(&rule)?;
-            println!("✅ Enabled {} rule(s)", count);
+            println!("Enabled {} rule(s)", count);
         }
 
         RulesCommands::Disable { rule } => {
             let count = rule_manager.disable_rule(&rule)?;
-            println!("✅ Disabled {} rule(s)", count);
+            println!("Disabled {} rule(s)", count);
         }
 
         RulesCommands::Import { path, validate } => {
@@ -1394,12 +1367,12 @@ async fn rules_command(command: RulesCommands) -> Result<()> {
             }
 
             let count = rule_manager.import_rules(&path)?;
-            println!("✅ Imported {} custom rule(s)", count);
+            println!("Imported {} custom rule(s)", count);
         }
 
         RulesCommands::Export { path, custom_only } => {
             rule_manager.export_rules(&path, custom_only)?;
-            println!("✅ Rules exported to: {}", path.display());
+            println!("Rules exported to: {}", path.display());
         }
     }
 
