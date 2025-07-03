@@ -66,7 +66,7 @@ pub mod auth;
 pub mod benchmark;
 pub mod compliance;
 pub mod fabric;
-pub mod formal_verification;
+// pub mod formal_verification;  // Commented out - requires z3 system dependency
 pub mod interactive;
 pub mod llm;
 pub mod optimizer;

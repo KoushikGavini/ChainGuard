@@ -108,7 +108,7 @@ redis = "0.24"
 rocksdb = "0.21"
 
 # Formal verification and symbolic execution
-z3 = "0.12"
+# z3 = "0.12"  # Commented out - requires z3 system dependency
 # Use updated smt2parser or alternative
 # smt2parser = "0.1"
 
