@@ -13,19 +13,36 @@ env:
 jobs:
   test:
     name: Test Suite
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        rust: [1.82.0]
     steps:
       - uses: actions/checkout@v4
       
-      - name: Install Z3
+      - name: Install Z3 (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update && sudo apt-get install -y z3 libz3-dev
           echo "Z3_SYS_Z3_HEADER=/usr/include/z3.h" >> $GITHUB_ENV
       
+      - name: Install Z3 (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew install z3
+          echo "Z3_SYS_Z3_HEADER=$(brew --prefix)/include/z3.h" >> $GITHUB_ENV
+      
+      - name: Accept Xcode license (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          sudo xcode-select --reset
+          sudo xcodebuild -license accept
+      
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: 1.82.0
+          toolchain: ${{ matrix.rust }}
       
       - name: Cache dependencies
         uses: actions/cache@v4

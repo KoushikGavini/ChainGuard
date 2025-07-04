@@ -151,3 +151,12 @@ target/
 
 # Mailmap
 .mailmap 
+
+# Cursor and Claude related files
+.cursor/
+.claude/
+.cursor.json
+.cursor_history
+.cursor_session
+.cursor_suggestions
+.cursor_settings 
