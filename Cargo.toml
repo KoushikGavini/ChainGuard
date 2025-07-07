@@ -167,7 +167,7 @@ once_cell = "1.19"
 tempfile = "3.10"
 criterion = "0.5"
 mockito = "1.2"
-wiremock = "0.5"
+wiremock = "0.6"
 serial_test = "3.0"
 
 [profile.release]
