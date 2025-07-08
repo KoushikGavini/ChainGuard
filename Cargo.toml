@@ -1,6 +1,6 @@
 [package]
 name = "shieldcontract"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 authors = ["ShieldContract Team"]
 description = "Advanced security analysis for blockchain platforms"

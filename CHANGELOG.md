@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2025-07-08
+
+### Changed
+- **BREAKING**: Renamed project from "chainguard" to "shieldcontract"
+- Updated binary name from `chainguard` to `shieldcontract`
+- Updated package name and all references throughout codebase
+- Updated configuration directory from `.chainguard` to `.shieldcontract`
+- Updated default configuration file from `chainguard.toml` to `shieldcontract.toml`
+- Updated Docker image and container references
+- Updated all documentation and examples
+- Improved README accuracy by removing false promises and stub command documentation
+- Fixed CI badge URL to match actual workflow
+- Updated command documentation to reflect actual functionality
+
+### Fixed
+- Fixed CI pipeline formatting issues
+- Corrected repository URLs and references
+- Fixed command examples in documentation
+- Resolved rustfmt and clippy issues
+
+### Documentation
+- Made README more accurate about current capabilities vs future plans
+- Removed timeline references and "coming soon" statements
+- Updated Available Commands table to show only fully functional commands
+- Added transparency note about commands with limited functionality
+- Updated examples to use correct command syntax
+
 ## [0.1.0] - 2024-12-27
 
 ### Added
@@ -40,5 +67,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Solana programs (Rust)
 - General blockchain security analysis
 
-[Unreleased]: https://github.com/KoushikGavini/ShieldContract/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/KoushikGavini/ShieldContract/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/KoushikGavini/ShieldContract/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/KoushikGavini/ShieldContract/releases/tag/v0.1.0 

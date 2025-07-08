@@ -1,5 +1,5 @@
 // ShieldContract - Blockchain Security Analysis Framework
-// Copyright (c) 2024
+// Copyright (c) 2025
 
 #![warn(clippy::all)]
 #![allow(clippy::new_without_default)]
