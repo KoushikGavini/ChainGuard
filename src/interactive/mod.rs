@@ -1,4 +1,4 @@
-use crate::{ShieldContractError, Result};
+use crate::{Result, ShieldContractError};
 use console::style;
 use dialoguer::{theme::ColorfulTheme, Input, Select};
 use std::path::PathBuf;

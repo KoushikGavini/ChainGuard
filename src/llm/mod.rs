@@ -1,4 +1,4 @@
-use crate::{AIConsensus, AIExplanation, ShieldContractError, Finding, Result, Severity};
+use crate::{AIConsensus, AIExplanation, Finding, Result, Severity, ShieldContractError};
 use async_trait::async_trait;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};

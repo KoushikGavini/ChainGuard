@@ -1,4 +1,4 @@
-use crate::{ShieldContractError, Result};
+use crate::{Result, ShieldContractError};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -27,8 +27,9 @@ struct AuthConfig {
 
 impl AuthManager {
     pub fn new() -> Result<Self> {
-        let home_dir = dirs::home_dir()
-            .ok_or_else(|| ShieldContractError::Auth("Could not find home directory".to_string()))?;
+        let home_dir = dirs::home_dir().ok_or_else(|| {
+            ShieldContractError::Auth("Could not find home directory".to_string())
+        })?;
 
         let config_path = home_dir.join(CONFIG_DIR).join(AUTH_FILE);
 
@@ -101,7 +102,9 @@ impl AuthManager {
 
         // Validate API key format (basic validation)
         if api_key.trim().is_empty() {
-            return Err(ShieldContractError::Auth("API key cannot be empty".to_string()));
+            return Err(ShieldContractError::Auth(
+                "API key cannot be empty".to_string(),
+            ));
         }
 
         // Set endpoint based on service

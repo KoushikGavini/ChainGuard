@@ -1,4 +1,4 @@
-use crate::{ShieldContractError, Finding, Result, Severity};
+use crate::{Finding, Result, Severity, ShieldContractError};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::path::Path;

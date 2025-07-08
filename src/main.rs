@@ -3,6 +3,9 @@
 #![allow(clippy::needless_borrows_for_generic_args)]
 #![allow(clippy::uninlined_format_args)]
 
+use clap::{Parser, Subcommand, ValueEnum};
+use console::style;
+use indicatif::{ProgressBar, ProgressStyle};
 use shieldcontract::{
     analyzer::{AnalysisResult, Analyzer},
     fabric::FabricAnalyzer,
@@ -11,11 +14,8 @@ use shieldcontract::{
     solana::SolanaAnalyzer,
     token_standards::TokenStandardsValidator,
     validator::Validator,
-    AnalysisConfig, ShieldContractError, OutputFormat, Result, Severity,
+    AnalysisConfig, OutputFormat, Result, Severity, ShieldContractError,
 };
-use clap::{Parser, Subcommand, ValueEnum};
-use console::style;
-use indicatif::{ProgressBar, ProgressStyle};
 use std::path::PathBuf;
 use tracing::Level;
 use tracing_subscriber::{EnvFilter, FmtSubscriber};
@@ -1381,7 +1381,10 @@ async fn rules_command(command: RulesCommands) -> Result<()> {
 async fn interactive_command(path: Option<PathBuf>, ai_assist: bool) -> Result<()> {
     use shieldcontract::interactive::InteractiveSession;
 
-    println!("{}", style("🎯 ShieldContract Interactive Mode").bold().cyan());
+    println!(
+        "{}",
+        style("🎯 ShieldContract Interactive Mode").bold().cyan()
+    );
     println!("{}", style("━".repeat(50)).dim());
     println!("Type 'help' for available commands, 'exit' to quit");
     println!();

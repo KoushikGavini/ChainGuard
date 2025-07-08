@@ -536,8 +536,9 @@ impl Reporter {
             }]
         });
 
-        serde_json::to_string_pretty(&sarif)
-            .map_err(|e| crate::ShieldContractError::Report(format!("SARIF generation failed: {}", e)))
+        serde_json::to_string_pretty(&sarif).map_err(|e| {
+            crate::ShieldContractError::Report(format!("SARIF generation failed: {}", e))
+        })
     }
 
     fn meets_severity_threshold(&self, severity: &Severity, threshold: &Severity) -> bool {

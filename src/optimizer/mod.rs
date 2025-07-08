@@ -1,4 +1,4 @@
-use crate::{llm::LLMManager, ShieldContractError, Result};
+use crate::{llm::LLMManager, Result, ShieldContractError};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 

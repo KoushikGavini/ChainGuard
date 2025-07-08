@@ -1,4 +1,4 @@
-use crate::{ShieldContractError, Finding, Result, Severity};
+use crate::{Finding, Result, Severity, ShieldContractError};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::Path;
