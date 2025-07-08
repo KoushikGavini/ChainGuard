@@ -90,7 +90,7 @@ opentelemetry-jaeger = "0.20"
 # File handling
 walkdir = "2.4"
 ignore = "0.4"
-notify = "6.1"
+notify = "8.1"
 glob = "0.3"
 dirs = "5.0"
 
