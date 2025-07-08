@@ -16,8 +16,8 @@ ShieldContract is a security analysis tool designed for blockchain developers wo
 
 ### Analysis Capabilities
 - **Security Vulnerability Detection**: Platform-specific security issue identification
-- **Performance Analysis**: Basic performance issue detection and optimization suggestions
 - **Code Quality Checks**: Best practices validation for supported platforms
+- **Interactive Analysis**: Real-time analysis with interactive mode
 
 ## Installation
 
@@ -102,18 +102,14 @@ Critical: 2 | High: 4 | Medium: 2 | Low: 0 | Info: 0
 |---|---|---|
 | `analyze` | Comprehensive security and quality analysis | `shieldcontract analyze ./contracts/ --fabric` |
 | `scan` | Quick vulnerability scanning | `shieldcontract scan ./contracts/ --fabric` |
-| `audit` | Compliance and standards checking | `shieldcontract audit ./contracts/ --fabric` |
-| `validate` | AI-generated code validation | `shieldcontract validate ./contract.go` |
-| `benchmark` | Performance analysis and benchmarking | `shieldcontract benchmark ./contracts/ --fabric` |
 | `report` | Generate detailed report from analysis | `shieldcontract report results.json -o report.html` |
-| `optimize` | AI-powered performance optimization suggestions | `shieldcontract optimize ./contracts/` |
 | `init` | Create default configuration file | `shieldcontract init` |
-| `auth` | Manage AI integrations and API keys | `shieldcontract auth set openai --key sk-...` |
-| `history` | Show analysis history | `shieldcontract history` |
 | `rules` | Manage custom rules | `shieldcontract rules list` |
 | `interactive` | Interactive mode with live validation | `shieldcontract interactive` |
 
 Run `shieldcontract --help` for complete usage information.
+
+**Note**: Additional commands like `audit`, `validate`, `benchmark`, `optimize`, `auth`, and `history` are available but currently have limited functionality.
 
 ## Configuration
 
