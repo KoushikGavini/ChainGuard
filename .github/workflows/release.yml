@@ -23,15 +23,15 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
-          name: ChainGuard ${{ github.ref_name }}
+          name: ShieldContract ${{ github.ref_name }}
           draft: false
           prerelease: false
           generate_release_notes: true
           body: |
-            ## ChainGuard ${{ github.ref_name }}
+            ## ShieldContract ${{ github.ref_name }}
             
             ### What's New
-            - See [CHANGELOG.md](https://github.com/KoushikGavini/ChainGuard/blob/main/CHANGELOG.md) for details
+            - See [CHANGELOG.md](https://github.com/KoushikGavini/ShieldContract/blob/main/CHANGELOG.md) for details
             
             ### Installation
             
@@ -40,7 +40,7 @@ jobs:
             
             #### From source
             ```bash
-            cargo install --git https://github.com/KoushikGavini/ChainGuard --tag ${{ github.ref_name }}
+            cargo install --git https://github.com/KoushikGavini/ShieldContract --tag ${{ github.ref_name }}
             ```
             
             ### Checksums
@@ -55,19 +55,19 @@ jobs:
         include:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
-            binary: chainguard
+            binary: shieldcontract
             archive: tar.gz
           - os: ubuntu-latest
             target: x86_64-unknown-linux-musl
-            binary: chainguard
+            binary: shieldcontract
             archive: tar.gz
           - os: macos-latest
             target: x86_64-apple-darwin
-            binary: chainguard
+            binary: shieldcontract
             archive: tar.gz
           - os: macos-latest
             target: aarch64-apple-darwin
-            binary: chainguard
+            binary: shieldcontract
             archive: tar.gz
     steps:
       - uses: actions/checkout@v4
@@ -99,11 +99,11 @@ jobs:
       
       - name: Create archive
         run: |
-          mkdir -p chainguard-${{ github.ref_name }}-${{ matrix.target }}
-          cp target/${{ matrix.target }}/release/${{ matrix.binary }} chainguard-${{ github.ref_name }}-${{ matrix.target }}/
-          cp README.md LICENSE chainguard-${{ github.ref_name }}-${{ matrix.target }}/
-          tar czf chainguard-${{ github.ref_name }}-${{ matrix.target }}.tar.gz chainguard-${{ github.ref_name }}-${{ matrix.target }}
-          echo "ASSET=chainguard-${{ github.ref_name }}-${{ matrix.target }}.tar.gz" >> $GITHUB_ENV
+          mkdir -p shieldcontract-${{ github.ref_name }}-${{ matrix.target }}
+          cp target/${{ matrix.target }}/release/${{ matrix.binary }} shieldcontract-${{ github.ref_name }}-${{ matrix.target }}/
+          cp README.md LICENSE shieldcontract-${{ github.ref_name }}-${{ matrix.target }}/
+          tar czf shieldcontract-${{ github.ref_name }}-${{ matrix.target }}.tar.gz shieldcontract-${{ github.ref_name }}-${{ matrix.target }}
+          echo "ASSET=shieldcontract-${{ github.ref_name }}-${{ matrix.target }}.tar.gz" >> $GITHUB_ENV
       
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -134,7 +134,7 @@ jobs:
       
       - name: Generate checksums
         run: |
-          sha256sum chainguard-*.tar.gz > checksums.txt || echo "No files to checksum"
+          sha256sum shieldcontract-*.tar.gz > checksums.txt || echo "No files to checksum"
           cat checksums.txt
       
       - name: Upload checksums to release
