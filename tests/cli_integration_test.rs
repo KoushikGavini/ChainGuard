@@ -24,7 +24,7 @@ fn test_cli_analyze_fabric() {
     }
 
     assert!(
-        stdout.contains("Analysis complete") || stdout.contains("ChainGuard Analysis Report"),
+        stdout.contains("Analysis complete") || stdout.contains("ShieldContract Analysis Report"),
         "Should complete analysis"
     );
     assert!(stdout.contains("Total findings"), "Should show findings");
@@ -53,7 +53,7 @@ fn test_cli_analyze_solana() {
     }
 
     assert!(
-        stdout.contains("Analysis complete") || stdout.contains("ChainGuard Analysis Report"),
+        stdout.contains("Analysis complete") || stdout.contains("ShieldContract Analysis Report"),
         "Should complete analysis"
     );
     assert!(stdout.contains("Total findings"), "Should show findings");
@@ -101,7 +101,7 @@ fn test_cli_help() {
     }
 
     assert!(
-        stdout.contains("ChainGuard") || stdout.contains("shieldcontract"),
+        stdout.contains("ShieldContract") || stdout.contains("shieldcontract"),
         "Should show help text"
     );
     assert!(stdout.contains("analyze"), "Should list analyze command");

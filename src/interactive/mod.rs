@@ -31,7 +31,7 @@ impl InteractiveSession {
     pub async fn run(&mut self) -> Result<()> {
         println!(
             "{}",
-            style("Welcome to ChainGuard Interactive Mode!")
+            style("Welcome to ShieldContract Interactive Mode!")
                 .bold()
                 .cyan()
         );
@@ -177,7 +177,7 @@ impl InteractiveSession {
     fn show_help(&self) {
         println!(
             "{}",
-            style("ChainGuard Interactive Mode Help").bold().cyan()
+            style("ShieldContract Interactive Mode Help").bold().cyan()
         );
         println!("{}", style("================================").dim());
         println!();

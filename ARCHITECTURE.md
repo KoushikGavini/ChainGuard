@@ -1,13 +1,13 @@
-# ChainGuard Architecture
+# ShieldContract Architecture
 
 ## Overview
 
-ChainGuard is a modular security analysis platform for blockchain smart contracts. It's designed to be extensible, allowing easy addition of new blockchain platforms, analysis rules, and AI providers.
+ShieldContract is a modular security analysis platform for blockchain smart contracts. It's designed to be extensible, allowing easy addition of new blockchain platforms, analysis rules, and AI providers.
 
 ## Project Structure
 
 ```
-chainguard/
+shieldcontract/
 ├── src/
 │   ├── main.rs              # CLI entry point
 │   ├── lib.rs               # Library exports

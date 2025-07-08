@@ -440,7 +440,7 @@ impl Reporter {
         // Simple table format for terminal output
         let mut output = String::new();
         output.push_str(&format!(
-            "ChainGuard Analysis Report - {}\n",
+            "ShieldContract Analysis Report - {}\n",
             report.metadata.timestamp
         ));
         output.push_str(&format!("{}\n", "=".repeat(80)));
@@ -504,9 +504,9 @@ impl Reporter {
             "runs": [{
                 "tool": {
                     "driver": {
-                        "name": "ChainGuard",
+                        "name": "ShieldContract",
                         "version": report.metadata.tool_version,
-                        "informationUri": "https://github.com/KoushikGavini/ChainGuard"
+                        "informationUri": "https://github.com/KoushikGavini/ShieldContract"
                     }
                 },
                 "results": report.findings.iter().map(|f| {
@@ -558,7 +558,7 @@ impl Reporter {
 impl Report {
     pub fn summary(&self) -> String {
         format!(
-            "ChainGuard Analysis Report\n\
+            "ShieldContract Analysis Report\n\
              ==========================\n\
              Total Findings: {}\n\
              Critical: {} | High: {} | Medium: {} | Low: {} | Info: {}\n\

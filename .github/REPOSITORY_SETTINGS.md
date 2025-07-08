@@ -19,7 +19,7 @@ Advanced security analysis and AI code review platform for blockchain smart cont
 - defi
 
 ## Website
-https://crates.io/crates/chainguard
+https://crates.io/crates/shieldcontract
 
 ## Settings to Enable
 - ✅ Issues

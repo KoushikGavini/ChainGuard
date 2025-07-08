@@ -4,7 +4,7 @@
 
 ShieldContract is a security analysis tool designed for blockchain developers working with Hyperledger Fabric and Solana platforms. It provides vulnerability detection, code review capabilities, and basic performance analysis for smart contracts.
 
-[![CI](https://github.com/KoushikGavini/ChainGuard/workflows/CI/badge.svg)](https://github.com/KoushikGavini/ChainGuard/actions/workflows/rust.yml)
+[![CI](https://github.com/KoushikGavini/ShieldContract/workflows/CI/badge.svg)](https://github.com/KoushikGavini/ShieldContract/actions/workflows/rust.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=flat&logo=rust&logoColor=white)](https://www.rust-lang.org/)
 
