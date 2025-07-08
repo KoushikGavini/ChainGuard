@@ -1,59 +1,30 @@
-# ShieldContract 
+# ShieldContract
 
-> Advanced security analysis and AI code review platform for blockchain smart contracts
+> Security analysis tool for blockchain smart contracts with focus on Hyperledger Fabric and Solana
 
-ShieldContract is a comprehensive security analysis tool designed specifically for non-Ethereum blockchain developers. It provides deep vulnerability detection, AI-powered code review, and performance optimization for smart contracts on Hyperledger Fabric and Solana platforms.
+ShieldContract is a security analysis tool designed for blockchain developers working with Hyperledger Fabric and Solana platforms. It provides vulnerability detection, code review capabilities, and basic performance analysis for smart contracts.
 
 [![CI](https://github.com/KoushikGavini/ShieldContract/actions/workflows/rust.yml/badge.svg)](https://github.com/KoushikGavini/ShieldContract/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=flat&logo=rust&logoColor=white)](https://www.rust-lang.org/)
-[![Security Audit](https://github.com/KoushikGavini/ShieldContract/actions/workflows/security-audit.yml/badge.svg)](https://github.com/KoushikGavini/ShieldContract/actions)
 
-## Key Features
+## Features
 
-### Non-Ethereum Blockchain Focus
-- **Hyperledger Fabric**: Enterprise chaincode analysis with determinism checking, endorsement policies, private data security, and MVCC compliance
-- **Solana**: Advanced Rust program analysis with account validation, CPI security, PDA vulnerabilities, and compute optimization
+### Supported Platforms
+- **Hyperledger Fabric**: Chaincode analysis with determinism checking, basic endorsement policy validation, and private data leak detection
+- **Solana**: Rust program analysis with account validation, arithmetic safety checks, and CPI security validation
 
-### AI-Powered Analysis
-- **Multi-LLM Consensus Analysis**: Leverage multiple AI providers (ChatGPT, Claude, Gemini) for robust, consensus-based security analysis
-- **AI-Generated Code Validation**: Specialized detection of hallucinations, logic errors, and security vulnerabilities in AI-produced smart contracts
-- **Blockchain-Specific AI Prompts**: Custom AI prompts tailored for each blockchain platform's unique security considerations
-
-### Comprehensive Security Analysis
-- **Platform-Specific Vulnerabilities**: Deep understanding of each blockchain's unique attack vectors and security requirements
-- **Performance & Optimization**: Platform-specific performance analysis and optimization suggestions
+### Analysis Capabilities
+- **Security Vulnerability Detection**: Platform-specific security issue identification
+- **Performance Analysis**: Basic performance issue detection and optimization suggestions
+- **Code Quality Checks**: Best practices validation for supported platforms
 
 ## Installation
 
 ### Prerequisites
-- **Z3 Solver (required for formal verification):**
-  ```bash
-  # macOS
-  brew install z3
-  
-  # Ubuntu/Debian
-  sudo apt-get install z3 libz3-dev
-  ```
-
-### Install from Pre-built Binaries (Coming Soon)
-Pre-built binaries will be available in future releases. For now, please build from source.
-
-<!---
-Download the latest release for your platform from the [releases page](https://github.com/KoushikGavini/ShieldContract/releases).
-
-```bash
-# Example for Linux/macOS
-wget https://github.com/KoushikGavini/ShieldContract/releases/latest/download/shieldcontract-x86_64-unknown-linux-gnu.tar.gz
-tar xzf shieldcontract-x86_64-unknown-linux-gnu.tar.gz
-sudo mv shieldcontract /usr/local/bin/
-shieldcontract --version
-```
--->
+- Rust 1.82+ (install via [rustup.rs](https://rustup.rs/))
 
 ### Build from Source
-Requires Rust 1.82+ (install via [rustup.rs](https://rustup.rs/))
-
 ```bash
 # Clone the repository
 git clone https://github.com/KoushikGavini/ShieldContract.git
@@ -67,296 +38,164 @@ cargo build --release
 ./target/release/shieldcontract --version
 ```
 
-## Getting Started: A Quick Example
+## Getting Started
 
-Once installed, you can immediately run a scan on the provided test file to see ShieldContract in action.
-
-### Run Your First Scan
-
-From the root of the project directory, run the following command after building the tool:
+### Basic Analysis
 
 ```bash
 # Analyze Fabric chaincode
-./target/release/shieldcontract analyze test_chaincode.go --fabric
+./target/release/shieldcontract scan examples/test_chaincode.go --fabric
 
-# Analyze Solana program
-./target/release/shieldcontract analyze examples/vulnerable_solana_program.rs.example --solana
+# Analyze Solana program  
+./target/release/shieldcontract scan examples/vulnerable_solana_program.rs.example --solana
 ```
-
-These commands analyze the sample files using ShieldContract's platform-specific rules.
 
 ### Expected Output
 
-You will see a summary of the findings directly in your terminal, similar to this:
-
 For Fabric chaincode:
 ```text
-Chainguard Analysis
+ShieldContract Analysis
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-...
-ShieldContract Analysis Report
+Analysis Report
 ==========================
-Total Findings: 2
-Critical: 0 | High: 2 | Medium: 0 | Low: 0 | Info: 0
+Total Findings: 3
+Critical: 0 | High: 2 | Medium: 1 | Low: 0 | Info: 0
 
-[High] SEC-ND-TIMESTAMP_USAGE - Nondeterministic pattern: timestamp_usage
-  File: test_chaincode.go:1
-  System timestamps are non-deterministic across peers
+[High] FABRIC-ND-001 - Nondeterministic operation detected
+  File: test_chaincode.go:15
+  Use of time.Now() can lead to nondeterministic behavior
 
-[High] SEC-ACCESS-001 - Missing access control implementation
+[High] FABRIC-EP-001 - Missing endorsement policy validation
   File: test_chaincode.go:1
-  No authentication or authorization checks found
+  Chaincode does not validate transaction creator or MSP ID
+
+[Medium] FABRIC-MVCC-001 - Potential MVCC read conflict
+  File: test_chaincode.go:1
+  Multiple state reads detected
 ```
 
 For Solana programs:
 ```text
-Chainguard Analysis
+ShieldContract Analysis
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-...
-ShieldContract Analysis Report
+Analysis Report
 ==========================
-Total Findings: 15
-Critical: 4 | High: 7 | Medium: 3 | Low: 1 | Info: 0
+Total Findings: 8
+Critical: 2 | High: 4 | Medium: 2 | Low: 0 | Info: 0
 
 [Critical] SOL-ACC-001 - Missing account validation
   File: vulnerable_solana_program.rs.example:22
   Account used without proper validation
 
-[Critical] SOL-SIGN-001 - Missing signer verification  
-  File: vulnerable_solana_program.rs.example:26
-  Sensitive operation 'transfer' performed without verifying signer
+[Critical] SOL-ARITH-BAL-SUBTRACTION - Unsafe subtraction on balance
+  File: vulnerable_solana_program.rs.example:37
+  Unsafe subtraction operation detected on balance value
 
-[High] SOL-ARITH-001 - Unsafe arithmetic operation
-  File: vulnerable_solana_program.rs.example:29
-  Unchecked multiplication operation detected
+[High] SOL-SIGN-TRANSFER - Missing signer verification
+  File: vulnerable_solana_program.rs.example:42
+  Transfer operation found without prior signer verification
 ```
 
-This gives you immediate feedback that the tool is working correctly. You can now point ShieldContract at your own projects.
-
-## Common Commands
-
-ShieldContract offers a rich set of commands for different analysis needs.
+## Available Commands
 
 | Command | Description | Example |
 |---|---|---|
-| `analyze` | Analyze Fabric chaincode for security vulnerabilities. | `shieldcontract analyze --fabric ./my-chaincode/` |
-| `analyze` | Analyze Solana programs for security vulnerabilities. | `shieldcontract analyze --solana ./my-program/` |
-| `scan` | Quick scan for high-severity vulnerabilities. | `shieldcontract scan ./contracts/` |
-| `validate` | Use multiple LLMs to review and validate code for correctness. | `shieldcontract validate --consensus ./contract.go` |
-| `benchmark` | Analyze Fabric chaincode performance metrics. | `shieldcontract benchmark --fabric ./chaincode/` |
-| `benchmark` | Analyze Solana program compute unit usage. | `shieldcontract benchmark --solana ./program.rs` |
-| `report` | Generate a detailed report from a previous analysis. | `shieldcontract report results.json -o report.html` |
-| `init` | Create a default `shieldcontract.toml` configuration file. | `shieldcontract init` |
+| `scan` | Analyze code for security vulnerabilities | `shieldcontract scan ./contracts/ --fabric` |
+| `report` | Generate detailed report from analysis | `shieldcontract report results.json -o report.html` |
+| `init` | Create default configuration file | `shieldcontract init` |
 
-Run `shieldcontract --help` or `shieldcontract <COMMAND> --help` for a full list of options.
-
-## AI-Powered Review and Analysis
-
-ShieldContract's AI capabilities are designed to augment the developer's review process, not replace it. To enable these features, you need to configure API keys for one or more supported LLM providers.
-
-### 1. Configure API Keys
-You can connect multiple LLM providers to ShieldContract. API keys are stored securely in `~/.shieldcontract/auth.toml`.
-
-```bash
-# Set API keys for your preferred AI services
-shieldcontract auth set openai --key sk-...
-shieldcontract auth set claude --key ...
-shieldcontract auth set gemini --key ...
-
-# Test the connection to all configured services
-shieldcontract auth test
-```
-
-### 2. Run AI-Assisted Review
-Use the `validate` command to specifically review AI-generated code, or use the `--ai-validate` flag during a full analysis to incorporate AI-driven checks.
-
-```bash
-# Review AI-generated code for correctness, hallucinations, and vulnerabilities
-shieldcontract validate ./ai-generated-contract.go
-
-# Run a full analysis, including an AI-powered review with multiple LLMs
-shieldcontract analyze --ai-validate --ai-plugins chatgpt,claude ./contracts/
-```
-
-## CI/CD Integration
-
-ShieldContract can be easily integrated into your CI/CD pipeline to automate security checks. Use the `--exit-code` flag to have the process fail if high-severity findings are detected.
-
-### GitHub Actions Example
-```yaml
-- name: Run ShieldContract Analysis for Fabric
-  run: |
-    shieldcontract analyze ./chaincode/ \
-      --fabric \
-      --severity high \
-      --exit-code \
-      --output-file fabric-results.sarif \
-      --format sarif
-
-- name: Run ShieldContract Analysis for Solana
-  run: |
-    shieldcontract analyze ./programs/ \
-      --solana \
-      --severity high \
-      --exit-code \
-      --output-file solana-results.sarif \
-      --format sarif
-
-- name: Upload SARIF to GitHub Security
-  uses: github/codeql-action/upload-sarif@v2
-  with:
-    sarif_file: |
-      fabric-results.sarif
-      solana-results.sarif
-```
+Run `shieldcontract --help` for complete usage information.
 
 ## Configuration
 
-Generate a default `shieldcontract.toml` file to customize analysis settings.
+Generate a default configuration file:
 ```bash
 shieldcontract init
 ```
-This file allows you to configure rules, AI models, severity thresholds, and more.
+
+This creates `shieldcontract.toml` with customizable analysis settings.
 
 ## Docker Usage
-You can also run ShieldContract within a Docker container.
 
 ```bash
 # Build the Docker image
 docker build -t shieldcontract .
 
-# Run Fabric analysis on a local directory
-docker run -v $(pwd):/workspace shieldcontract analyze --fabric /workspace/chaincode
-
-# Run Solana analysis on a local directory
-docker run -v $(pwd):/workspace shieldcontract analyze --solana /workspace/program
+# Run analysis on local directory
+docker run -v $(pwd):/workspace shieldcontract scan --fabric /workspace/chaincode
 ```
 
-## Contributing
+## Security Analysis Details
 
-We welcome contributions! Please read our `CONTRIBUTING.md` for details on how to submit pull requests, our code of conduct, and development setup.
+### Hyperledger Fabric
 
-## License
+**Currently Implemented:**
+- **Determinism Checks**: Detects nondeterministic operations (time.Now(), rand, etc.)
+- **Global Variables**: Identifies problematic global state usage
+- **Private Data**: Basic detection of private data leakage patterns
+- **Endorsement Policy**: Checks for basic access control validation
+- **MVCC**: Simple detection of potential read conflicts
+- **Rich Queries**: Flags non-deterministic query usage
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+**Check Categories:**
+- `FABRIC-ND-001`: Nondeterministic operations
+- `FABRIC-GV-001`: Global variable usage
+- `FABRIC-EP-001`: Missing endorsement policy validation
+- `FABRIC-PD-001`: Private data leakage
+- `FABRIC-MVCC-001`: MVCC read conflicts
+- `FABRIC-RQ-001`: Rich query usage
+- `FABRIC-DOS-001/002`: DoS vulnerabilities
 
-## Solana Program Security
+### Solana Programs
 
-ShieldContract provides comprehensive security analysis for Solana programs, detecting common vulnerabilities and performance issues:
+**Currently Implemented:**
+- **Account Validation**: Detects missing account ownership and signer checks
+- **Arithmetic Safety**: Identifies unsafe arithmetic operations
+- **CPI Security**: Basic cross-program invocation validation
+- **Signer Verification**: Checks for proper authorization
+- **Type Safety**: Detects missing discriminator validation
+- **Performance**: Identifies excessive logging and compute usage
 
-### Key Solana Security Checks:
-- **Account Validation**: Ensures proper validation of account ownership, signer status, and writability
-- **Arithmetic Safety**: Detects integer overflow/underflow vulnerabilities in balance calculations
-- **Cross-Program Invocation (CPI) Security**: Validates program IDs and prevents arbitrary program execution
-- **Signer Verification**: Ensures proper authorization checks before sensitive operations
-- **PDA Security**: Detects seed collision vulnerabilities and validates canonical bumps
-- **Type Confusion**: Identifies missing discriminators and account type validation
-- **Duplicate Mutable Accounts**: Prevents exploitation through duplicate account references
-
-## Hyperledger Fabric Security
-
-ShieldContract provides extensive security analysis for Fabric chaincode, focusing on enterprise-specific concerns:
-
-### Key Fabric Security Checks:
-- **Determinism**: Ensures chaincode execution produces consistent results across peers
-- **Endorsement Policy**: Validates proper usage of endorsement policies and access controls
-- **Private Data**: Detects mishandling of private data collections and privacy leaks
-- **MVCC**: Identifies potential conflicts in multi-version concurrency control
-- **State DB**: Analyzes state database access patterns and potential bottlenecks
-- **Access Control**: Validates proper implementation of chaincode access control
-- **Upgrade Safety**: Ensures safe chaincode upgrade paths and state compatibility
-
-## Stablecoin Security
-
-ShieldContract includes comprehensive security checks specifically designed for stablecoin contracts:
-
-### Key Stablecoin Checks:
-- **Collateralization**: Verifies proper collateral ratio tracking and minimum thresholds
-- **Oracle Security**: Detects vulnerable price feeds, single oracle dependencies, and manipulation risks
-- **Minting Controls**: Ensures proper access control and supply limits on token creation
-- **Emergency Mechanisms**: Checks for pause functionality and timelock governance
-- **Peg Stability**: Validates rebalancing mechanisms and redemption functionality
-- **Flash Loan Protection**: Identifies reentrancy vulnerabilities and price manipulation risks
-- **Reserve Management**: Ensures multi-signature controls and transparent tracking
-- **Liquidation Logic**: Verifies proper liquidation mechanisms and incentives
-
-### Example Usage:
-```bash
-# Analyze a stablecoin contract
-shieldcontract analyze --standards stablecoin ./my-stablecoin.sol
-
-# The analysis will identify issues like:
-# - STABLE-COLLAT-001: Missing collateralization mechanism
-# - STABLE-ORACLE-001: Unprotected oracle price feed
-# - STABLE-MINT-001: Unrestricted minting capability
-# - STABLE-FLASH-001: Missing reentrancy protection
-```
-
-## Analysis Categories
-
-### Security Vulnerabilities
-- **FABRIC-SEC-xxx**: Fabric-specific security issues
-- **SOL-xxx**: Solana-specific vulnerabilities
-  - **SOL-ACC-xxx**: Account validation issues
-  - **SOL-SIGN-xxx**: Signer verification problems
-  - **SOL-ARITH-xxx**: Arithmetic overflow/underflow
-  - **SOL-CPI-xxx**: Cross-program invocation vulnerabilities
-  - **SOL-PDA-xxx**: Program Derived Address issues
-- **TOKEN-SEC-xxx**: Token-related vulnerabilities
-- **CRYPTO-SEC-xxx**: Cryptographic weaknesses
-- **ACCESS-xxx**: Access control issues
-
-### Performance Issues
-- **PERF-xxx**: General performance problems
-- **FABRIC-PERF-xxx**: Fabric-specific performance issues
-- **SOL-PERF-xxx**: Solana-specific performance issues
-- **STATE-xxx**: State management inefficiencies
-
-### Compliance Violations
-- **ERC20-xxx**: ERC-20 standard violations
-- **ERC721-xxx**: ERC-721 standard violations
-- **FABRIC-COMP-xxx**: Fabric best practices violations
-- **SOL-COMP-xxx**: Solana best practices violations
-
-## Integration
-
-### IDE Integration (Planned)
-IDE extensions are planned for future releases:
-- **VSCode**: ShieldContract extension (planned)
-- **IntelliJ**: JetBrains marketplace integration (planned)
-- **Vim**: chainGuard.vim plugin (planned)
-
-### Git Hooks
-```bash
-# Add pre-commit hook
-echo '#!/bin/sh
-shieldcontract analyze --exit-code $(git diff --cached --name-only --diff-filter=ACM | grep -E "\.(go|js|ts|sol)$")
-' > .git/hooks/pre-commit
-chmod +x .git/hooks/pre-commit
-```
-
-### Docker Usage
-```bash
-# Run in Docker
-docker run -v $(pwd):/workspace shieldcontract/shieldcontract:latest analyze /workspace
-
-# With AI services
-docker run -e OPENAI_API_KEY=$OPENAI_API_KEY \
-  -v $(pwd):/workspace \
-  shieldcontract/shieldcontract:latest analyze --ai-validate /workspace
-```
+**Check Categories:**
+- `SOL-ACC-001` to `SOL-ACC-006`: Account validation issues
+- `SOL-SIGN-*`: Signer verification problems
+- `SOL-ARITH-*`: Arithmetic safety issues
+- `SOL-CPI-001`: Cross-program invocation vulnerabilities
+- `SOL-OWN-001`: Ownership validation issues
+- `SOL-TYPE-001`: Type safety problems
+- `SOL-PERF-*`: Performance issues
 
 ## Output Formats
 
-ShieldContract supports multiple output formats:
-- **Table** (default): Human-readable terminal output
-- **JSON**: Machine-readable format for tooling
-- **HTML**: Interactive web report
-- **PDF**: Professional audit reports
-- **SARIF**: GitHub/GitLab integration
-- **CSV**: Spreadsheet analysis
-- **XML**: Legacy tool integration
-- **Markdown**: Documentation-friendly format
+Supported output formats:
+- **Table** (default): Terminal-friendly output
+- **JSON**: Machine-readable format
+- **HTML**: Web-based report
+- **SARIF**: GitHub Security integration
+
+Example:
+```bash
+shieldcontract scan ./contracts --format json -o results.json
+```
+
+## CI/CD Integration
+
+### GitHub Actions Example
+```yaml
+- name: Run ShieldContract Analysis
+  run: |
+    shieldcontract scan ./chaincode/ \
+      --fabric \
+      --severity high \
+      --exit-code \
+      --output-file results.sarif \
+      --format sarif
+
+- name: Upload SARIF to GitHub Security
+  uses: github/codeql-action/upload-sarif@v2
+  with:
+    sarif_file: results.sarif
+```
 
 ## Development
 
@@ -369,13 +208,21 @@ cargo build
 cargo test
 
 # Run with debug logging
-RUST_LOG=debug cargo run -- analyze ./test-contracts/
+RUST_LOG=debug cargo run -- scan ./examples/
 ```
+
+## Contributing
+
+We welcome contributions! Please read our `CONTRIBUTING.md` for details on how to submit pull requests and our development setup.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Support
 
 - **Repository**: [https://github.com/KoushikGavini/ShieldContract](https://github.com/KoushikGavini/ShieldContract)
 - **Issues**: [GitHub Issues](https://github.com/KoushikGavini/ShieldContract/issues)
-- **Pull Requests**: [Contribute](https://github.com/KoushikGavini/ShieldContract/pulls)
+- **Documentation**: See repository documentation for detailed usage examples
 
 
