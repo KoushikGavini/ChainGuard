@@ -1,4 +1,4 @@
-use chainguard::fabric::FabricAnalyzer;
+use shieldcontract::fabric::FabricAnalyzer;
 use std::path::Path;
 
 #[tokio::test]

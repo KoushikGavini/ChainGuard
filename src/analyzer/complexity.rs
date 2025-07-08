@@ -40,7 +40,7 @@ impl ComplexityAnalyzer {
                 .parser
                 .set_language(tree_sitter_go::language())
                 .map_err(|e| {
-                    crate::ChainGuardError::Parse(format!("Failed to set Go language: {}", e))
+                    crate::ShieldContractError::Parse(format!("Failed to set Go language: {}", e))
                 })?,
             // TODO: Re-enable Rust support once tree-sitter version conflict is resolved
             // "rs" => self.parser.set_language(tree_sitter_rust::language())
@@ -49,7 +49,7 @@ impl ComplexityAnalyzer {
                 .parser
                 .set_language(tree_sitter_javascript::language())
                 .map_err(|e| {
-                    crate::ChainGuardError::Parse(format!(
+                    crate::ShieldContractError::Parse(format!(
                         "Failed to set JavaScript language: {}",
                         e
                     ))
@@ -59,7 +59,7 @@ impl ComplexityAnalyzer {
 
         // Parse the code
         let tree = self.parser.parse(content, None).ok_or_else(|| {
-            crate::ChainGuardError::Parse(format!("Failed to parse {} code", extension))
+            crate::ShieldContractError::Parse(format!("Failed to parse {} code", extension))
         })?;
 
         // Analyze functions

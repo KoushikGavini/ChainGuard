@@ -1,4 +1,4 @@
-use crate::{ChainGuardError, Finding, Result, Severity};
+use crate::{ShieldContractError, Finding, Result, Severity};
 use regex::Regex;
 use std::path::Path;
 use tree_sitter::{Parser, Query, QueryCursor};
@@ -226,11 +226,11 @@ impl SecurityAnalyzer {
         let tree = self
             .parser
             .parse(content, None)
-            .ok_or_else(|| ChainGuardError::Parse("Failed to parse Go code".to_string()))?;
+            .ok_or_else(|| ShieldContractError::Parse("Failed to parse Go code".to_string()))?;
 
         for pattern in &self.concurrency_patterns {
             let query = Query::new(tree_sitter_go::language(), &pattern.query)
-                .map_err(|e| ChainGuardError::Parse(format!("Invalid query: {}", e)))?;
+                .map_err(|e| ShieldContractError::Parse(format!("Invalid query: {}", e)))?;
 
             let mut cursor = QueryCursor::new();
             let matches = cursor.matches(&query, tree.root_node(), content.as_bytes());

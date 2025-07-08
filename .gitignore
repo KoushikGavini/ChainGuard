@@ -24,9 +24,9 @@ CRITICAL_ISSUES.md
 CLAUDE.md
 
 # Project specific
-.chainguard-cache/
-chainguard.toml
-!chainguard.example.toml
+.shieldcontract-cache/
+shieldcontract.toml
+!shieldcontract.example.toml
 auth.toml
 analysis-results/
 reports/
@@ -126,7 +126,7 @@ perf.data
 custom-rules/
 plugins/
 
-# ChainGuard output files
+# ShieldContract output files
 report.md
 report.json
 report.csv

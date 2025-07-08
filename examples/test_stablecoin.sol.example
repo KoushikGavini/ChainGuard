@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-// Example vulnerable stablecoin contract for testing ChainGuard
+// Example vulnerable stablecoin contract for testing ShieldContract
 contract VulnerableStablecoin {
     mapping(address => uint256) public balances;
     uint256 public totalSupply;

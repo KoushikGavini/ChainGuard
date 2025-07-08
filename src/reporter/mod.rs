@@ -302,7 +302,7 @@ impl Reporter {
     ) -> Result<()> {
         let content = match format {
             OutputFormat::Json => serde_json::to_string_pretty(report)
-                .map_err(|e| crate::ChainGuardError::Report(e.to_string()))?,
+                .map_err(|e| crate::ShieldContractError::Report(e.to_string()))?,
             OutputFormat::Html => self.render_html(report)?,
             OutputFormat::Markdown => self.render_markdown(report)?,
             OutputFormat::Pdf => self.render_pdf(report)?,
@@ -420,18 +420,18 @@ impl Reporter {
     fn render_html(&self, report: &Report) -> Result<String> {
         self.handlebars
             .render("html", report)
-            .map_err(|e| crate::ChainGuardError::Report(e.to_string()))
+            .map_err(|e| crate::ShieldContractError::Report(e.to_string()))
     }
 
     fn render_markdown(&self, report: &Report) -> Result<String> {
         self.handlebars
             .render("markdown", report)
-            .map_err(|e| crate::ChainGuardError::Report(e.to_string()))
+            .map_err(|e| crate::ShieldContractError::Report(e.to_string()))
     }
 
     fn render_pdf(&self, _report: &Report) -> Result<String> {
         // TODO: Implement PDF generation
-        Err(crate::ChainGuardError::Report(
+        Err(crate::ShieldContractError::Report(
             "PDF generation not yet implemented".to_string(),
         ))
     }
@@ -473,7 +473,7 @@ impl Reporter {
     fn render_xml(&self, report: &Report) -> Result<String> {
         // Basic XML format
         let xml = quick_xml::se::to_string(report).map_err(|e| {
-            crate::ChainGuardError::Report(format!("XML serialization failed: {}", e))
+            crate::ShieldContractError::Report(format!("XML serialization failed: {}", e))
         })?;
         Ok(xml)
     }
@@ -537,7 +537,7 @@ impl Reporter {
         });
 
         serde_json::to_string_pretty(&sarif)
-            .map_err(|e| crate::ChainGuardError::Report(format!("SARIF generation failed: {}", e)))
+            .map_err(|e| crate::ShieldContractError::Report(format!("SARIF generation failed: {}", e)))
     }
 
     fn meets_severity_threshold(&self, severity: &Severity, threshold: &Severity) -> bool {

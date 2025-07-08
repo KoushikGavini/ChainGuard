@@ -1,13 +1,13 @@
-# ChainGuard 
+# ShieldContract 
 
 > Advanced security analysis and AI code review platform for blockchain smart contracts
 
-ChainGuard is a comprehensive security analysis tool designed specifically for non-Ethereum blockchain developers. It provides deep vulnerability detection, AI-powered code review, and performance optimization for smart contracts on Hyperledger Fabric and Solana platforms.
+ShieldContract is a comprehensive security analysis tool designed specifically for non-Ethereum blockchain developers. It provides deep vulnerability detection, AI-powered code review, and performance optimization for smart contracts on Hyperledger Fabric and Solana platforms.
 
-[![CI](https://github.com/KoushikGavini/ChainGuard/actions/workflows/rust.yml/badge.svg)](https://github.com/KoushikGavini/ChainGuard/actions)
+[![CI](https://github.com/KoushikGavini/ShieldContract/actions/workflows/rust.yml/badge.svg)](https://github.com/KoushikGavini/ShieldContract/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=flat&logo=rust&logoColor=white)](https://www.rust-lang.org/)
-[![Security Audit](https://github.com/KoushikGavini/ChainGuard/actions/workflows/security-audit.yml/badge.svg)](https://github.com/KoushikGavini/ChainGuard/actions)
+[![Security Audit](https://github.com/KoushikGavini/ShieldContract/actions/workflows/security-audit.yml/badge.svg)](https://github.com/KoushikGavini/ShieldContract/actions)
 
 ## Key Features
 
@@ -40,14 +40,14 @@ ChainGuard is a comprehensive security analysis tool designed specifically for n
 Pre-built binaries will be available in future releases. For now, please build from source.
 
 <!---
-Download the latest release for your platform from the [releases page](https://github.com/KoushikGavini/ChainGuard/releases).
+Download the latest release for your platform from the [releases page](https://github.com/KoushikGavini/ShieldContract/releases).
 
 ```bash
 # Example for Linux/macOS
-wget https://github.com/KoushikGavini/ChainGuard/releases/latest/download/chainguard-x86_64-unknown-linux-gnu.tar.gz
-tar xzf chainguard-x86_64-unknown-linux-gnu.tar.gz
-sudo mv chainguard /usr/local/bin/
-chainguard --version
+wget https://github.com/KoushikGavini/ShieldContract/releases/latest/download/shieldcontract-x86_64-unknown-linux-gnu.tar.gz
+tar xzf shieldcontract-x86_64-unknown-linux-gnu.tar.gz
+sudo mv shieldcontract /usr/local/bin/
+shieldcontract --version
 ```
 -->
 
@@ -56,20 +56,20 @@ Requires Rust 1.82+ (install via [rustup.rs](https://rustup.rs/))
 
 ```bash
 # Clone the repository
-git clone https://github.com/KoushikGavini/ChainGuard.git
-cd ChainGuard
+git clone https://github.com/KoushikGavini/ShieldContract.git
+cd ShieldContract
 
 # Build and install
 cargo install --path .
 
 # Or build without installing
 cargo build --release
-./target/release/chainguard --version
+./target/release/shieldcontract --version
 ```
 
 ## Getting Started: A Quick Example
 
-Once installed, you can immediately run a scan on the provided test file to see ChainGuard in action.
+Once installed, you can immediately run a scan on the provided test file to see ShieldContract in action.
 
 ### Run Your First Scan
 
@@ -77,13 +77,13 @@ From the root of the project directory, run the following command after building
 
 ```bash
 # Analyze Fabric chaincode
-./target/release/chainguard analyze test_chaincode.go --fabric
+./target/release/shieldcontract analyze test_chaincode.go --fabric
 
 # Analyze Solana program
-./target/release/chainguard analyze examples/vulnerable_solana_program.rs.example --solana
+./target/release/shieldcontract analyze examples/vulnerable_solana_program.rs.example --solana
 ```
 
-These commands analyze the sample files using ChainGuard's platform-specific rules.
+These commands analyze the sample files using ShieldContract's platform-specific rules.
 
 ### Expected Output
 
@@ -94,7 +94,7 @@ For Fabric chaincode:
 Chainguard Analysis
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ...
-ChainGuard Analysis Report
+ShieldContract Analysis Report
 ==========================
 Total Findings: 2
 Critical: 0 | High: 2 | Medium: 0 | Low: 0 | Info: 0
@@ -113,7 +113,7 @@ For Solana programs:
 Chainguard Analysis
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ...
-ChainGuard Analysis Report
+ShieldContract Analysis Report
 ==========================
 Total Findings: 15
 Critical: 4 | High: 7 | Medium: 3 | Low: 1 | Info: 0
@@ -131,40 +131,40 @@ Critical: 4 | High: 7 | Medium: 3 | Low: 1 | Info: 0
   Unchecked multiplication operation detected
 ```
 
-This gives you immediate feedback that the tool is working correctly. You can now point ChainGuard at your own projects.
+This gives you immediate feedback that the tool is working correctly. You can now point ShieldContract at your own projects.
 
 ## Common Commands
 
-ChainGuard offers a rich set of commands for different analysis needs.
+ShieldContract offers a rich set of commands for different analysis needs.
 
 | Command | Description | Example |
 |---|---|---|
-| `analyze` | Analyze Fabric chaincode for security vulnerabilities. | `chainguard analyze --fabric ./my-chaincode/` |
-| `analyze` | Analyze Solana programs for security vulnerabilities. | `chainguard analyze --solana ./my-program/` |
-| `scan` | Quick scan for high-severity vulnerabilities. | `chainguard scan ./contracts/` |
-| `validate` | Use multiple LLMs to review and validate code for correctness. | `chainguard validate --consensus ./contract.go` |
-| `benchmark` | Analyze Fabric chaincode performance metrics. | `chainguard benchmark --fabric ./chaincode/` |
-| `benchmark` | Analyze Solana program compute unit usage. | `chainguard benchmark --solana ./program.rs` |
-| `report` | Generate a detailed report from a previous analysis. | `chainguard report results.json -o report.html` |
-| `init` | Create a default `chainguard.toml` configuration file. | `chainguard init` |
+| `analyze` | Analyze Fabric chaincode for security vulnerabilities. | `shieldcontract analyze --fabric ./my-chaincode/` |
+| `analyze` | Analyze Solana programs for security vulnerabilities. | `shieldcontract analyze --solana ./my-program/` |
+| `scan` | Quick scan for high-severity vulnerabilities. | `shieldcontract scan ./contracts/` |
+| `validate` | Use multiple LLMs to review and validate code for correctness. | `shieldcontract validate --consensus ./contract.go` |
+| `benchmark` | Analyze Fabric chaincode performance metrics. | `shieldcontract benchmark --fabric ./chaincode/` |
+| `benchmark` | Analyze Solana program compute unit usage. | `shieldcontract benchmark --solana ./program.rs` |
+| `report` | Generate a detailed report from a previous analysis. | `shieldcontract report results.json -o report.html` |
+| `init` | Create a default `shieldcontract.toml` configuration file. | `shieldcontract init` |
 
-Run `chainguard --help` or `chainguard <COMMAND> --help` for a full list of options.
+Run `shieldcontract --help` or `shieldcontract <COMMAND> --help` for a full list of options.
 
 ## AI-Powered Review and Analysis
 
-ChainGuard's AI capabilities are designed to augment the developer's review process, not replace it. To enable these features, you need to configure API keys for one or more supported LLM providers.
+ShieldContract's AI capabilities are designed to augment the developer's review process, not replace it. To enable these features, you need to configure API keys for one or more supported LLM providers.
 
 ### 1. Configure API Keys
-You can connect multiple LLM providers to ChainGuard. API keys are stored securely in `~/.chainguard/auth.toml`.
+You can connect multiple LLM providers to ShieldContract. API keys are stored securely in `~/.shieldcontract/auth.toml`.
 
 ```bash
 # Set API keys for your preferred AI services
-chainguard auth set openai --key sk-...
-chainguard auth set claude --key ...
-chainguard auth set gemini --key ...
+shieldcontract auth set openai --key sk-...
+shieldcontract auth set claude --key ...
+shieldcontract auth set gemini --key ...
 
 # Test the connection to all configured services
-chainguard auth test
+shieldcontract auth test
 ```
 
 ### 2. Run AI-Assisted Review
@@ -172,30 +172,30 @@ Use the `validate` command to specifically review AI-generated code, or use the 
 
 ```bash
 # Review AI-generated code for correctness, hallucinations, and vulnerabilities
-chainguard validate ./ai-generated-contract.go
+shieldcontract validate ./ai-generated-contract.go
 
 # Run a full analysis, including an AI-powered review with multiple LLMs
-chainguard analyze --ai-validate --ai-plugins chatgpt,claude ./contracts/
+shieldcontract analyze --ai-validate --ai-plugins chatgpt,claude ./contracts/
 ```
 
 ## CI/CD Integration
 
-ChainGuard can be easily integrated into your CI/CD pipeline to automate security checks. Use the `--exit-code` flag to have the process fail if high-severity findings are detected.
+ShieldContract can be easily integrated into your CI/CD pipeline to automate security checks. Use the `--exit-code` flag to have the process fail if high-severity findings are detected.
 
 ### GitHub Actions Example
 ```yaml
-- name: Run ChainGuard Analysis for Fabric
+- name: Run ShieldContract Analysis for Fabric
   run: |
-    chainguard analyze ./chaincode/ \
+    shieldcontract analyze ./chaincode/ \
       --fabric \
       --severity high \
       --exit-code \
       --output-file fabric-results.sarif \
       --format sarif
 
-- name: Run ChainGuard Analysis for Solana
+- name: Run ShieldContract Analysis for Solana
   run: |
-    chainguard analyze ./programs/ \
+    shieldcontract analyze ./programs/ \
       --solana \
       --severity high \
       --exit-code \
@@ -212,24 +212,24 @@ ChainGuard can be easily integrated into your CI/CD pipeline to automate securit
 
 ## Configuration
 
-Generate a default `chainguard.toml` file to customize analysis settings.
+Generate a default `shieldcontract.toml` file to customize analysis settings.
 ```bash
-chainguard init
+shieldcontract init
 ```
 This file allows you to configure rules, AI models, severity thresholds, and more.
 
 ## Docker Usage
-You can also run ChainGuard within a Docker container.
+You can also run ShieldContract within a Docker container.
 
 ```bash
 # Build the Docker image
-docker build -t chainguard .
+docker build -t shieldcontract .
 
 # Run Fabric analysis on a local directory
-docker run -v $(pwd):/workspace chainguard analyze --fabric /workspace/chaincode
+docker run -v $(pwd):/workspace shieldcontract analyze --fabric /workspace/chaincode
 
 # Run Solana analysis on a local directory
-docker run -v $(pwd):/workspace chainguard analyze --solana /workspace/program
+docker run -v $(pwd):/workspace shieldcontract analyze --solana /workspace/program
 ```
 
 ## Contributing
@@ -242,7 +242,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Solana Program Security
 
-ChainGuard provides comprehensive security analysis for Solana programs, detecting common vulnerabilities and performance issues:
+ShieldContract provides comprehensive security analysis for Solana programs, detecting common vulnerabilities and performance issues:
 
 ### Key Solana Security Checks:
 - **Account Validation**: Ensures proper validation of account ownership, signer status, and writability
@@ -255,7 +255,7 @@ ChainGuard provides comprehensive security analysis for Solana programs, detecti
 
 ## Hyperledger Fabric Security
 
-ChainGuard provides extensive security analysis for Fabric chaincode, focusing on enterprise-specific concerns:
+ShieldContract provides extensive security analysis for Fabric chaincode, focusing on enterprise-specific concerns:
 
 ### Key Fabric Security Checks:
 - **Determinism**: Ensures chaincode execution produces consistent results across peers
@@ -268,7 +268,7 @@ ChainGuard provides extensive security analysis for Fabric chaincode, focusing o
 
 ## Stablecoin Security
 
-ChainGuard includes comprehensive security checks specifically designed for stablecoin contracts:
+ShieldContract includes comprehensive security checks specifically designed for stablecoin contracts:
 
 ### Key Stablecoin Checks:
 - **Collateralization**: Verifies proper collateral ratio tracking and minimum thresholds
@@ -283,7 +283,7 @@ ChainGuard includes comprehensive security checks specifically designed for stab
 ### Example Usage:
 ```bash
 # Analyze a stablecoin contract
-chainguard analyze --standards stablecoin ./my-stablecoin.sol
+shieldcontract analyze --standards stablecoin ./my-stablecoin.sol
 
 # The analysis will identify issues like:
 # - STABLE-COLLAT-001: Missing collateralization mechanism
@@ -322,7 +322,7 @@ chainguard analyze --standards stablecoin ./my-stablecoin.sol
 
 ### IDE Integration (Planned)
 IDE extensions are planned for future releases:
-- **VSCode**: ChainGuard extension (planned)
+- **VSCode**: ShieldContract extension (planned)
 - **IntelliJ**: JetBrains marketplace integration (planned)
 - **Vim**: chainGuard.vim plugin (planned)
 
@@ -330,7 +330,7 @@ IDE extensions are planned for future releases:
 ```bash
 # Add pre-commit hook
 echo '#!/bin/sh
-chainguard analyze --exit-code $(git diff --cached --name-only --diff-filter=ACM | grep -E "\.(go|js|ts|sol)$")
+shieldcontract analyze --exit-code $(git diff --cached --name-only --diff-filter=ACM | grep -E "\.(go|js|ts|sol)$")
 ' > .git/hooks/pre-commit
 chmod +x .git/hooks/pre-commit
 ```
@@ -338,17 +338,17 @@ chmod +x .git/hooks/pre-commit
 ### Docker Usage
 ```bash
 # Run in Docker
-docker run -v $(pwd):/workspace chainguard/chainguard:latest analyze /workspace
+docker run -v $(pwd):/workspace shieldcontract/shieldcontract:latest analyze /workspace
 
 # With AI services
 docker run -e OPENAI_API_KEY=$OPENAI_API_KEY \
   -v $(pwd):/workspace \
-  chainguard/chainguard:latest analyze --ai-validate /workspace
+  shieldcontract/shieldcontract:latest analyze --ai-validate /workspace
 ```
 
 ## Output Formats
 
-ChainGuard supports multiple output formats:
+ShieldContract supports multiple output formats:
 - **Table** (default): Human-readable terminal output
 - **JSON**: Machine-readable format for tooling
 - **HTML**: Interactive web report
@@ -374,8 +374,8 @@ RUST_LOG=debug cargo run -- analyze ./test-contracts/
 
 ## Support
 
-- **Repository**: [https://github.com/KoushikGavini/ChainGuard](https://github.com/KoushikGavini/ChainGuard)
-- **Issues**: [GitHub Issues](https://github.com/KoushikGavini/ChainGuard/issues)
-- **Pull Requests**: [Contribute](https://github.com/KoushikGavini/ChainGuard/pulls)
+- **Repository**: [https://github.com/KoushikGavini/ShieldContract](https://github.com/KoushikGavini/ShieldContract)
+- **Issues**: [GitHub Issues](https://github.com/KoushikGavini/ShieldContract/issues)
+- **Pull Requests**: [Contribute](https://github.com/KoushikGavini/ShieldContract/pulls)
 
 

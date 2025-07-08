@@ -1,4 +1,4 @@
-use crate::{ChainGuardError, Finding, Result, Severity};
+use crate::{ShieldContractError, Finding, Result, Severity};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::Path;
@@ -68,7 +68,7 @@ impl Auditor {
             "cis" => self.load_cis_framework(),
             "owasp" => self.load_owasp_framework(),
             _ => {
-                return Err(ChainGuardError::Config(format!(
+                return Err(ShieldContractError::Config(format!(
                     "Unknown compliance framework: {}",
                     framework_name
                 )))

@@ -5,7 +5,7 @@ FROM rust:1.75-alpine AS builder
 RUN apk add --no-cache musl-dev openssl-dev pkgconfig
 
 # Create app directory
-WORKDIR /usr/src/chainguard
+WORKDIR /usr/src/shieldcontract
 
 # Copy Cargo files
 COPY Cargo.toml Cargo.lock ./
@@ -33,28 +33,28 @@ RUN apk add --no-cache \
     tini
 
 # Create non-root user
-RUN addgroup -g 1000 chainguard && \
-    adduser -D -u 1000 -G chainguard chainguard
+RUN addgroup -g 1000 shieldcontract && \
+    adduser -D -u 1000 -G shieldcontract shieldcontract
 
 # Copy binary from builder
-COPY --from=builder /usr/src/chainguard/target/release/chainguard /usr/local/bin/chainguard
+COPY --from=builder /usr/src/shieldcontract/target/release/shieldcontract /usr/local/bin/shieldcontract
 
 # Create working directory
 WORKDIR /workspace
-RUN chown -R chainguard:chainguard /workspace
+RUN chown -R shieldcontract:shieldcontract /workspace
 
 # Switch to non-root user
-USER chainguard
+USER shieldcontract
 
 # Use tini as entrypoint to handle signals properly
 ENTRYPOINT ["/sbin/tini", "--"]
 
 # Default command
-CMD ["chainguard", "--help"]
+CMD ["shieldcontract", "--help"]
 
 # Labels
-LABEL org.opencontainers.image.title="ChainGuard"
+LABEL org.opencontainers.image.title="ShieldContract"
 LABEL org.opencontainers.image.description="Advanced security analysis for blockchain platforms"
-LABEL org.opencontainers.image.vendor="ChainGuard"
+LABEL org.opencontainers.image.vendor="ShieldContract"
 LABEL org.opencontainers.image.licenses="MIT"
-LABEL org.opencontainers.image.source="https://github.com/KoushikGavini/ChainGuard" 
+LABEL org.opencontainers.image.source="https://github.com/KoushikGavini/ShieldContract" 

@@ -1,4 +1,4 @@
-use chainguard::solana::SolanaAnalyzer;
+use shieldcontract::solana::SolanaAnalyzer;
 use std::path::Path;
 
 #[tokio::test]

@@ -1,4 +1,4 @@
-use crate::{ChainGuardError, Result};
+use crate::{ShieldContractError, Result};
 use console::style;
 use dialoguer::{theme::ColorfulTheme, Input, Select};
 use std::path::PathBuf;
@@ -21,7 +21,7 @@ impl InteractiveSession {
             self.working_directory = Some(path);
             Ok(())
         } else {
-            Err(ChainGuardError::Io(std::io::Error::new(
+            Err(ShieldContractError::Io(std::io::Error::new(
                 std::io::ErrorKind::NotFound,
                 "Directory not found",
             )))

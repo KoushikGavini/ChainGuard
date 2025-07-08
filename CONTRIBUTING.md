@@ -1,6 +1,6 @@
-# Contributing to ChainGuard
+# Contributing to ShieldContract
 
-Thank you for your interest in contributing to ChainGuard! This document provides guidelines and instructions for contributing.
+Thank you for your interest in contributing to ShieldContract! This document provides guidelines and instructions for contributing.
 
 ## Code of Conduct
 
@@ -48,8 +48,8 @@ Enhancement suggestions are welcome! Please include:
 
 ```bash
 # Clone your fork
-git clone https://github.com/YOUR_USERNAME/ChainGuard.git
-cd ChainGuard
+git clone https://github.com/YOUR_USERNAME/ShieldContract.git
+cd ShieldContract
 
 # Install Z3 (see README for platform-specific instructions)
 

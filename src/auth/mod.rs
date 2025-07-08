@@ -1,10 +1,10 @@
-use crate::{ChainGuardError, Result};
+use crate::{ShieldContractError, Result};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::PathBuf;
 use tokio::fs;
 
-const CONFIG_DIR: &str = ".chainguard";
+const CONFIG_DIR: &str = ".shieldcontract";
 const AUTH_FILE: &str = "auth.toml";
 
 pub struct AuthManager {
@@ -28,7 +28,7 @@ struct AuthConfig {
 impl AuthManager {
     pub fn new() -> Result<Self> {
         let home_dir = dirs::home_dir()
-            .ok_or_else(|| ChainGuardError::Auth("Could not find home directory".to_string()))?;
+            .ok_or_else(|| ShieldContractError::Auth("Could not find home directory".to_string()))?;
 
         let config_path = home_dir.join(CONFIG_DIR).join(AUTH_FILE);
 
@@ -42,7 +42,7 @@ impl AuthManager {
         if self.config_path.exists() {
             let content = fs::read_to_string(&self.config_path).await?;
             let config: AuthConfig = toml::from_str(&content).map_err(|e| {
-                ChainGuardError::Config(format!("Failed to parse auth config: {}", e))
+                ShieldContractError::Config(format!("Failed to parse auth config: {}", e))
             })?;
 
             self.credentials = config.credentials;
@@ -62,7 +62,7 @@ impl AuthManager {
         };
 
         let content = toml::to_string_pretty(&config).map_err(|e| {
-            ChainGuardError::Config(format!("Failed to serialize auth config: {}", e))
+            ShieldContractError::Config(format!("Failed to serialize auth config: {}", e))
         })?;
 
         fs::write(&self.config_path, content).await?;
@@ -93,7 +93,7 @@ impl AuthManager {
         ];
 
         if !valid_services.contains(&service_lower.as_str()) {
-            return Err(ChainGuardError::Auth(format!(
+            return Err(ShieldContractError::Auth(format!(
                 "Unknown service: {}. Valid services are: {:?}",
                 service, valid_services
             )));
@@ -101,7 +101,7 @@ impl AuthManager {
 
         // Validate API key format (basic validation)
         if api_key.trim().is_empty() {
-            return Err(ChainGuardError::Auth("API key cannot be empty".to_string()));
+            return Err(ShieldContractError::Auth("API key cannot be empty".to_string()));
         }
 
         // Set endpoint based on service
@@ -135,7 +135,7 @@ impl AuthManager {
 
         let service_lower = service.to_lowercase();
         if self.credentials.remove(&service_lower).is_none() {
-            return Err(ChainGuardError::Auth(format!(
+            return Err(ShieldContractError::Auth(format!(
                 "No credentials found for service: {}",
                 service
             )));
@@ -153,7 +153,7 @@ impl AuthManager {
             .get(&service_lower)
             .map(|c| c.api_key.clone())
             .ok_or_else(|| {
-                ChainGuardError::Auth(format!("No API key found for service: {}", service))
+                ShieldContractError::Auth(format!("No API key found for service: {}", service))
             })
     }
 
@@ -169,7 +169,7 @@ impl AuthManager {
             "chatgpt" | "openai" => self.test_openai_connection(&api_key).await,
             "claude" | "anthropic" => self.test_anthropic_connection(&api_key).await,
             "gemini" | "google" => self.test_google_connection(&api_key).await,
-            _ => Err(ChainGuardError::Auth(format!(
+            _ => Err(ShieldContractError::Auth(format!(
                 "Unknown service: {}",
                 service
             ))),
@@ -187,7 +187,7 @@ impl AuthManager {
         if response.status().is_success() {
             Ok(())
         } else {
-            Err(ChainGuardError::Auth(format!(
+            Err(ShieldContractError::Auth(format!(
                 "OpenAI API test failed: {}",
                 response.status()
             )))
@@ -207,7 +207,7 @@ impl AuthManager {
         if response.status().as_u16() == 405 || response.status().is_success() {
             Ok(())
         } else {
-            Err(ChainGuardError::Auth(format!(
+            Err(ShieldContractError::Auth(format!(
                 "Anthropic API test failed: {}",
                 response.status()
             )))
@@ -227,7 +227,7 @@ impl AuthManager {
         if response.status().is_success() {
             Ok(())
         } else {
-            Err(ChainGuardError::Auth(format!(
+            Err(ShieldContractError::Auth(format!(
                 "Google AI API test failed: {}",
                 response.status()
             )))
@@ -242,7 +242,7 @@ impl AuthManager {
             .get(&service_lower)
             .map(|c| (c.api_key.clone(), c.endpoint.clone()))
             .ok_or_else(|| {
-                ChainGuardError::Auth(format!("No credentials found for service: {}", service))
+                ShieldContractError::Auth(format!("No credentials found for service: {}", service))
             })
     }
 }

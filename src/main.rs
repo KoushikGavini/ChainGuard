@@ -3,7 +3,7 @@
 #![allow(clippy::needless_borrows_for_generic_args)]
 #![allow(clippy::uninlined_format_args)]
 
-use chainguard::{
+use shieldcontract::{
     analyzer::{AnalysisResult, Analyzer},
     fabric::FabricAnalyzer,
     llm::LLMManager,
@@ -11,7 +11,7 @@ use chainguard::{
     solana::SolanaAnalyzer,
     token_standards::TokenStandardsValidator,
     validator::Validator,
-    AnalysisConfig, ChainGuardError, OutputFormat, Result, Severity,
+    AnalysisConfig, ShieldContractError, OutputFormat, Result, Severity,
 };
 use clap::{Parser, Subcommand, ValueEnum};
 use console::style;
@@ -21,7 +21,7 @@ use tracing::Level;
 use tracing_subscriber::{EnvFilter, FmtSubscriber};
 
 #[derive(Parser)]
-#[command(name = "chainguard")]
+#[command(name = "shieldcontract")]
 #[command(about = "Advanced security analysis for blockchain platforms with Hyperledger Fabric specialization", long_about = None)]
 #[command(version)]
 #[command(author)]
@@ -285,7 +285,7 @@ enum Commands {
     /// Initialize configuration
     Init {
         /// Configuration file path
-        #[arg(short, long, default_value = "chainguard.toml")]
+        #[arg(short, long, default_value = "shieldcontract.toml")]
         config: PathBuf,
 
         /// Initialize for specific platform
@@ -458,7 +458,7 @@ async fn main() -> Result<()> {
 
     let filter = EnvFilter::from_default_env()
         .add_directive(level.into())
-        .add_directive("chainguard=debug".parse().unwrap());
+        .add_directive("shieldcontract=debug".parse().unwrap());
 
     let subscriber = FmtSubscriber::builder()
         .with_env_filter(filter)
@@ -706,7 +706,7 @@ async fn analyze_command(
     threads: Option<usize>,
     quiet: bool,
 ) -> Result<i32> {
-    println!("{}", style("Chainguard Analysis").bold().cyan());
+    println!("{}", style("ShieldContract Analysis").bold().cyan());
     println!("{}", style("━".repeat(50)).dim());
 
     // Load or create configuration
@@ -867,7 +867,7 @@ async fn report_command(
     // Load report from JSON file
     let content = tokio::fs::read_to_string(&input).await?;
     let report: Report = serde_json::from_str(&content)
-        .map_err(|e| ChainGuardError::Report(format!("Failed to parse report: {}", e)))?;
+        .map_err(|e| ShieldContractError::Report(format!("Failed to parse report: {}", e)))?;
 
     // Save report in requested format
     let output_format = match format {
@@ -910,7 +910,7 @@ async fn init_command(
 
     let config = AnalysisConfig::default();
     let content =
-        toml::to_string_pretty(&config).map_err(|e| ChainGuardError::Config(e.to_string()))?;
+        toml::to_string_pretty(&config).map_err(|e| ShieldContractError::Config(e.to_string()))?;
 
     tokio::fs::write(&config_path, content).await?;
 
@@ -1063,7 +1063,7 @@ async fn audit_command(
     );
 
     progress.set_message("Initializing auditor...");
-    let mut auditor = chainguard::auditor::Auditor::new();
+    let mut auditor = shieldcontract::auditor::Auditor::new();
 
     if fabric {
         progress.set_message("Loading Fabric compliance rules...");
@@ -1141,7 +1141,7 @@ async fn benchmark_command(
     );
 
     progress.set_message("Initializing benchmark suite...");
-    let mut benchmarker = chainguard::benchmark::Benchmarker::new();
+    let mut benchmarker = shieldcontract::benchmark::Benchmarker::new();
 
     if fabric {
         benchmarker.enable_fabric_benchmarks();
@@ -1151,7 +1151,7 @@ async fn benchmark_command(
         benchmarker.enable_solana_benchmarks();
     }
 
-    let mut results = chainguard::benchmark::BenchmarkResults::default();
+    let mut results = shieldcontract::benchmark::BenchmarkResults::default();
 
     if throughput {
         progress.set_message("Analyzing transaction throughput...");
@@ -1219,7 +1219,7 @@ async fn optimize_command(
     );
 
     progress.set_message("Initializing optimizer...");
-    let mut optimizer = chainguard::optimizer::Optimizer::new(&platform)?;
+    let mut optimizer = shieldcontract::optimizer::Optimizer::new(&platform)?;
 
     if ai_suggestions {
         progress.set_message("Connecting to AI services...");
@@ -1264,7 +1264,7 @@ async fn optimize_command(
 }
 
 async fn auth_command(command: AuthCommands) -> Result<()> {
-    use chainguard::auth::AuthManager;
+    use shieldcontract::auth::AuthManager;
     let mut auth_manager = AuthManager::new()?;
 
     match command {
@@ -1321,7 +1321,7 @@ async fn auth_command(command: AuthCommands) -> Result<()> {
 }
 
 async fn rules_command(command: RulesCommands) -> Result<()> {
-    use chainguard::rules::RuleManager;
+    use shieldcontract::rules::RuleManager;
     let mut rule_manager = RuleManager::new()?;
 
     match command {
@@ -1379,9 +1379,9 @@ async fn rules_command(command: RulesCommands) -> Result<()> {
 }
 
 async fn interactive_command(path: Option<PathBuf>, ai_assist: bool) -> Result<()> {
-    use chainguard::interactive::InteractiveSession;
+    use shieldcontract::interactive::InteractiveSession;
 
-    println!("{}", style("🎯 ChainGuard Interactive Mode").bold().cyan());
+    println!("{}", style("🎯 ShieldContract Interactive Mode").bold().cyan());
     println!("{}", style("━".repeat(50)).dim());
     println!("Type 'help' for available commands, 'exit' to quit");
     println!();
@@ -1404,11 +1404,11 @@ async fn load_config(path: &PathBuf) -> Result<AnalysisConfig> {
         .extension()
         .map_or(false, |ext| ext == "yaml" || ext == "yml")
     {
-        serde_yaml::from_str(&content).map_err(|e| ChainGuardError::Config(e.to_string()))?
+        serde_yaml::from_str(&content).map_err(|e| ShieldContractError::Config(e.to_string()))?
     } else if path.extension().map_or(false, |ext| ext == "json") {
-        serde_json::from_str(&content).map_err(|e| ChainGuardError::Config(e.to_string()))?
+        serde_json::from_str(&content).map_err(|e| ShieldContractError::Config(e.to_string()))?
     } else {
-        toml::from_str(&content).map_err(|e| ChainGuardError::Config(e.to_string()))?
+        toml::from_str(&content).map_err(|e| ShieldContractError::Config(e.to_string()))?
     };
 
     Ok(config)

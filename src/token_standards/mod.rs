@@ -1,4 +1,4 @@
-use crate::{ChainGuardError, Finding, Result, Severity};
+use crate::{ShieldContractError, Finding, Result, Severity};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -74,7 +74,7 @@ impl TokenStandardsValidator {
             "erc777" | "erc-777" => Box::new(self.erc777_validator.clone()),
             "stablecoin" | "stable" => Box::new(self.stablecoin_validator.clone()),
             _ => {
-                return Err(ChainGuardError::TokenStandard(format!(
+                return Err(ShieldContractError::TokenStandard(format!(
                     "Unknown token standard: {}",
                     standard
                 )))

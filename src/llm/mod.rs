@@ -1,4 +1,4 @@
-use crate::{AIConsensus, AIExplanation, ChainGuardError, Finding, Result, Severity};
+use crate::{AIConsensus, AIExplanation, ShieldContractError, Finding, Result, Severity};
 use async_trait::async_trait;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
@@ -116,7 +116,7 @@ impl LLMManager {
         let client = Client::builder()
             .timeout(std::time::Duration::from_secs(30))
             .build()
-            .map_err(|e| ChainGuardError::Network(e))?;
+            .map_err(|e| ShieldContractError::Network(e))?;
 
         Ok(Self {
             providers: Arc::new(RwLock::new(HashMap::new())),
@@ -129,7 +129,7 @@ impl LLMManager {
         let client = Client::builder()
             .timeout(std::time::Duration::from_secs(config.timeout_seconds))
             .build()
-            .map_err(|e| ChainGuardError::Network(e))?;
+            .map_err(|e| ShieldContractError::Network(e))?;
 
         Ok(Self {
             providers: Arc::new(RwLock::new(HashMap::new())),
@@ -165,7 +165,7 @@ impl LLMManager {
             let providers = self.providers.read().await;
 
             if providers.is_empty() {
-                return Err(ChainGuardError::LLM(
+                return Err(ShieldContractError::LLM(
                     "No LLM providers configured".to_string(),
                 ));
             }
@@ -204,7 +204,7 @@ impl LLMManager {
         }
 
         if results.is_empty() {
-            return Err(ChainGuardError::LLM("All providers failed".to_string()));
+            return Err(ShieldContractError::LLM("All providers failed".to_string()));
         }
 
         // Build consensus
@@ -286,7 +286,7 @@ impl LLMManager {
             let providers = self.providers.read().await;
 
             if providers.is_empty() {
-                return Err(ChainGuardError::LLM(
+                return Err(ShieldContractError::LLM(
                     "No LLM providers configured".to_string(),
                 ));
             }
@@ -314,7 +314,7 @@ impl LLMManager {
         }
 
         if validations.is_empty() {
-            return Err(ChainGuardError::LLM(
+            return Err(ShieldContractError::LLM(
                 "All validation attempts failed".to_string(),
             ));
         }

@@ -1,6 +1,6 @@
-# ChainGuard Report Generation Features
+# ShieldContract Report Generation Features
 
-ChainGuard provides comprehensive report generation capabilities in multiple formats to suit different needs.
+ShieldContract provides comprehensive report generation capabilities in multiple formats to suit different needs.
 
 ## Available Report Formats
 
@@ -8,7 +8,7 @@ ChainGuard provides comprehensive report generation capabilities in multiple for
 Perfect for CI/CD integration and programmatic processing.
 
 ```bash
-./target/release/chainguard analyze test_chaincode.go --fabric -o json --output-file report.json
+./target/release/shieldcontract analyze test_chaincode.go --fabric -o json --output-file report.json
 ```
 
 **Features:**
@@ -21,7 +21,7 @@ Perfect for CI/CD integration and programmatic processing.
 Great for documentation and GitHub/GitLab integration.
 
 ```bash
-./target/release/chainguard analyze test_chaincode.go --fabric -o markdown --output-file report.md
+./target/release/shieldcontract analyze test_chaincode.go --fabric -o markdown --output-file report.md
 ```
 
 **Features:**
@@ -34,7 +34,7 @@ Great for documentation and GitHub/GitLab integration.
 Console-friendly output for quick reviews.
 
 ```bash
-./target/release/chainguard analyze test_chaincode.go --fabric
+./target/release/shieldcontract analyze test_chaincode.go --fabric
 ```
 
 **Features:**
@@ -48,7 +48,7 @@ Interactive web-based reports.
 
 ```bash
 # Currently has a template rendering issue with the "lowercase" helper
-./target/release/chainguard analyze test_chaincode.go --fabric -o html --output-file report.html
+./target/release/shieldcontract analyze test_chaincode.go --fabric -o html --output-file report.html
 ```
 
 ### 5. **Other Formats** (📋 Planned)
@@ -99,11 +99,11 @@ Generate reports from saved analysis results:
 
 ```bash
 # First, save analysis results
-./target/release/chainguard analyze project/ --output-file results.json
+./target/release/shieldcontract analyze project/ --output-file results.json
 
 # Then generate reports in different formats
-./target/release/chainguard report results.json -f markdown -o report.md
-./target/release/chainguard report results.json -f html -o report.html --remediation --examples
+./target/release/shieldcontract report results.json -f markdown -o report.md
+./target/release/shieldcontract report results.json -f html -o report.html --remediation --examples
 ```
 
 ## Integration Examples
@@ -111,10 +111,10 @@ Generate reports from saved analysis results:
 ### CI/CD Pipeline
 ```yaml
 # GitHub Actions example
-- name: Run ChainGuard Analysis
+- name: Run ShieldContract Analysis
   run: |
-    ./chainguard analyze src/ -o json --output-file analysis.json
-    ./chainguard report analysis.json -f sarif -o results.sarif
+    ./shieldcontract analyze src/ -o json --output-file analysis.json
+    ./shieldcontract report analysis.json -f sarif -o results.sarif
     
 - name: Upload SARIF
   uses: github/codeql-action/upload-sarif@v2
@@ -125,7 +125,7 @@ Generate reports from saved analysis results:
 ### Automated Reporting
 ```bash
 # Generate daily security reports
-./chainguard analyze contracts/ \
+./shieldcontract analyze contracts/ \
   --fabric \
   --ai-validate \
   -o markdown \

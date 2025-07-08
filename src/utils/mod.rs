@@ -1,4 +1,4 @@
-use crate::{ChainGuardError, Result};
+use crate::{ShieldContractError, Result};
 use regex::Regex;
 use std::path::Path;
 
@@ -45,7 +45,7 @@ pub fn get_code_snippet(content: &str, line: usize) -> String {
 // Safe regex creation with proper error handling
 pub fn create_regex(pattern: &str) -> Result<Regex> {
     Regex::new(pattern)
-        .map_err(|e| ChainGuardError::Parse(format!("Invalid regex pattern '{}': {}", pattern, e)))
+        .map_err(|e| ShieldContractError::Parse(format!("Invalid regex pattern '{}': {}", pattern, e)))
 }
 
 // Create regex that should never fail - panics in debug mode, returns None in release

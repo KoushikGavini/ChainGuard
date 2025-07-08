@@ -1,4 +1,4 @@
-use crate::{ChainGuardError, Finding, Result, Severity};
+use crate::{ShieldContractError, Finding, Result, Severity};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
@@ -24,7 +24,7 @@ impl FabricAnalyzer {
         let mut parser = Parser::new();
         parser
             .set_language(tree_sitter_go::language())
-            .map_err(|e| ChainGuardError::Parse(format!("Failed to set Go language: {}", e)))?;
+            .map_err(|e| ShieldContractError::Parse(format!("Failed to set Go language: {}", e)))?;
 
         Ok(Self {
             parser,
@@ -44,7 +44,7 @@ impl FabricAnalyzer {
         let tree = self
             .parser
             .parse(&content, None)
-            .ok_or_else(|| ChainGuardError::Parse("Failed to parse chaincode".to_string()))?;
+            .ok_or_else(|| ShieldContractError::Parse("Failed to parse chaincode".to_string()))?;
 
         // Run all Fabric-specific analyses
         findings.extend(self.check_nondeterminism(&content, &tree)?);
@@ -159,7 +159,7 @@ impl FabricAnalyzer {
         "#;
 
         let query = Query::new(tree_sitter_go::language(), query_str)
-            .map_err(|e| ChainGuardError::Parse(format!("Failed to create query: {}", e)))?;
+            .map_err(|e| ShieldContractError::Parse(format!("Failed to create query: {}", e)))?;
 
         let mut cursor = QueryCursor::new();
         let matches = cursor.matches(&query, tree.root_node(), content.as_bytes());

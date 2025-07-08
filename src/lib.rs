@@ -1,4 +1,4 @@
-// ChainGuard - Blockchain Security Analysis Framework
+// ShieldContract - Blockchain Security Analysis Framework
 // Copyright (c) 2024
 
 #![warn(clippy::all)]
@@ -82,7 +82,7 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 #[derive(Error, Debug)]
-pub enum ChainGuardError {
+pub enum ShieldContractError {
     #[error("IO error: {0}")]
     Io(#[from] std::io::Error),
 
@@ -129,7 +129,7 @@ pub enum ChainGuardError {
     FormalVerification(String),
 }
 
-pub type Result<T> = std::result::Result<T, ChainGuardError>;
+pub type Result<T> = std::result::Result<T, ShieldContractError>;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, ValueEnum)]
 pub enum Severity {
@@ -277,23 +277,23 @@ pub mod types {
 
 pub use types::*;
 
-impl From<toml::ser::Error> for ChainGuardError {
+impl From<toml::ser::Error> for ShieldContractError {
     fn from(e: toml::ser::Error) -> Self {
-        ChainGuardError::Config(e.to_string())
+        ShieldContractError::Config(e.to_string())
     }
 }
 
-impl From<dialoguer::Error> for ChainGuardError {
+impl From<dialoguer::Error> for ShieldContractError {
     fn from(e: dialoguer::Error) -> Self {
-        ChainGuardError::Io(std::io::Error::new(
+        ShieldContractError::Io(std::io::Error::new(
             std::io::ErrorKind::Other,
             e.to_string(),
         ))
     }
 }
 
-impl From<serde_json::Error> for ChainGuardError {
+impl From<serde_json::Error> for ShieldContractError {
     fn from(e: serde_json::Error) -> Self {
-        ChainGuardError::Report(format!("JSON serialization error: {}", e))
+        ShieldContractError::Report(format!("JSON serialization error: {}", e))
     }
 }

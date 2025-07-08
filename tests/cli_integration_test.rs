@@ -101,7 +101,7 @@ fn test_cli_help() {
     }
 
     assert!(
-        stdout.contains("ChainGuard") || stdout.contains("chainguard"),
+        stdout.contains("ChainGuard") || stdout.contains("shieldcontract"),
         "Should show help text"
     );
     assert!(stdout.contains("analyze"), "Should list analyze command");
@@ -118,7 +118,7 @@ fn test_cli_version() {
     assert!(output.status.success(), "Version command should succeed");
 
     let stdout = String::from_utf8_lossy(&output.stdout);
-    assert!(stdout.contains("chainguard"), "Should show version");
+    assert!(stdout.contains("shieldcontract"), "Should show version");
 }
 
 #[test]

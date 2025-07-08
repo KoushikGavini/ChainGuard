@@ -1,25 +1,25 @@
 [package]
-name = "chainguard"
+name = "shieldcontract"
 version = "0.1.0"
 edition = "2021"
-authors = ["ChainGuard Team"]
-description = "Advanced command-line security analysis tool for blockchain platforms with Hyperledger Fabric specialization"
-license = "MIT OR Apache-2.0"
-repository = "https://github.com/KoushikGavini/ChainGuard"
-keywords = ["blockchain", "security", "hyperledger", "fabric", "cli"]
-categories = ["command-line-utilities", "development-tools"]
+authors = ["ShieldContract Team"]
+description = "Advanced security analysis for blockchain platforms"
+license = "MIT"
+repository = "https://github.com/KoushikGavini/ShieldContract"
+keywords = ["blockchain", "security", "analysis", "solana", "fabric"]
+categories = ["development-tools", "cryptography"]
 readme = "README.md"
-homepage = "https://github.com/KoushikGavini/ChainGuard"
+homepage = "https://github.com/KoushikGavini/ShieldContract"
 rust-version = "1.82"
 
-# This is a binary crate (CLI tool), not a library
+# Binary target
 [[bin]]
-name = "chainguard"
+name = "shieldcontract"
 path = "src/main.rs"
 
-# Disable library compilation - this is purely a CLI tool
+# Library target
 [lib]
-name = "chainguard"
+name = "shieldcontract"
 path = "src/lib.rs"
 
 [dependencies]

@@ -1,5 +1,5 @@
-# ChainGuard Configuration Example
-# Copy this file to chainguard.toml and customize for your needs
+# ShieldContract Configuration Example
+# Copy this file to shieldcontract.toml and customize for your needs
 
 [analysis]
 # Enable parallel analysis for faster processing
@@ -27,7 +27,7 @@ custom_rules_path = "./custom-rules"
 cache_enabled = true
 
 # Cache directory (defaults to system temp)
-cache_dir = ".chainguard-cache"
+cache_dir = ".shieldcontract-cache"
 
 # Enable incremental analysis
 incremental_analysis = true

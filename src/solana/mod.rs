@@ -1,4 +1,4 @@
-use crate::{ChainGuardError, Finding, Result, Severity};
+use crate::{ShieldContractError, Finding, Result, Severity};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::path::Path;

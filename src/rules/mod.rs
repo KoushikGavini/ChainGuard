@@ -1,4 +1,4 @@
-use crate::{ChainGuardError, Finding, Result, Severity};
+use crate::{ShieldContractError, Finding, Result, Severity};
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -52,7 +52,7 @@ impl RuleManager {
 
     pub fn enable_rule(&mut self, pattern: &str) -> Result<usize> {
         let regex = Regex::new(pattern)
-            .map_err(|e| ChainGuardError::Config(format!("Invalid pattern: {}", e)))?;
+            .map_err(|e| ShieldContractError::Config(format!("Invalid pattern: {}", e)))?;
 
         let mut count = 0;
 
@@ -75,7 +75,7 @@ impl RuleManager {
 
     pub fn disable_rule(&mut self, pattern: &str) -> Result<usize> {
         let regex = Regex::new(pattern)
-            .map_err(|e| ChainGuardError::Config(format!("Invalid pattern: {}", e)))?;
+            .map_err(|e| ShieldContractError::Config(format!("Invalid pattern: {}", e)))?;
 
         let mut count = 0;
 
@@ -103,11 +103,11 @@ impl RuleManager {
             .map_or(false, |e| e == "yaml" || e == "yml")
         {
             serde_yaml::from_str(&content).map_err(|e| {
-                ChainGuardError::Config(format!("Failed to parse rules YAML: {}", e))
+                ShieldContractError::Config(format!("Failed to parse rules YAML: {}", e))
             })?
         } else {
             serde_json::from_str(&content).map_err(|e| {
-                ChainGuardError::Config(format!("Failed to parse rules JSON: {}", e))
+                ShieldContractError::Config(format!("Failed to parse rules JSON: {}", e))
             })?
         };
 
@@ -136,11 +136,11 @@ impl RuleManager {
             .map_or(false, |e| e == "yaml" || e == "yml")
         {
             serde_yaml::to_string(&rules).map_err(|e| {
-                ChainGuardError::Config(format!("Failed to serialize rules to YAML: {}", e))
+                ShieldContractError::Config(format!("Failed to serialize rules to YAML: {}", e))
             })?
         } else {
             serde_json::to_string_pretty(&rules).map_err(|e| {
-                ChainGuardError::Config(format!("Failed to serialize rules to JSON: {}", e))
+                ShieldContractError::Config(format!("Failed to serialize rules to JSON: {}", e))
             })?
         };
 
@@ -157,10 +157,10 @@ impl RuleManager {
             .map_or(false, |e| e == "yaml" || e == "yml")
         {
             let _: Vec<Rule> = serde_yaml::from_str(&content)
-                .map_err(|e| ChainGuardError::Config(format!("Invalid rules YAML: {}", e)))?;
+                .map_err(|e| ShieldContractError::Config(format!("Invalid rules YAML: {}", e)))?;
         } else {
             let _: Vec<Rule> = serde_json::from_str(&content)
-                .map_err(|e| ChainGuardError::Config(format!("Invalid rules JSON: {}", e)))?;
+                .map_err(|e| ShieldContractError::Config(format!("Invalid rules JSON: {}", e)))?;
         }
 
         Ok(())
