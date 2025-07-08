@@ -4,7 +4,7 @@
 
 ShieldContract is a security analysis tool designed for blockchain developers working with Hyperledger Fabric and Solana platforms. It provides vulnerability detection, code review capabilities, and basic performance analysis for smart contracts.
 
-[![CI](https://github.com/KoushikGavini/ShieldContract/actions/workflows/rust.yml/badge.svg)](https://github.com/KoushikGavini/ShieldContract/actions)
+[![CI](https://github.com/KoushikGavini/ChainGuard/workflows/CI/badge.svg)](https://github.com/KoushikGavini/ChainGuard/actions/workflows/rust.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=flat&logo=rust&logoColor=white)](https://www.rust-lang.org/)
 
@@ -44,10 +44,10 @@ cargo build --release
 
 ```bash
 # Analyze Fabric chaincode
-./target/release/shieldcontract scan examples/test_chaincode.go --fabric
+./target/release/shieldcontract analyze examples/test_chaincode.go --fabric
 
 # Analyze Solana program  
-./target/release/shieldcontract scan examples/vulnerable_solana_program.rs.example --solana
+./target/release/shieldcontract analyze examples/vulnerable_solana_program.rs.example --solana
 ```
 
 ### Expected Output
@@ -100,9 +100,18 @@ Critical: 2 | High: 4 | Medium: 2 | Low: 0 | Info: 0
 
 | Command | Description | Example |
 |---|---|---|
-| `scan` | Analyze code for security vulnerabilities | `shieldcontract scan ./contracts/ --fabric` |
+| `analyze` | Comprehensive security and quality analysis | `shieldcontract analyze ./contracts/ --fabric` |
+| `scan` | Quick vulnerability scanning | `shieldcontract scan ./contracts/ --fabric` |
+| `audit` | Compliance and standards checking | `shieldcontract audit ./contracts/ --fabric` |
+| `validate` | AI-generated code validation | `shieldcontract validate ./contract.go` |
+| `benchmark` | Performance analysis and benchmarking | `shieldcontract benchmark ./contracts/ --fabric` |
 | `report` | Generate detailed report from analysis | `shieldcontract report results.json -o report.html` |
+| `optimize` | AI-powered performance optimization suggestions | `shieldcontract optimize ./contracts/` |
 | `init` | Create default configuration file | `shieldcontract init` |
+| `auth` | Manage AI integrations and API keys | `shieldcontract auth set openai --key sk-...` |
+| `history` | Show analysis history | `shieldcontract history` |
+| `rules` | Manage custom rules | `shieldcontract rules list` |
+| `interactive` | Interactive mode with live validation | `shieldcontract interactive` |
 
 Run `shieldcontract --help` for complete usage information.
 
@@ -175,7 +184,7 @@ Supported output formats:
 
 Example:
 ```bash
-shieldcontract scan ./contracts --format json -o results.json
+shieldcontract analyze ./contracts --format json -o results.json
 ```
 
 ## CI/CD Integration
@@ -184,7 +193,7 @@ shieldcontract scan ./contracts --format json -o results.json
 ```yaml
 - name: Run ShieldContract Analysis
   run: |
-    shieldcontract scan ./chaincode/ \
+    shieldcontract analyze ./chaincode/ \
       --fabric \
       --severity high \
       --exit-code \
@@ -208,7 +217,7 @@ cargo build
 cargo test
 
 # Run with debug logging
-RUST_LOG=debug cargo run -- scan ./examples/
+RUST_LOG=debug cargo run -- analyze ./examples/
 ```
 
 ## Contributing
