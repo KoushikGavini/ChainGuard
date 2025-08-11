@@ -16,7 +16,7 @@ jobs:
       release_id: ${{ steps.create_release.outputs.id }}
       upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       
       - name: Create Release
         id: create_release
@@ -70,7 +70,7 @@ jobs:
             binary: shieldcontract
             archive: tar.gz
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       
       - name: Install Z3 (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
@@ -121,7 +121,7 @@ jobs:
     needs: [create-release, build-release]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       
       - name: Download all artifacts
         uses: actions/download-artifact@v4
